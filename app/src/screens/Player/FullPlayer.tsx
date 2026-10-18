@@ -1,6 +1,9 @@
+import type React from 'react';
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { View, Text, StyleSheet, Pressable, Animated, PanResponder, Platform, useWindowDimensions, Modal, TouchableOpacity } from 'react-native';
-import MaskedView from '@react-native-masked-view/masked-view';
+import MaskedViewBase from '@react-native-masked-view/masked-view';
+// Kiểu của thư viện chưa theo kịp React 19: dùng như component bình thường.
+const MaskedView = MaskedViewBase as unknown as React.ComponentType<React.PropsWithChildren<{ style?: any; maskElement: React.ReactElement }>>;
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore } from '../../store/useStore';
 import { useIsMobile } from '../../lib/responsive';
@@ -281,11 +284,7 @@ export default function FullPlayer({ onClose, initialTab = 'art' }: { onClose: (
               </View>
               <View style={styles.specItem}>
                 <Text style={styles.specLabel}>Định dạng âm thanh</Text>
-                <Text style={styles.specValue}>{qualityInfo.codec} · {qualityInfo.sampleRate}</Text>
-              </View>
-              <View style={styles.specItem}>
-                <Text style={styles.specLabel}>Độ phân giải</Text>
-                <Text style={styles.specValue}>{qualityInfo.bitDepth}</Text>
+                <Text style={styles.specValue}>{qualityInfo.codec}</Text>
               </View>
               <View style={styles.specItem}>
                 <Text style={styles.specLabel}>Phân đoạn (HLS Segment)</Text>

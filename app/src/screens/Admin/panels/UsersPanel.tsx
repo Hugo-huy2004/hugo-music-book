@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, Pressable, Image } from 'react-native';
 import CoverArt from '../../../components/CoverArt';
-import { API_BASE_URL, api } from '../../../api/api';
+import { api } from '../../../api/api';
 import { showAlert, confirmAlert } from '../../../lib/alert';
 import { ActionButton, Badge, BarChart, Card, Chips, EmptyState, ErrorText, Pager, SearchField, Sheet, StatCard } from 'hugo-music';
 import { C, useLoader, timeAgo, s } from '../ui';
@@ -12,7 +12,7 @@ type UserRow = {
   favorites: number; plays: number; minutes: number; playlists: number;
 };
 
-const avatarUri = (u?: string) => (u && u.startsWith('/') ? `${API_BASE_URL}${u}` : u);
+const avatarUri = (u?: string) => u;
 function Avatar({ user, size = 36 }: { user: { avatarUrl?: string; nickname?: string; username: string }; size?: number }) {
   const uri = avatarUri(user.avatarUrl);
   if (uri) return <Image source={{ uri }} style={{ width: size, height: size, borderRadius: size / 2 }} />;

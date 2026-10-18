@@ -1,19 +1,10 @@
 import { useState, useEffect } from 'react';
 import { View, Image, StyleSheet, ImageStyle, ViewStyle } from 'react-native';
-import { API_BASE_URL, CDN_BASE_URL } from '../api/api';
 import { GlassArt, Icon } from 'hugo-music';
 
-// The raw R2 endpoint has no CORS/CORP headers, so Chrome's Opaque Response
-// Blocking rejects a cross-origin fetch/XHR-loaded <Image> the same way it rejects
-// audio (see apps/server/src/modules/songs/controller.js streamSong for the full
-// writeup) — serve it from the Worker CDN (covers/ is public there, with CORS, cached at the edge),
-// falling back to our own backend proxy when no CDN is configured. Keeps image bytes off the API tier.
+// Ảnh bìa nằm trong bucket công khai `covers`, toSong() đã đổi sẵn thành URL đầy đủ (chương 8).
 export function resolveImageUri(uri?: string): string | undefined {
-  if (!uri) return uri;
-  const match = uri.match(/r2\.cloudflarestorage\.com\/[^/]+\/(covers\/.+)$/);
-  if (!match) return uri;
-  if (CDN_BASE_URL) return `${CDN_BASE_URL.replace(/\/$/, '')}/${match[1].split('/').map(encodeURIComponent).join('/')}`;
-  return `${API_BASE_URL}/api/images/proxy?key=${encodeURIComponent(match[1])}`;
+  return uri;
 }
 
 // The repository has ~300 articles that share an illustration taken from Unsplash as a placeholder image — that's not it

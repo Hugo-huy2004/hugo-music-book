@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, LayoutChangeEvent } from 'react-native';
+import type { ScrollViewInstance } from 'react-native';
 import { audioEngine } from '../../audio/audioEngine';
 import { Lyrics, activeLine, activeWord } from './useLyrics';
 import { Spinner } from 'hugo-music';
@@ -30,7 +31,7 @@ function useLivePosition(fallback: number, enabled: boolean) {
 export default function LyricsView({ lyrics, position, onSeek }: {
   lyrics: Lyrics; position: number; onSeek: (seconds: number) => void;
 }) {
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
   const offsets = useRef<number[]>([]);
   const [boxHeight, setBoxHeight] = useState(0);
   const userScrollAt = useRef(0);

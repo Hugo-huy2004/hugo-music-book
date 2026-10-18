@@ -195,7 +195,7 @@ interface StoreState {
   }) => Promise<void>;
   updateAvatar: (file: File | Blob) => Promise<void>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
-  resetPassword: (tempToken: string, code: string, newPassword: string) => Promise<void>;
+  resetPassword: (email: string, code: string, newPassword: string) => Promise<void>;
 
   // --- registration wizard (step -> step) ---
   registrationEmail: string | null;
@@ -352,7 +352,7 @@ export const useStore = create<StoreState>()(
       authError: null,
       pendingOtpToken: null,
       setLoginModalVisible: (visible) => set({ isLoginModalVisible: visible, authError: null }),
-      login: async () => { throw new Error('Hugo Music không dùng mật khẩu: đăng nhập bằng mã gửi qua email hoặc Google.'); },
+      login: (email, password) => withAuthState(async () => { await auth.signInWithPassword(email, password); }),
       verifyOtp: async () => {},
       // Đăng nhập 1 chạm: nhập email -> nhận mã 6 số -> xong. Email mới thì Supabase tự tạo tài khoản.
       startPasswordlessLogin: (email) => withAuthState(async () => { await auth.sendCode(email); return { tempToken: email, email }; }),
@@ -417,7 +417,7 @@ export const useStore = create<StoreState>()(
       },
       // Không còn mật khẩu: hai hàm giữ lại cho đúng kiểu, không làm gì.
       changePassword: async () => {},
-      resetPassword: async () => {},
+      resetPassword: (email, code, newPassword) => withAuthState(() => auth.resetPassword(email, code, newPassword)),
 
       // --- song library ---
       songs: [],

@@ -9,7 +9,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 const url = Deno.env.get('SUPABASE_URL')!;
 const admin = createClient(url, Deno.env.get('SUPABASE_SECRET_KEY') ?? Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 const TICKET_TTL = 2 * 60 * 60; // giây
-const cors = { 'access-control-allow-origin': '*', 'access-control-allow-headers': 'authorization, apikey, content-type' };
+const cors = { 'access-control-allow-origin': '*', 'access-control-allow-headers': 'authorization, x-client-info, apikey, content-type' };
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: cors });

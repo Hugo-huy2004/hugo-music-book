@@ -1,10 +1,11 @@
 import { forwardRef } from 'react';
 import { ScrollView, ScrollViewProps } from 'react-native';
+import type { ScrollViewInstance } from 'react-native';
 import { useCollapseOnScroll } from './chrome';
 
 // ScrollView tells the tab bar/mini player whether the user is scrolling up or down
 // (ui/chrome.ts). Horizontal scrolling remains the same as a regular ScrollView.
-const ChromeScrollView = forwardRef<ScrollView, ScrollViewProps>(function ChromeScrollView(props, ref) {
+const ChromeScrollView = forwardRef<ScrollViewInstance, ScrollViewProps>(function ChromeScrollView(props, ref) {
   const collapse = useCollapseOnScroll();
   if (props.horizontal) return <ScrollView ref={ref} {...props} />;
   return (

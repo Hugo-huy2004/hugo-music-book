@@ -1,6 +1,9 @@
+import type React from 'react';
 import { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, Platform } from 'react-native';
-import MaskedView from '@react-native-masked-view/masked-view';
+import MaskedViewBase from '@react-native-masked-view/masked-view';
+// Kiểu của thư viện chưa theo kịp React 19: dùng như component bình thường.
+const MaskedView = MaskedViewBase as unknown as React.ComponentType<React.PropsWithChildren<{ style?: any; maskElement: React.ReactElement }>>;
 import { useAdminAuth } from '../hooks/useAdminAuth';
 import { Gradient, Icon, Spinner } from 'hugo-music';
 

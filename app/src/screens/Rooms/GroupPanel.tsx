@@ -29,7 +29,7 @@ export default function GroupPanel() {
     };
     return (
       <InsetGroup header="Nhóm nghe chung" footer={isHost ? 'Bạn điều khiển: mọi người trong nhóm nghe đúng bài và đúng giây bạn đang phát.' : 'Chủ nhóm đang điều khiển nhạc.'}>
-        <ListRow icon="people" title={group.name} subtitle={`Mã nhóm ${group.code} · ${members.length} người đang nghe`}
+        <ListRow icon="people" title={group.name} subtitle={`${group.code} · ${members.length} người`}
           right={<ActionButton size="sm" variant="glass" icon="share-outline" title={Platform.OS === 'web' ? 'Chép mã' : 'Mời'} onPress={invite} />} />
         {members.map((m, i) => <ListRow key={i} icon="person-circle-outline" title={m.name || 'Người nghe'} separator={i < members.length - 1} />)}
         <View style={{ paddingVertical: space.md }}>

@@ -6,8 +6,8 @@ import type { Song } from '../store/useStore';
 export const newestFirst = (a: Song, b: Song) => (Date.parse(b.createdAt || '') || 0) - (Date.parse(a.createdAt || '') || 0);
 export const byNewest = (list: Song[]) => [...list].sort(newestFirst);
 
-// Chart — Hugo listens (≥ 30 s or complete) mixed with global popularity
-// (apps/server/src/modules/metrics/controller.js getTopSongs, apps/server/src/ranking/score.js).
+// Bảng xếp hạng: lượt nghe từ 30 giây trở lên; bài chưa ai nghe xếp theo lượt thích rồi ngày phát hành
+// (hàm SQL top_songs, chương 11).
 export type TopEntry = { rank: number; song: Song; plays: number; listeners: number; globalPlays: number; score: number };
 
 // Each (range, quantity) loads only once per session; When I go back to the viewed interval, it's there immediately, no white flashing.

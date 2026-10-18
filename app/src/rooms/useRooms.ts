@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { Alert } from 'react-native';
 import type { RealtimeChannel } from '@supabase/supabase-js';
-import { supabase, resolvePlayback, toSong } from '../api/api';
+import { supabase, resolvePlayback, toSong, roomLook } from '../api/api';
 import { audioEngine } from '../audio/audioEngine';
 import { useStore, liveRoomHooks, Song } from '../store/useStore';
 import { serverNow, syncClock } from './serverClock';
@@ -111,7 +111,7 @@ async function loadStation(id: string): Promise<Omit<StationState, 'listeners'>>
   if (error) throw error;
   const now: any = Array.isArray(st.now) ? st.now[0] : st.now;
   return {
-    station: { id: String(st.id), name: st.name, tagline: st.tagline, colors: st.colors, allowRequests: st.allow_requests },
+    station: { ...roomLook(st), allowRequests: st.allow_requests },
     now: now?.song ? { song: toSong(now.song) as Song & { duration: number }, startedAt: Date.parse(now.started_at) } : null,
     queue: (reqs ?? []).map((r: any) => ({ id: String(r.id), song: toSong(r.song), addedBy: r.user_id, addedByName: '', votes: r.votes, voters: [] })),
   };
@@ -237,7 +237,7 @@ export async function joinBlindRoom(id: string, name: string) {
     aAt: ms(last.a_at), bAt: ms(last.b_at), voteFrom: ms(last.b_at), voteUntil: ms(last.vote_until), revealUntil: ms(last.reveal_until),
   }) : null;
   useRooms.setState({
-    blind: { room: { id, name: room!.name, tagline: room!.tagline, colors: room!.colors }, trial, listenerCount: 1, leaderboard: [] },
+    blind: { room: { ...roomLook(room!), id }, trial, listenerCount: 1, leaderboard: [] },
     votesIn: null, myVote: null, reveal: null, error: null,
   });
   if (trial) runTrial(trial).catch(() => {});
@@ -268,7 +268,7 @@ export async function joinBlindRoom(id: string, name: string) {
     })
     .on('broadcast', { event: 'votes' }, ({ payload }) => {
       const blind = useRooms.getState().blind;
-      if (inBlind() && blind?.trial?.id === payload.trialId) useRooms.setState({ votesIn: { voted: payload.voted, listeners: blind.listenerCount } });
+      if (inBlind() && blind?.trial?.id === payload.trialId) useRooms.setState({ votesIn: { voted: payload.voted, listeners: blind!.listenerCount } });
     })
     .on('presence', { event: 'sync' }, () => {
       const blind = useRooms.getState().blind;

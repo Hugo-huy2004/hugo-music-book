@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import type { ScrollViewInstance } from 'react-native';
 import { useStore } from '../../store/useStore';
 import CoverArt from '../CoverArt';
 import { useAppTheme } from '../../ui/theme';
@@ -62,7 +63,7 @@ export default function LyricsSidePanel({
   const { colors, isDark } = useAppTheme();
   const { t } = useTranslation();
 
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
   const [lyricsState, setLyricsState] = useState<{
     loading: boolean;
     plainLyrics: string | null;

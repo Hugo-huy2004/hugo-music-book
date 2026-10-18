@@ -21,14 +21,27 @@ Cuốn sách dẫn bạn xây **Hugo Music** từ thư mục trống tới app c
 
 ### Lấy code về máy
 
-Toàn bộ code của sách nằm trong một repo. Mỗi chương ứng với một commit, nên bạn có thể đối chiếu từng bước:
+Toàn bộ code của sách nằm trong một repo, ở trạng thái hoàn chỉnh: chương nào cũng chạy được ngay trên bản này. Cuối mỗi chương có mục *Code của chương* liệt kê đúng các file chương đó viết, để bạn mở ra đối chiếu.
 
 ```bash
 git clone https://github.com/Hugo-huy2004/hugo-music-book.git
 cd hugo-music-book
 pnpm install
-cp app/.env.example app/.env        # điền URL và publishable key của project Supabase
-pnpm web                            # mở http://localhost:8081
+cp app/.env.example app/.env          # URL + publishable key của project Supabase
+cp worker/.env.example worker/.env    # URL + secret key (chỉ dùng ở server)
+```
+
+Chạy toàn bộ trên project Supabase của bạn (mỗi lệnh được giải thích ở chương tương ứng):
+
+```bash
+supabase link --project-ref <project-ref>
+supabase db push                                        # bảng, hàm, lịch chạy (chương 4–15)
+supabase secrets set PLAYBACK_SECRET=$(openssl rand -hex 32)
+supabase functions deploy playback delete-account       # chương 11, 6
+python3 supabase/seed/make_demo_music.py demo           # 10 bài nhạc mẫu CC0 (chương 10)
+node --env-file=worker/.env supabase/seed/seed.ts demo admin@vidu.dev <mật-khẩu>
+pnpm worker                                             # xử lý hàng đợi, tạo HLS (chương 10)
+pnpm web                                                # mở http://localhost:8081
 ```
 
 ### Máy cần có

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable, Platform, KeyboardAvoidingView, ScrollView, Image } from 'react-native';
 import { useStore } from '../../store/useStore';
-import { api } from '../../api/api';
+import { auth } from '../../api/api';
 import { ActionButton, Spinner, TextField } from 'hugo-music';
 import { GlassButton } from '../../ui/kit';
 import { useAppTheme } from '../../ui/theme';
@@ -39,7 +39,6 @@ export default function LoginModal({ onClose, onOpenRegister }: { onClose: () =>
   // Password-based login state
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
-  const [adminNotice, setAdminNotice] = useState(false);
 
   // Forgot password state
   const [resetEmail, setResetEmail] = useState('');
@@ -52,7 +51,7 @@ export default function LoginModal({ onClose, onOpenRegister }: { onClose: () =>
 
   const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const otpCodeOk = /^\d{6}$/.test(otpCode.trim());
-  const idOk = identifier.trim().length >= 3;
+  const idOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier.trim());
   const pwOk = password.length >= 6;
   const resetEmailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(resetEmail.trim());
   const resetOk = /^\d{6}$/.test(resetCode.trim()) && newPassword.length >= 6;
@@ -116,10 +115,8 @@ export default function LoginModal({ onClose, onOpenRegister }: { onClose: () =>
   const handlePasswordNext = () => idOk && setStep('password_input');
   const handlePasswordSubmit = async () => {
     if (!pwOk || isAuthLoading) return;
-    setAdminNotice(false);
     try {
       await login(identifier.trim(), password);
-      if (useStore.getState().pendingOtpToken) return setAdminNotice(true);
       onClose();
     } catch {
       // error is stored in store (authError)
@@ -144,8 +141,8 @@ export default function LoginModal({ onClose, onOpenRegister }: { onClose: () =>
     setSendingReset(true);
     setForgotError(null);
     try {
-      const { tempToken } = await api.forgotPassword(resetEmail.trim());
-      setResetToken(tempToken);
+      await auth.sendResetCode(resetEmail.trim());
+      setResetToken(resetEmail.trim());
       setResendResetIn(60);
       setStep('reset');
     } catch (e: any) {
@@ -172,8 +169,6 @@ export default function LoginModal({ onClose, onOpenRegister }: { onClose: () =>
       ? otpError || authError
       : step === 'forgot'
       ? forgotError
-      : adminNotice
-      ? 'Tài khoản quản trị đăng nhập ở trang quản trị (mật khẩu + OTP).'
       : authError;
 
   const back =
@@ -329,13 +324,13 @@ export default function LoginModal({ onClose, onOpenRegister }: { onClose: () =>
             {step === 'password_id' && (
               <>
                 <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-                  Nhập email, tên người dùng hoặc số điện thoại của bạn.
+                  Nhập email của tài khoản đã đặt mật khẩu.
                 </Text>
 
                 <TextField
                   key="id-input"
                   style={[styles.input, field]}
-                  placeholder="Email, tên người dùng hoặc SĐT"
+                  placeholder="Email"
                   placeholderTextColor={colors.textTertiary}
                   value={identifier}
                   onChangeText={setIdentifier}

@@ -8,3 +8,4 @@ web-build/
 supabase/.temp/
 supabase/.branches/
 worker/.venv/
+supabase/.env.deploy

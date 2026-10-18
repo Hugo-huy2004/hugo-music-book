@@ -174,6 +174,21 @@ while (running) {
 
 `process.on('SIGTERM', () => (running = false))` cho worker làm nốt việc đang dở rồi mới thoát khi deploy bản mới.
 
+**Bước 7: nạp nhạc mẫu và chạy thử.** Script Python tạo 10 bài nhạc CC0 (tổng hợp bằng code, không dính bản quyền) kèm ảnh bìa. Script Node tải chúng lên Storage, tạo bài, rồi duyệt bằng tài khoản admin: đúng con đường mà admin đi trong app, nên hàng đợi nhận việc như thật.
+
+```bash
+python3 supabase/seed/make_demo_music.py demo
+node --env-file=worker/.env supabase/seed/seed.ts demo admin@vidu.dev <mật-khẩu>
+pnpm worker
+```
+
+```ts
+// supabase/seed/seed.ts (trích): mỗi bài một vòng
+await admin.storage.from('originals').upload(key, await readFile(join(dir, it.file)), { contentType: 'audio/flac' });
+const { data: song } = await admin.from('songs').insert({ title: it.title, artist_id: artistId, license: 'cc0', original_path: key, ... }).select('id').single();
+await asAdmin.rpc('review_song', { p_song_id: song.id, p_decision: 'publish' });   // bài vào hàng đợi media
+```
+
 ### Kết quả
 
 Đo thật một bài nguồn lossless (1411 kbps) với bốn mức ứng viên:

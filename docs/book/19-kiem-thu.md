@@ -71,7 +71,8 @@ rollback;
 ```
 
 ```bash
-supabase test db            # chạy mọi file trong supabase/tests/
+supabase test db            # chạy mọi file trong supabase/tests/ trên database local (cần Docker)
+bash scripts/test-db.sh     # không có Docker: chạy cùng file đó trên project cloud, rollback ở cuối
 ```
 
 **Bước 3: test đầu cuối bằng Playwright.** Mở bản build web, chờ trang chủ có bài thật, bấm phát, kiểm tra trình phát đã tải playlist HLS.

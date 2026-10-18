@@ -79,13 +79,14 @@ export function toSong(r: any): Song {
 **Bước 5: dữ liệu tham chiếu bằng một hàm SQL.** Danh sách thể loại và giấy phép nằm trong bảng (thêm một thể loại là thêm một dòng, không phát hành lại app). Hàm `get_meta()` gói tất cả thành đúng hình dạng app cần, một lượt gọi.
 
 ```sql
--- supabase/migrations/20261018001000_meta.sql (trích)
+-- supabase/migrations/20261018001400_meta_genres.sql (trích)
 create or replace function public.get_meta()
 returns jsonb language sql stable set search_path = '' as $$
   select jsonb_build_object(
-    'genreGroups', (select jsonb_agg(jsonb_build_object('key', key, 'label', label, 'colors', colors) order by sort_order)
-                      from public.genre_groups),
-    'licenses',    (select jsonb_agg(jsonb_build_object('key', key, 'label', label)) from public.licenses)
+    'genreGroups',      (select jsonb_agg(jsonb_build_object('key', key, 'label', label, 'colors', colors) order by sort_order)
+                           from public.genre_groups),
+    'licenses',         (select jsonb_agg(jsonb_build_object('key', key, 'label', label)) from public.licenses),
+    'preferenceGenres', (select jsonb_agg(name order by sort_order) from public.preference_genres)
   )
 $$;
 grant execute on function public.get_meta to anon, authenticated;

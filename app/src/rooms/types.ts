@@ -7,7 +7,7 @@ export type RoomRules = {
 
 export type StationInfo = {
   id: string; name: string; tagline?: string; colors: [string, string]; allowRequests: boolean; rules: RoomRules;
-  listenerCount: number; now: { title: string; artist: string; coverArt?: string } | null;
+  listenerCount: number; now: { title: string; artist: string; coverArt?: string; startedAt?: string; endsAt?: string } | null;
 };
 
 export type BlindRoomInfo = {

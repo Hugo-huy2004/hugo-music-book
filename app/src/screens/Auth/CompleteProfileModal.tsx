@@ -24,7 +24,7 @@ export default function CompleteProfileModal() {
 
   // Admins go through their own separate flow (see AdminScreen.tsx) — this modal is
   // for regular members only.
-  if (!user || user.role === 'admin') return null;
+  if (!user || user.role === 'admin' || user.isGuest) return null; // khách chưa có hồ sơ để hoàn thiện
 
   const missingNickname = !user.nickname;
   const missingGenres = !user.musicGenres || user.musicGenres.length === 0;

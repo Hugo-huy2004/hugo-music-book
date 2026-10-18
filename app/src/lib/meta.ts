@@ -31,7 +31,7 @@ export function loadMeta(): Promise<void> {
     const cached = await AsyncStorage.getItem(CACHE_KEY).catch(() => null);
     if (cached) try { useMeta.setState({ ...hydrate(JSON.parse(cached)), loaded: true }); } catch {}
     try {
-      const raw: RawMeta = await api.getMeta();
+      const raw = (await api.getMeta()) as unknown as RawMeta;
       useMeta.setState({ ...hydrate(raw), loaded: true });
       AsyncStorage.setItem(CACHE_KEY, JSON.stringify(raw)).catch(() => {});
     } catch {

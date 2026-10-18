@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { ScrollView, StyleSheet, Text, View, type NativeScrollEvent, type NativeSyntheticEvent, type StyleProp, type ViewStyle } from 'react-native';
+import type { ScrollViewInstance } from 'react-native';
 import { useHugoTheme } from '../theme';
 import Glass from '../glass/Glass';
 
@@ -32,7 +33,7 @@ function monthNames(locale: string) {
 
 function Wheel({ items, index, onIndex, flex, label }: { items: string[]; index: number; onIndex: (i: number) => void; flex: number; label: string }) {
   const { colors } = useHugoTheme();
-  const ref = useRef<ScrollView>(null);
+  const ref = useRef<ScrollViewInstance>(null);
   useEffect(() => { ref.current?.scrollTo({ y: index * ROW, animated: false }); }, [index, items.length]);
   const settle = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const i = Math.max(0, Math.min(items.length - 1, Math.round(e.nativeEvent.contentOffset.y / ROW)));
