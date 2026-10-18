@@ -8,3 +8,6 @@ create policy "users join their own workspace channel"
 create policy "users broadcast on their own workspace channel"
   on realtime.messages for insert to authenticated
   with check ((select realtime.topic()) = 'workspace:' || (select auth.uid())::text);
+
+-- Bảng nào được gửi thay đổi qua Postgres Changes (vẫn lọc theo RLS của người nhận).
+alter publication supabase_realtime add table public.station_requests, public.pipeline_runs;

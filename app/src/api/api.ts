@@ -206,6 +206,12 @@ export const api = {
     must(await supabase.rpc('request_song', { p_station_id: Number(stationId), p_song_id: songId })),
   getRadioStations: async () => [],
 
+  getBlindRooms: async () => ({
+    rooms: must(await supabase.from('blind_rooms').select('*').order('sort_order')).map((r: any) => ({
+      id: String(r.id), name: r.name, tagline: r.tagline, colors: r.colors, trialNo: 0, listenerCount: 0,
+    })),
+  }),
+
   // ---------- admin
   getReviewQueue: async (status: 'pending' | 'published' | 'rejected') =>
     must(await supabase.from('songs').select(SONG_COLUMNS).eq('status', status).order('created_at', { ascending: false }).limit(200)).map(toSong),
@@ -215,6 +221,59 @@ export const api = {
   updateSong: async (songId: string, f: Record<string, string>) =>
     must(await supabase.from('songs').update({ title: f.title, genre: f.genre, license: f.licenseType, source_url: f.sourceUrl, attribution: f.attribution }).eq('id', songId)),
   uploadSong: (form: FormData) => uploadSong(form),
+
+  // Trang quản trị (chương 17): mọi lượt gọi vẫn đi qua RLS và hàm SQL tự kiểm is_admin().
+  admin: {
+    overview: async () => must(await supabase.rpc('admin_overview')),
+    songs: async ({ q = '', status = '', page = 1, limit = 30 }: Record<string, any>) => {
+      let query = supabase.from('songs').select(SONG_COLUMNS, { count: 'exact' }).order('created_at', { ascending: false })
+        .range((page - 1) * limit, page * limit - 1);
+      if (status) query = query.eq('status', status);
+      if (q) query = query.ilike('title', `%${q}%`);
+      const { data, count, error } = await query;
+      if (error) throw error;
+      return { total: count ?? 0, page, limit, songs: data.map((r) => ({ ...toSong(r), pipeline: null })) };
+    },
+    bulkSongs: async (ids: string[], action: 'publish' | 'reject', note?: string) => {
+      const results = await Promise.allSettled(ids.map((id) => api.reviewSong(id, action, note)));
+      return { updated: results.filter((r) => r.status === 'fulfilled').length };
+    },
+    pipeline: async ({ status = '', page = 1, limit = 20 }: Record<string, any>) => {
+      const map: Record<string, string> = { ok: 'done' };
+      let query = supabase.from('pipeline_runs')
+        .select('id, status, step, error, created_at, finished_at, song:songs(id, title, cover_path, artist:artists(name))', { count: 'exact' })
+        .order('created_at', { ascending: false }).range((page - 1) * limit, page * limit - 1);
+      if (status) query = query.eq('status', map[status] ?? status);
+      const { data, count, error } = await query;
+      if (error) throw error;
+      const steps = ['download', 'analyze', 'psl', 'hls'];
+      return {
+        total: count ?? 0, page, limit, counts: {},
+        runs: data.map((r: any) => ({
+          id: String(r.id), status: r.status === 'done' ? 'ok' : r.status, startedAt: r.created_at, finishedAt: r.finished_at ?? undefined,
+          trigger: 'review',
+          stages: steps.map((job) => {
+            const at = steps.indexOf(r.step ?? ''), me = steps.indexOf(job);
+            const st = r.status === 'done' ? 'ok' : me < at ? 'ok' : me === at ? (r.status === 'failed' ? 'failed' : 'running') : 'pending';
+            return { job, status: st, note: me === at && r.error ? r.error : '' };
+          }),
+          song: r.song ? { _id: r.song.id, title: r.song.title, artist: r.song.artist?.name ?? '', coverArt: coverUrl(r.song.cover_path) } : null,
+        })),
+      };
+    },
+    retryPipeline: (songId: string) => api.reviewSong(songId, 'publish'),
+    artists: async () => ({ artists: must(await supabase.from('artists').select('*').order('name')), total: 0 }),
+    updateArtist: async (f: { name: string; newName?: string; photo?: string; bio?: string }) =>
+      must(await supabase.from('artists').update({ name: f.newName ?? f.name, photo_url: f.photo, bio: f.bio }).eq('name', f.name)),
+    albums: async () => ({ albums: [], total: 0 }),
+    album: async () => null,
+    updateAlbum: async () => null,
+    users: async () => ({ users: [], total: 0 }),
+    user: async () => null,
+    setUserDisabled: async () => null,
+    revokeSessions: async () => null,
+    deleteUser: async () => null,
+  },
 };
 
 /** Admin tải bài lên: file đi thẳng từ máy lên Storage, rồi tạo dòng songs ở trạng thái chờ duyệt. */

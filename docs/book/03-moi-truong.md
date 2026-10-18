@@ -1,0 +1,103 @@
+## Chương 3. Môi trường và cấu trúc repo
+
+### Chương này làm gì
+
+Cài công cụ, tạo project Supabase, dựng monorepo ba phần (`supabase/`, `worker/`, `app/`) và chạy được lệnh đầu tiên.
+
+### Để làm gì
+
+Cấu trúc thư mục rõ ràng từ đầu giúp người mới tìm đúng chỗ để sửa, và giúp chính bạn sáu tháng sau. Mỗi thư mục tên theo **nơi nó chạy**.
+
+### Phân tích kỹ thuật
+
+**Chạy TypeScript trên server:**
+
+| Cách | Ghi chú |
+|---|---|
+| Biên dịch bằng `tsc` rồi chạy file `.js` | Thêm bước build và thư mục `dist/` |
+| Công cụ chạy thẳng (`tsx`, `ts-node`) | Thêm một thư viện, chậm hơn khi khởi động |
+| **Node.js 26 chạy thẳng file `.ts`** | Node tự bỏ phần kiểu khi chạy (type stripping). Không build, không thư viện thêm. Chỉ cần viết TypeScript "xóa được" (không dùng `enum`, `namespace`) |
+
+**Quản lý thư viện cho monorepo:**
+
+| Công cụ | Ghi chú |
+|---|---|
+| npm workspaces | Có sẵn, chậm và tốn ổ đĩa hơn |
+| **pnpm 12** | Nhanh, tiết kiệm ổ đĩa, chặn script cài đặt lạ theo mặc định |
+| Bun | Rất nhanh, nhưng React Native và Expo hỗ trợ npm/pnpm tốt hơn |
+
+### Chọn gì, vì sao
+
+**Node.js 26, pnpm 12, Supabase CLI, Expo SDK 58.** Node 26 thành bản LTS vào tháng 10/2026 và được hỗ trợ tới tháng 4/2029, nên là lựa chọn dài hơi nhất cho dự án mới; nó còn cho chạy thẳng TypeScript, bớt hẳn một bước build cho worker.
+
+### Làm từng bước
+
+**Bước 1: cài công cụ.**
+
+```bash
+# Node 26 (qua fnm, nvm hoặc trình cài từ nodejs.org)
+fnm install 26 && fnm use 26
+npm install -g pnpm@12
+npm install -g supabase          # Supabase CLI
+brew install ffmpeg              # macOS; Ubuntu: sudo apt install ffmpeg
+```
+
+**Bước 2: tạo project Supabase.** Vào supabase.com → *New project*, chọn vùng Singapore (gần Việt Nam). Ghi lại ba thứ ở *Project Settings → API Keys*: Project URL, **publishable key** (`sb_publishable_...`, dùng trong app) và **secret key** (`sb_secret_...`, chỉ dùng ở server).
+
+| Khóa | Dùng ở đâu | Làm được gì |
+|---|---|---|
+| Publishable | App web, iOS, Android | Chỉ những gì RLS cho phép (chương 7) |
+| Secret | Worker, Edge Function | Bỏ qua RLS, làm được mọi thứ. Không bao giờ để trong app. |
+
+**Bước 3: cấu trúc repo.**
+
+```text
+hugo-music-book/
+├─ supabase/            backend: chạy trên Supabase
+│  ├─ migrations/       mỗi file SQL là một bước thay đổi database, chạy theo thứ tự tên
+│  ├─ functions/        Edge Function (Deno), ví dụ playback/
+│  ├─ seed/             tạo nhạc mẫu để thử
+│  └─ config.toml       cấu hình Auth, Edge Function...
+├─ worker/              Node.js 26: xử lý âm thanh, chạy trên server của bạn
+├─ app/                 Expo: một mã nguồn cho web, iOS, Android
+└─ packages/
+   ├─ ui/               hugo-music: bộ giao diện kính mờ tự làm
+   └─ stream/           hugo-stream: đồng hồ máy chủ, lời bài hát LRC
+```
+
+**Bước 4: khai báo workspace.**
+
+```yaml
+# pnpm-workspace.yaml
+packages:
+  - app
+  - worker
+  - packages/*
+# Expo/React Native cần node_modules phẳng như npm để Metro tìm thấy module native
+nodeLinker: hoisted
+```
+
+**Bước 5: nối repo với project.**
+
+```bash
+supabase login                              # mở trình duyệt để đăng nhập
+supabase link --project-ref <project-ref>   # project-ref là phần đầu của Project URL
+supabase db push                            # chạy mọi file trong supabase/migrations lên project
+```
+
+### Kết quả
+
+> 📷 Ảnh: cửa sổ dòng lệnh sau `supabase db push` và trang Table Editor của Supabase hiện các bảng vừa tạo.
+
+### Kiểm tra
+
+```bash
+node -v                      # v26.x
+pnpm -v                      # 12.x
+supabase migration list      # cột Local và Remote khớp nhau
+```
+
+### Khi nào đổi
+
+- **Nhiều người cùng làm:** mỗi người một nhánh database (Supabase Branching) thay vì cùng sửa một project.
+- **Muốn làm việc không cần mạng:** `supabase start` chạy cả bộ Supabase trên máy bằng Docker.

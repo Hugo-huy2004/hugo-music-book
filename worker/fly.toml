@@ -1,0 +1,9 @@
+app = "hugo-music-worker"
+primary_region = "sin"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[[vm]]
+  size = "shared-cpu-2x"
+  memory = "2gb"
