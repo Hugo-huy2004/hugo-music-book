@@ -1,0 +1,16 @@
+{
+  "name": "hugo-music",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.14.0",
+  "engines": { "node": ">=26" },
+  "scripts": {
+    "dev": "pnpm --filter @hugo/app start",
+    "web": "pnpm --filter @hugo/app web",
+    "build:web": "pnpm --filter @hugo/app build:web",
+    "worker": "pnpm --filter @hugo/worker dev",
+    "test": "pnpm -r test",
+    "db:push": "supabase db push",
+    "db:types": "supabase gen types typescript --linked > app/src/api/database.types.ts"
+  }
+}

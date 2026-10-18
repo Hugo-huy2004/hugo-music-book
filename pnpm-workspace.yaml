@@ -1,0 +1,6 @@
+packages:
+  - app
+  - worker
+  - packages/*
+# Expo/React Native cần node_modules phẳng như npm để Metro tìm thấy mọi module native
+nodeLinker: hoisted

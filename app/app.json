@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "Hugo Music",
+    "slug": "hugo-music",
+    "scheme": "hugomusic",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/logo.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "studio.hugowishpax.music",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio"
+        ]
+      }
+    },
+    "android": {
+      "package": "studio.hugowishpax.music"
+    },
+    "web": {
+      "favicon": "./assets/logo.png",
+      "name": "Hugo Music",
+      "lang": "vi",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-audio",
+      "expo-font",
+      "expo-asset",
+      "expo-web-browser",
+      "expo-status-bar",
+      "expo-sqlite"
+    ]
+  }
+}

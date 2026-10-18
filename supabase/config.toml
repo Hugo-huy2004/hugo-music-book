@@ -1,0 +1,23 @@
+# Cấu hình Supabase CLI cho dự án (supabase start chạy bản local; supabase link + db push đẩy lên cloud).
+project_id = "hugo-music-book"
+
+[api]
+schemas = ["public", "graphql_public"]
+
+[db]
+major_version = 17
+
+[auth]
+site_url = "http://localhost:8081"
+additional_redirect_urls = ["http://localhost:8081", "hugomusic://auth"]
+enable_anonymous_sign_ins = true
+enable_manual_linking = true
+
+[auth.email]
+enable_signup = true
+otp_length = 6
+otp_expiry = 600
+
+[functions.playback]
+# Trình phát gọi GET không kèm phiên đăng nhập: function tự kiểm vé HMAC.
+verify_jwt = false
