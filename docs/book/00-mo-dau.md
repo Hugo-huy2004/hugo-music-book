@@ -57,10 +57,13 @@ pnpm web                                                # mở http://localhost:
 
 ### Lộ trình đọc
 
-Năm phần, đọc theo thứ tự vì chương sau dùng kết quả của chương trước:
+Một cuốn, tám phần. Ai đã biết lập trình web có thể bỏ qua phần Nền tảng; ai chỉ cần dựng app có thể đọc phần Truyền phát sau.
 
-1. **Nền móng** (chương 1 tới 3): sản phẩm là gì, kiến trúc, môi trường.
-2. **Backend trên Supabase** (chương 4 tới 12): database, API tự sinh, đăng nhập, RLS, lưu file, hàng đợi, worker, phát nhạc, tìm kiếm.
-3. **Nghe cùng nhau** (chương 13 tới 15): đài 24/7, blind test, nhóm nghe chung và đồng bộ nhiều thiết bị.
-4. **Giao diện** (chương 16 tới 18): một app cho ba nền tảng, chuẩn giao diện và trải nghiệm, trang quản trị.
-5. **Ra production** (chương 19 tới 22): kiểm thử, deploy, vận hành, checklist ra mắt.
+1. **Nền tảng** (Nền tảng 1 tới 5): khái niệm cho người mới, JavaScript và TypeScript, bất đồng bộ, Node.js 26 và công cụ, Git và gỡ lỗi.
+2. **Hiểu truyền phát nhạc** (Truyền phát 1 tới 6): tệp nhạc, Range và cắt đoạn, HLS, CDN và bộ đệm, thuật toán chọn chất lượng, kiểm soát truy cập.
+3. **Nền móng dự án** (chương 1 tới 3): sản phẩm là gì, kiến trúc, môi trường.
+4. **Backend trên Supabase** (chương 4 tới 12): database, API tự sinh, đăng nhập, RLS, lưu file, hàng đợi, worker, phát nhạc, tìm kiếm.
+5. **Nghe cùng nhau** (chương 13 tới 15): đài 24/7, blind test, nhóm nghe chung và đồng bộ nhiều thiết bị.
+6. **Giao diện** (chương 16 tới 18): một app cho ba nền tảng, chuẩn giao diện và trải nghiệm, trang quản trị.
+7. **Ra production** (chương 19 tới 22): kiểm thử, deploy, vận hành, checklist ra mắt.
+8. **Nghiên cứu và phụ lục** (Nghiên cứu 1, 2; Phụ lục A, B): thiết kế thí nghiệm cho đề tài, đọc tài liệu, nền âm thanh, thuật ngữ, và bảng đối chiếu cho người đã đọc các bản Hugo Music trước.

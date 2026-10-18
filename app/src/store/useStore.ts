@@ -25,7 +25,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { audioEngine } from '../audio/audioEngine';
-import { api, auth, me, supabase, resolvePlayback, steering } from '../api/api';
+import { api, auth, me, supabase, resolvePlayback, resolveOfflineUrl, steering } from '../api/api';
 import { joinSyncChannel, leaveSyncChannel as leaveWorkspace, sendSyncState as sendWorkspaceState } from '../rooms/workspace';
 import { prefetchNext } from '../audio/prefetch';
 import { offlineManager } from '../audio/offlineManager';
@@ -854,11 +854,11 @@ export const useStore = create<StoreState>()(
       },
       downloadSongOffline: async (song: Song) => {
         // Offline download is only available for registered members.
-        if (!get().user) {
+        if (!get().user || get().user?.isGuest) {
           set({ isLoginModalVisible: true });
           return;
         }
-        const { url } = await resolvePlayback(song, 'original');
+        const url = await resolveOfflineUrl(song);
         const success = await offlineManager.downloadSong(song, url, offlineKey(song._id));
         if (success) {
           await get().loadOfflineSongs();

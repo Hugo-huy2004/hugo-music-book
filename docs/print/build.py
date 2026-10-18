@@ -28,7 +28,7 @@ def render(md_text):
                lambda m: f'<figure class="shot"><img src="../../book/images/{m.group(2)}"><figcaption>{m.group(1)}</figcaption></figure>', h)
     return h
 
-files = sorted(glob.glob(str(BOOK / '[0-9][0-9]-*.md')))
+files = [str(BOOK / n) for n in (BOOK / 'ORDER.txt').read_text().split()]
 sections, toc = [], []
 for f in files:
     text = Path(f).read_text()
@@ -36,10 +36,10 @@ for f in files:
     title = title_m.group(1)
     body = render(re.sub(r'^#{1,2} .+\n', '', text, count=1))
     sid = Path(f).stem
-    m = re.match(r'Chương (\d+)\. (.+)', title)
-    label = f'Chương {m.group(1)}' if m else ''
+    m = re.match(r'((?:Chương|Nền tảng|Truyền phát|Nghiên cứu|Phụ lục) \w+)\. (.+)', title)
+    label = m.group(1) if m else ''
     heading = m.group(2) if m else title
-    toc.append(f'<a class="toc-ch" href="#{sid}"><span class="n">{m.group(1) if m else ""}</span><span class="t">{html.escape(heading)}</span></a>')
+    toc.append(f'<a class="toc-ch" href="#{sid}"><span class="n">{html.escape(label)}</span><span class="t">{html.escape(heading)}</span></a>')
     sections.append(f'<section class="chapter" id="{sid}">' + (f'<div class="ch-label">{label}</div>' if label else '') + f'<h2>{html.escape(heading)}</h2>{body}</section>')
 
 css = (ROOT / 'book.css').read_text() + HtmlFormatter(cssclass='hl').get_style_defs('.hl') + \

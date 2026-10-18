@@ -182,6 +182,19 @@ async function pipelineCounts() {
 
 type StageStatus = 'pending' | 'running' | 'ok' | 'failed' | 'skipped';
 
+/** Link tải về để nghe offline: mỗi mức HLS là MỘT file .mp4 hoàn chỉnh (chương 10), nên tải nguyên file
+ *  đó là phát được ngay, không cần ghép đoạn. Lấy link đã ký từ dòng EXT-X-MAP của playlist mức 160 kbps
+ *  (hoặc mức cao nhất thấp hơn): đủ hay mà không tốn bộ nhớ máy. */
+export async function resolveOfflineUrl(song: PlayableSong): Promise<string> {
+  const tiers = (song.hlsTiers ?? []).map(Number).filter((k) => k <= 160);
+  const tier = tiers.length ? String(Math.max(...tiers)) : song.hlsTiers?.[0];
+  const { url } = await resolvePlayback(song, tier ?? 'auto');
+  const playlist = await (await fetch(url)).text();
+  const file = playlist.match(/#EXT-X-MAP:URI="([^"]+)"/)?.[1];
+  if (!file) throw new Error('Bài này chưa có bản để tải về');
+  return file;
+}
+
 // ---------- API theo tên cũ để màn hình không phải đổi
 export const api = {
   me,

@@ -1,0 +1,54 @@
+## Truyền phát 5. Thuật toán chọn chất lượng theo mạng
+
+### Chương này làm gì
+
+Trình bày bốn trường phái thuật toán ABR (adaptive bitrate), cái nào hợp với nhạc, và điểm mù chung của cả bốn mà PSL của Hugo Music lấp vào.
+
+### Để làm gì
+
+HLS cho trình phát nhiều mức; còn chọn mức nào, lúc nào thì là việc của thuật toán ABR trong trình phát (hls.js, AVPlayer, ExoPlayer). Hiểu chúng để biết khi nào nên để mặc định và khi nào phải can thiệp.
+
+### Vòng lặp quyết định
+
+Trước mỗi đoạn, trình phát quyết định tải đoạn kế ở mức nào, dựa trên những gì nó đo được: tốc độ tải các đoạn trước và lượng nhạc còn trong buffer. Mục tiêu đánh đổi nhau: chất lượng cao, ít ngắt tiếng, ít đổi mức qua lại.
+
+### Bốn trường phái
+
+| Trường phái | Quyết định dựa trên | Đại diện | Điểm mạnh | Điểm yếu |
+|---|---|---|---|---|
+| Thông lượng | Tốc độ tải ước lượng (trung bình trượt) | FESTIVE (Jiang và cộng sự, 2012), mặc định của nhiều trình phát | Đơn giản, phản ứng nhanh | Ước lượng sai khi mạng dao động mạnh |
+| Bộ đệm | Lượng nhạc trong buffer | BBA (Huang và cộng sự, 2014), BOLA (Spiteri và cộng sự, 2016) | Ít ngắt tiếng, có chứng minh toán học (BOLA) | Lúc mới bắt đầu buffer rỗng nên chọn thấp lâu |
+| Dự báo | Tối ưu vài đoạn tới theo dự báo thông lượng | MPC (Yin và cộng sự, 2015) | Cân bằng tốt khi dự báo đúng | Tính nặng hơn, phụ thuộc dự báo |
+| Học tăng cường | Mạng nơ-ron học từ dữ liệu mạng thật | Pensieve (Mao và cộng sự, 2017) | Tốt nhất trên tập dữ liệu nó học | Khó giải thích, khó chuyển sang môi trường khác |
+
+Hầu hết trình phát hiện đại dùng lai: thông lượng lúc đầu, bộ đệm khi đã có buffer. hls.js là kiểu này.
+
+### Nhạc khác video thế nào
+
+| Điểm | Video | Nhạc |
+|---|---|---|
+| Bitrate | Vài Mbps | 64–256 kbps: mạng 3G yếu cũng đủ mức giữa |
+| Người dùng nhận ra chất lượng | Rõ (mờ, vỡ hình) | Khó: nhiều người không phân biệt 192 với 256 |
+| Ngắt tiếng | Khó chịu | Rất khó chịu: nhạc mất nhịp |
+| Hành vi | Xem liền | Nghe trên đường, vào hầm, ra khỏi Wi-Fi |
+
+Hệ quả: với nhạc, **tránh ngắt tiếng quan trọng hơn leo mức cao**, và mức cao chỉ đáng giá nếu tai người nghe ra.
+
+### Điểm mù chung của cả bốn
+
+Cả bốn trường phái coi thang mức là **cho sẵn**: chọn tốt nhất trong các mức đang có. Không thuật toán nào hỏi các mức đó có đáng tồn tại không. Nếu 256 và 320 kbps nghe như nhau, thuật toán vẫn cố leo lên 320, tốn băng thông mà người nghe không được gì.
+
+Đó là chỗ của **PSL** (Perceptual Stepped Ladder, chương 10): đo từng bài bằng ViSQOL, chỉ giữ mức hơn mức đã giữ ít nhất τ = 0,10 điểm. Thuật toán ABR nào cũng hưởng lợi, vì nó chỉ còn chọn giữa những mức khác nhau thật. Số đo thật trên 10 bài mẫu: mức 320 bị bỏ ở mọi bài; "Sóng Xa" chỉ còn một mức.
+
+### Chọn gì, vì sao
+
+**Để ABR mặc định của từng nền tảng (hls.js, AVPlayer, ExoPlayer) làm việc, và cải thiện từ phía server bằng thang mức tốt hơn (PSL).** Viết ABR riêng cho ba nền tảng tốn công mà lợi ít; còn thang mức tốt thì mọi trình phát đều dùng được.
+
+### Kiểm tra
+
+Mở app trên trình duyệt, DevTools → Network → giả lập "Slow 3G": request chuyển từ `kbps=256` xuống mức thấp; tắt giả lập thì leo lại. Bảng `plays` ghi `tier_kbps` của từng lượt nghe.
+
+### Khi nào đổi
+
+- Dữ liệu `plays` cho thấy rebuffer nhiều ở một nhóm mạng: chỉnh tham số ABR của hls.js (ví dụ ước lượng băng thông thận trọng hơn) cho nhóm đó.
+- Có đủ dữ liệu thật và đội ngũ: thử ABR học máy, nhưng đo bằng thí nghiệm có đối chứng (Nghiên cứu 1).

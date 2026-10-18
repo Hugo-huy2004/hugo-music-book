@@ -32,7 +32,7 @@ section.stage { display: flex; flex-direction: column; justify-content: center; 
 .toc-stage { font: 700 10pt "Inter", sans-serif; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin: 4.5mm 0 1.2mm; }
 .toc-stage .t { flex: 1; }
 .toc-ch { font: 10pt/1.75 "Inter", sans-serif; }
-.toc-ch .n { width: 9mm; color: var(--quiet); font-variant-numeric: tabular-nums; flex: none; }
+.toc-ch .n { width: 26mm; color: var(--quiet); font-variant-numeric: tabular-nums; flex: none; }
 .toc-ch .t { flex: none; max-width: 140mm; }
 .toc-ch .dots { flex: 1; border-bottom: 1px dotted #9aa0a8; margin: 0 2mm; transform: translateY(-1mm); }
 .toc .p { font-variant-numeric: tabular-nums; min-width: 8mm; text-align: right; }
