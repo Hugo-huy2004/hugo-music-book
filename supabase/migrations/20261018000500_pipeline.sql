@@ -82,10 +82,16 @@ as $$ select pgmq.archive('media', p_msg_id) $$;
 revoke execute on function public.media_read, public.media_archive from public, anon, authenticated;
 grant execute on function public.media_read, public.media_archive to service_role;
 
--- Dọn khách ẩn danh không quay lại sau 30 ngày (hồ sơ, lượt nghe xóa theo nhờ on delete cascade).
+-- Khách ẩn danh không quay lại sau 30 ngày: hàm này chỉ LIỆT KÊ, worker xóa bằng auth.admin.deleteUser()
+-- (API chính thức của Supabase Auth; không sửa thẳng schema auth bằng SQL).
+create or replace function public.stale_guest_ids(p_days integer default 30, p_limit integer default 500)
+returns setof uuid
+language sql stable
+security definer
+set search_path = ''
+as $$ select id from auth.users where is_anonymous and created_at < now() - make_interval(days => p_days) limit p_limit $$;
+
+revoke execute on function public.stale_guest_ids from public, anon, authenticated;
+grant execute on function public.stale_guest_ids to service_role;
+
 create extension if not exists pg_cron;
-select cron.schedule(
-  'cleanup-guests',
-  '17 3 * * *',
-  $$ delete from auth.users where is_anonymous and created_at < now() - interval '30 days' $$
-);

@@ -77,7 +77,7 @@ export async function me(): Promise<User | null> {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) return null;
   const u = session.user;
-  const { data: p } = await supabase.from('profiles').select('*').eq('id', u.id).single();
+  const { data: p } = await supabase.rpc('my_profile'); // hồ sơ đầy đủ chỉ đọc được qua hàm này
   return {
     _id: u.id,
     username: p?.username ?? '',
@@ -189,7 +189,7 @@ export const api = {
     must(await supabase.from('profiles').update({ avatar_url: null }).eq('id', user!.id));
     return me();
   },
-  deleteAccount: async () => must(await supabase.rpc('delete_my_account')),
+  deleteAccount: async () => must(await supabase.functions.invoke('delete-account', { method: 'POST' })),
 
   // đài 24/7
   getStations: async () => {

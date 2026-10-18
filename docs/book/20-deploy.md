@@ -1,4 +1,4 @@
-## Chương 19. Deploy: đưa từng phần lên đúng chỗ
+## Chương 20. Deploy: đưa từng phần lên đúng chỗ
 
 ### Chương này làm gì
 

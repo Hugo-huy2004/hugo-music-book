@@ -18,7 +18,12 @@ Một trò chơi nhiều người cần: đồng hồ chung (mọi người nghe
 | Một client làm "chủ phòng" | Chủ phòng thoát là phòng đứng; client gian lận được |
 | **pg_cron mỗi giây gọi một hàm SQL** | Trạng thái nằm trong bảng; hàm đẩy phòng sang bước kế (tạo lượt, công bố) và phát sự kiện qua Realtime |
 
-**Giấu đáp án:** client cần biết mức bitrate để tải đúng file A và B, nhưng không được biết *mức nào cao hơn* trước khi công bố. Vì A/B được đảo ngẫu nhiên và nhãn "hay hơn" chỉ gửi trong sự kiện công bố, client chỉ biết hai con số. Hiện app không hiện hai con số này trước khi công bố.
+**Giấu đáp án:** biết bitrate của A và B là biết đáp án (bên cao hơn là bản tốt hơn). Vì vậy client **không được đọc** hai cột `a_kbps`, `b_kbps` trước khi công bố, kể cả khi tự gọi API. Hai lớp chặn:
+
+| Lớp | Cách |
+|---|---|
+| Database | Quyền theo cột: `anon`, `authenticated` chỉ được `select` các cột thời gian, bài, số thứ tự; không có hai cột bitrate |
+| Âm thanh | Client xin playlist bằng `?trial=<id>&side=A`; Edge Function `playback` tự tra bitrate bằng secret key. URL không chứa con số nào |
 
 ### Chọn gì, vì sao
 
@@ -100,12 +105,33 @@ end;
 $$;
 ```
 
-**Bước 5: app nghe ba sự kiện.** Mỗi lượt xin một vé nghe cho bài, rồi tạo hai URL cho hai mức.
+**Bước 5: giấu bitrate bằng quyền theo cột.** RLS chọn dòng; quyền theo cột chọn cột.
+
+```sql
+revoke select on public.blind_trials from anon, authenticated;
+grant select (id, room_id, no, song_id, excerpt_start, excerpt_sec, a_at, b_at, vote_until, reveal_until, revealed)
+  on public.blind_trials to anon, authenticated;
+```
+
+Sự kiện `trial` phát lúc bắt đầu lượt cũng không mang bitrate; chỉ sự kiện `reveal` (sau khi hết giờ bỏ phiếu) mới có.
+
+**Bước 6: âm thanh A/B qua Edge Function.** Client chỉ nói "bên A", function tra bitrate rồi trả playlist của đúng mức đó.
+
+```ts
+// supabase/functions/playback/index.ts (trích)
+async function blindSideKbps(trialId: string, songId: string, side: string | null) {
+  const { data } = await admin.from('blind_trials').select('song_id, a_kbps, b_kbps').eq('id', trialId).single();
+  if (data.song_id !== songId || (side !== 'A' && side !== 'B')) throw new Error('ticket does not match trial');
+  return side === 'A' ? data.a_kbps : data.b_kbps;
+}
+```
+
+**Bước 7: app nghe ba sự kiện.** Mỗi lượt xin một vé nghe cho bài, rồi tạo hai URL chỉ ghi bên A, bên B.
 
 ```ts
 // app/src/rooms/useRooms.ts (trích)
 const { url } = await resolvePlayback({ _id: trial.song._id }, 'auto');
-trialUrls = { A: `${url}&kbps=${trial.a.kbps}`, B: `${url}&kbps=${trial.b.kbps}` };
+trialUrls = { A: `${url}&trial=${trial.id}&side=A`, B: `${url}&trial=${trial.id}&side=B` };
 
 roomChannel = supabase.channel(`blind:${id}`)
   .on('broadcast', { event: 'trial' }, async ({ payload }) => runTrial(await toTrial(payload)))
@@ -114,7 +140,7 @@ roomChannel = supabase.channel(`blind:${id}`)
   .subscribe();
 ```
 
-**Bước 6: kết quả cho nghiên cứu.** Một view tổng hợp theo cặp mức: bao nhiêu phần trăm người nghe phân biệt được.
+**Bước 8: kết quả cho nghiên cứu.** Một view tổng hợp theo cặp mức: bao nhiêu phần trăm người nghe phân biệt được.
 
 ```sql
 create view public.blind_results with (security_invoker = true) as
@@ -142,3 +168,5 @@ select * from public.blind_results;          -- hit_rate gần 0,5 nghĩa là g�
 
 - **Muốn so nhiều hơn hai mức:** đổi `a_kbps`, `b_kbps` thành mảng và bỏ phiếu theo thứ hạng (MUSHRA).
 - **Kết quả blind test lệch nhiều so với PSL:** dùng `blind_results` để chỉnh τ theo từng thể loại thay vì một số cho cả danh mục.
+
+Kiểm tra lỗ hổng: đăng nhập rồi gọi `supabase.from('blind_trials').select('a_kbps')` trong lúc đang bỏ phiếu phải báo lỗi `permission denied for table blind_trials`.

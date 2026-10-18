@@ -46,6 +46,9 @@ alter table public.station_votes enable row level security;
 create policy "stations are public" on public.stations for select to anon, authenticated using (active);
 create policy "now playing is public" on public.station_now for select to anon, authenticated using (true);
 create policy "requests are public" on public.station_requests for select to anon, authenticated using (played_at is null);
+-- Ai gợi ý bài nào là thông tin riêng: không mở cột user_id.
+revoke select on public.station_requests from anon, authenticated;
+grant select (id, station_id, song_id, votes, played_at, created_at) on public.station_requests to anon, authenticated;
 create policy "admins manage stations" on public.stations for all to authenticated
   using ((select public.is_admin())) with check ((select public.is_admin()));
 

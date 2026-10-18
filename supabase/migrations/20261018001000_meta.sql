@@ -56,16 +56,6 @@ $$;
 revoke execute on function public.ensure_artist from public, anon;
 grant execute on function public.ensure_artist to authenticated;
 
--- Người dùng tự xóa tài khoản (App Store bắt buộc có). Xóa auth.users -> hồ sơ, lượt thích, danh sách phát xóa theo.
-create or replace function public.delete_my_account()
-returns void
-language sql
-security definer
-set search_path = ''
-as $$ delete from auth.users where id = auth.uid() $$;
-revoke execute on function public.delete_my_account from public, anon;
-grant execute on function public.delete_my_account to authenticated;
-
 insert into public.genre_groups (key, label, label_en, colors, pattern, sort_order) values
   ('all', 'Tất cả', 'All', array['#8E8E93', '#3A3A3C'], null, 0),
   ('chill', 'Chill', 'Chill', array['#5AC8FA', '#5856D6'], 'lo.?fi|ambient|chill|downtempo|jazz|instrumental', 1),

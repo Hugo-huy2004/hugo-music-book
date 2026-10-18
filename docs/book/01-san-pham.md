@@ -17,14 +17,14 @@ Code viết trước khi biết sản phẩm cần gì thường phải viết l
 | Vai | Họ là ai | Họ cần |
 |---|---|---|
 | Khách | Người mở link lần đầu, chưa muốn đăng ký | Nghe thử ngay, không phải điền gì. Giới hạn 3 bài mỗi ngày. |
-| Thành viên | Người nghe thường xuyên | Thư viện riêng, bài yêu thích, danh sách phát, nghe tiếp trên máy khác |
+| Thành viên | Người nghe thường xuyên | Thư viện riêng, bài yêu thích, danh sách phát, tạo nhóm nghe cùng bạn bè, nghe tiếp trên máy khác |
 | Admin | Người quản lý danh mục | Tải bài lên kèm giấy phép, duyệt bài, xem bài nào đang xử lý |
 
 ### Bốn luồng chính
 
 1. **Nhập danh mục.** Admin tải file nhạc lên kèm giấy phép và nguồn → bài ở trạng thái *chờ duyệt* → admin duyệt → hệ thống tự xử lý (đo chất lượng, tạo luồng phát nhiều mức) → bài được phát hành.
 2. **Nghe.** Người nghe bấm phát → app xin vé nghe → trình phát tải luồng HLS, tự chọn mức chất lượng theo tốc độ mạng. Khách hết 3 lượt thì được mời đăng nhập, rồi nghe tiếp đúng bài đang dở.
-3. **Nghe cùng nhau.** Đài 24/7: mọi người vào đài nghe cùng một bài, cùng một giây; thành viên gợi ý và bỏ phiếu bài tiếp theo. Blind test: cả phòng nghe một đoạn ở hai mức chất lượng, đoán bản nào tốt hơn, rồi cùng xem đáp án.
+3. **Nghe cùng nhau.** Nhóm: tạo nhóm, gửi mã 6 ký tự cho bạn bè, cả nhóm nghe đúng bài, đúng giây với chủ nhóm. Đồng bộ thiết bị: nghe trên máy tính, chuyển sang điện thoại nghe tiếp. Đài 24/7: mọi người vào đài nghe cùng một bài, cùng một giây; thành viên gợi ý và bỏ phiếu bài tiếp theo. Blind test: cả phòng nghe một đoạn ở hai mức chất lượng, đoán bản nào tốt hơn, rồi cùng xem đáp án.
 4. **Thư viện.** Thích bài, tạo danh sách phát, xem lời bài hát chạy theo nhạc, tìm bài bằng tiếng Việt không dấu.
 
 ### Điểm khác biệt
@@ -33,7 +33,7 @@ Code viết trước khi biết sản phẩm cần gì thường phải viết l
 |---|---|
 | **PSL** (thang chất lượng theo cảm nhận) | Không dựng sẵn mọi mức bitrate như nhau. Mỗi bài được đo xem tai người còn nghe ra khác biệt tới mức nào, và chỉ giữ những mức đáng giữ. Tiết kiệm dung lượng và băng thông mà người nghe không nhận ra. |
 | **Blind test** | Người nghe tự kiểm chứng PSL: nếu đa số không phân biệt được hai mức, mức cao hơn là thừa. Dữ liệu này quay lại cải thiện PSL. |
-| **Nghe chung chính xác tới giây** | Mọi máy cùng nghe một đài lệch nhau dưới một giây, kể cả khi đồng hồ điện thoại sai. |
+| **Nghe chung chính xác tới giây** | Nhóm bạn bè, đài 24/7 và các thiết bị của cùng một người lệch nhau dưới một giây, kể cả khi đồng hồ điện thoại sai. |
 | **Chỉ nhạc có giấy phép mở** | Mỗi bài bắt buộc có giấy phép và nguồn. Bài có giấy phép cấm chỉnh sửa (ND) không được chuyển mã. |
 
 ### Không làm (giai đoạn đầu)

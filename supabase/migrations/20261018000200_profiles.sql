@@ -55,6 +55,19 @@ create policy "profiles are readable by signed-in users"
   on public.profiles for select
   to authenticated
   using (true);
+-- Người khác chỉ thấy tên hiển thị và ảnh (bảng xếp hạng blind test, người đang nghe đài).
+-- Quốc gia, thể loại yêu thích... chỉ chủ hồ sơ đọc được, qua hàm my_profile().
+revoke select on public.profiles from anon, authenticated;
+grant select (id, nickname, avatar_url) on public.profiles to authenticated;
+
+create or replace function public.my_profile()
+returns public.profiles
+language sql stable
+security definer
+set search_path = ''
+as $$ select * from public.profiles where id = auth.uid() $$;
+revoke execute on function public.my_profile from public, anon;
+grant execute on function public.my_profile to authenticated;
 
 create policy "users update their own profile"
   on public.profiles for update

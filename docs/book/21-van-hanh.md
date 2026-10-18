@@ -1,4 +1,4 @@
-## Chương 20. Vận hành: theo dõi, sao lưu, chi phí
+## Chương 21. Vận hành: theo dõi, sao lưu, chi phí
 
 ### Chương này làm gì
 
@@ -70,4 +70,4 @@ Bảng giá thay đổi thường xuyên nên sách không in số tiền; xem t
 ### Khi nào đổi
 
 - **Vượt giới hạn gói miễn phí** (dung lượng database, băng thông Storage, số người dùng hoạt động): lên gói Pro, đồng thời có thêm khôi phục về thời điểm bất kỳ.
-- **Có người dùng ở châu Âu:** quy trình xóa dữ liệu theo yêu cầu (GDPR) đã có sẵn nhờ `delete_my_account()` và `on delete cascade`; ghi rõ thời gian giữ bản sao lưu trong chính sách quyền riêng tư.
+- **Có người dùng ở châu Âu:** quy trình xóa dữ liệu theo yêu cầu (GDPR) đã có sẵn nhờ Edge Function `delete-account` và `on delete cascade`; ghi rõ thời gian giữ bản sao lưu trong chính sách quyền riêng tư.

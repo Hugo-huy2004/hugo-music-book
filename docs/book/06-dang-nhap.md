@@ -133,6 +133,33 @@ Cấp quyền admin cho một tài khoản (chạy trong SQL Editor, một lần
 update auth.users set raw_app_meta_data = raw_app_meta_data || '{"role": "admin"}' where email = 'ban@example.com';
 ```
 
+**Bước 7: ai đọc được hồ sơ của ai.** Người khác chỉ cần thấy tên hiển thị và ảnh (bảng xếp hạng, danh sách người cùng nghe). Quốc gia, thể loại yêu thích là thông tin riêng. RLS chọn *dòng*; chọn *cột* thì dùng quyền theo cột của PostgreSQL, còn chủ hồ sơ đọc đủ qua một hàm.
+
+```sql
+revoke select on public.profiles from anon, authenticated;
+grant select (id, nickname, avatar_url) on public.profiles to authenticated;
+
+create or replace function public.my_profile() returns public.profiles
+language sql stable security definer set search_path = '' as $$
+  select * from public.profiles where id = auth.uid()
+$$;
+```
+
+**Bước 8: tự xóa tài khoản** (App Store bắt buộc có). Không xóa thẳng bảng `auth.users` bằng SQL: schema `auth` thuộc về Supabase Auth. Dùng API chính thức `auth.admin.deleteUser()` trong một Edge Function; hồ sơ, lượt thích, danh sách phát xóa theo nhờ `on delete cascade`.
+
+```ts
+// supabase/functions/delete-account/index.ts (trích)
+const token = (req.headers.get('Authorization') ?? '').replace(/^Bearer /, '');
+const { data, error } = await admin.auth.getUser(token);          // token này của ai?
+if (error || !data.user) return Response.json({ error: 'not signed in' }, { status: 401 });
+await admin.auth.admin.deleteUser(data.user.id);
+```
+
+```ts
+// app/src/api/api.ts
+deleteAccount: async () => must(await supabase.functions.invoke('delete-account', { method: 'POST' })),
+```
+
 ### Kết quả
 
 > 📷 Ảnh: hộp đăng nhập của app (ô email, nút Google, dòng "nghe thử không cần tài khoản"), email chứa mã 6 số, và trang Authentication → Users có một người dùng ẩn danh và một người dùng email.

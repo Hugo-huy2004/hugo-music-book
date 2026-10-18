@@ -14,6 +14,7 @@ export { LinearGradient as Gradient } from 'expo-linear-gradient';
 export { default as Glass, type GlassProps } from './glass/Glass';
 export { default as GlassGroup } from './glass/GlassGroup';
 export { useDroplet } from './glass/useDroplet';
+export { useReducedMotion } from './glass/useReducedMotion';
 
 // Controls
 export { GlassButton, CapsuleButton, GlassCapsule, DropletPressable } from './controls/GlassButton';

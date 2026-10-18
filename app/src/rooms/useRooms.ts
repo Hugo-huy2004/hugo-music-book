@@ -197,7 +197,8 @@ async function runTrial(trial: Trial) {
   try {
     // Một vé nghe cho bài, hai URL cho hai mức: playlist của từng mức HLS.
     const { url } = await resolvePlayback({ _id: trial.song._id }, 'auto');
-    trialUrls = { A: `${url}&kbps=${trial.a.kbps}`, B: `${url}&kbps=${trial.b.kbps}` };
+    // Hai URL chỉ ghi "bên A", "bên B": mức bitrate của mỗi bên chỉ server biết tới khi công bố.
+    trialUrls = { A: `${url}&trial=${trial.id}&side=A`, B: `${url}&trial=${trial.id}&side=B` };
     // Load A and then pre-load B while preparing. Must be sequential: load() unloads the waiting deck, running in parallel will
     // delete B just loaded.
     await audioEngine.load(trialUrls.A, false, { startAt: trial.excerptStart });
@@ -213,10 +214,10 @@ async function runTrial(trial: Trial) {
 
 async function toTrial(t: any): Promise<Trial> {
   const { data } = await supabase.from('songs').select('*, artist:artists(name)').eq('id', t.songId ?? t.song_id).single();
-  const label = (kbps: number, other: number) => ({ key: kbps >= other ? 'high' : 'low', kbps });
+  const hidden = { key: 'hidden', kbps: null }; // chưa công bố: không ai biết bên nào là mức nào
   return {
     id: t.id, no: t.no, song: toSong(data) as Song & { duration: number },
-    a: label(t.aKbps, t.bKbps), b: label(t.bKbps, t.aKbps), excerptStart: Number(t.excerptStart), excerptSeconds: Number(t.excerptSeconds),
+    a: hidden, b: hidden, excerptStart: Number(t.excerptStart), excerptSeconds: Number(t.excerptSeconds),
     difficulty: '', aAt: t.aAt, bAt: t.bAt, voteFrom: t.voteFrom, voteUntil: t.voteUntil, revealUntil: t.revealUntil,
   };
 }
@@ -228,9 +229,13 @@ export async function joinBlindRoom(id: string, name: string) {
   useStore.setState({ currentSong: null, isPlaying: false, queue: [], liveRoom: { kind: 'blind', id, name } });
   const [{ data: room }, { data: last }] = await Promise.all([
     supabase.from('blind_rooms').select('*').eq('id', Number(id)).single(),
-    supabase.from('blind_trials').select('*').eq('room_id', Number(id)).eq('revealed', false).order('no', { ascending: false }).limit(1).maybeSingle(),
+    supabase.from('blind_trials').select('id, no, song_id, excerpt_start, excerpt_sec, a_at, b_at, vote_until, reveal_until').eq('room_id', Number(id)).eq('revealed', false).order('no', { ascending: false }).limit(1).maybeSingle(),
   ]);
-  const trial = last ? await toTrial((await supabase.rpc('blind_trial_json', { t: last })).data) : null;
+  const ms = (iso: string) => Date.parse(iso);
+  const trial = last ? await toTrial({
+    id: last.id, no: last.no, songId: last.song_id, excerptStart: last.excerpt_start, excerptSeconds: last.excerpt_sec,
+    aAt: ms(last.a_at), bAt: ms(last.b_at), voteFrom: ms(last.b_at), voteUntil: ms(last.vote_until), revealUntil: ms(last.reveal_until),
+  }) : null;
   useRooms.setState({
     blind: { room: { id, name: room!.name, tagline: room!.tagline, colors: room!.colors }, trial, listenerCount: 1, leaderboard: [] },
     votesIn: null, myVote: null, reveal: null, error: null,

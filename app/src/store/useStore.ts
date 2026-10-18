@@ -26,7 +26,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { audioEngine } from '../audio/audioEngine';
 import { api, auth, me, supabase, resolvePlayback, steering } from '../api/api';
-import { joinWorkspace as joinWorkspaceChannel, leaveWorkspace, sendWorkspaceState } from '../rooms/workspace';
+import { joinSyncChannel, leaveSyncChannel as leaveWorkspace, sendSyncState as sendWorkspaceState } from '../rooms/workspace';
 import { prefetchNext } from '../audio/prefetch';
 import { offlineManager } from '../audio/offlineManager';
 import { Platform } from 'react-native';
@@ -281,6 +281,13 @@ interface StoreState {
   fetchArtists: () => Promise<void>;
 
   liveRoom: LiveRoom | null;
+
+  // --- nhóm nghe chung (chương 15): chủ nhóm điều khiển, thành viên phát theo
+  group: { id: string; code: string; name: string; hostId: string } | null;
+  groupMembers: { name?: string }[];
+  createGroup: (name: string) => Promise<void>;
+  joinGroup: (code: string) => Promise<void>;
+  leaveGroup: () => Promise<void>;
 
   // --- workspace (personal multi-device sync, see workspaceRoomId above) ---
   workspaceEnabled: boolean;
@@ -788,6 +795,30 @@ export const useStore = create<StoreState>()(
 
       liveRoom: null,
 
+      // --- nhóm nghe chung ---
+      group: null,
+      groupMembers: [],
+      createGroup: async (name) => {
+        const { data, error } = await supabase.rpc('create_group', { p_name: name });
+        if (error) throw error;
+        set({ group: { id: data.id, code: data.code, name: data.name, hostId: data.host_id }, workspaceEnabled: false });
+        await joinWorkspace();
+      },
+      joinGroup: async (code) => {
+        const { data, error } = await supabase.rpc('join_group', { p_code: code });
+        if (error) throw new Error(error.code === 'P0002' ? 'Không tìm thấy nhóm hoặc nhóm đã kết thúc' : error.message);
+        set({ group: { id: data.id, code: data.code, name: data.name, hostId: data.host_id }, workspaceEnabled: false });
+        await joinWorkspace();
+      },
+      leaveGroup: async () => {
+        const { group, user } = get();
+        if (!group) return;
+        await leaveWorkspace();
+        if (user?._id === group.hostId) await supabase.from('listening_groups').update({ ended_at: new Date().toISOString() }).eq('id', group.id);
+        else await supabase.from('group_members').delete().eq('group_id', group.id).eq('user_id', user?._id ?? '');
+        set({ group: null, groupMembers: [] });
+      },
+
       // --- workspace ---
       workspaceEnabled: false,
       workspaceMemberCount: 0,
@@ -1024,14 +1055,16 @@ let autoAdvanceOf: string | null = null; // Track that was auto-advanced (not in
 
 const expectedOf = (t: Timeline) => () => t.pos + (t.playing ? (serverNow() - t.at) / 1000 : 0);
 const workspaceActive = () => {
-  const { workspaceEnabled, user, liveRoom } = useStore.getState();
-  return !!user && workspaceEnabled && !liveRoom;
+  const { workspaceEnabled, group, user, liveRoom } = useStore.getState();
+  return !!user && (workspaceEnabled || !!group) && !liveRoom;
 };
 
 // User intended to play or transition — audio engine might still be buffering.
 async function emitWorkspaceSync(playing?: boolean) {
   const { user, currentSong, isPlaying, position, queue, queueIndex } = useStore.getState();
   if (!currentSong || !user || !workspaceActive() || isLiveRadio(currentSong)) return;
+  const { group } = useStore.getState();
+  if (group && group.hostId !== user._id) return; // trong nhóm, chỉ chủ nhóm phát lệnh; thành viên phát theo
   const auto = autoAdvanceOf === currentSong._id;
   autoAdvanceOf = null;
   // Auto-advanced follower device: leader device will broadcast timeline — avoid race.
@@ -1117,13 +1150,15 @@ setInterval(() => {
 
 // Vào kênh đồng bộ của chính mình: chỉnh giờ theo máy chủ trước, rồi hỏi máy khác đang phát gì.
 async function joinWorkspace() {
-  const { user } = useStore.getState();
-  if (!user || user.isGuest) return;
+  const { user, group } = useStore.getState();
+  if (!user || (!group && user.isGuest)) return;
   await syncClock().catch(() => {});
-  await joinWorkspaceChannel(user._id, DEVICE, {
+  // Nhóm: kênh group:<id>. Không có nhóm: kênh workspace:<id người dùng> (các máy của chính mình).
+  const topic = group ? `group:${group.id}` : `workspace:${user._id}`;
+  await joinSyncChannel(topic, DEVICE, { name: user.nickname || 'Người nghe' }, {
     onState: applyRemoteState,
     onStateRequest: () => { if (timeline?.device === DEVICE) emitWorkspaceSync(); },
-    onMembers: (count) => useStore.setState({ workspaceMemberCount: count }),
+    onMembers: (members) => useStore.setState({ workspaceMemberCount: members.length, groupMembers: members }),
   });
 }
 

@@ -43,23 +43,27 @@ alter table public.blind_rooms enable row level security;
 alter table public.blind_trials enable row level security;
 alter table public.blind_votes enable row level security;
 create policy "blind rooms are public" on public.blind_rooms for select to anon, authenticated using (active);
--- Lượt đang diễn ra ai cũng xem được, nhưng chưa công bố thì không được biết A/B là mức nào: chỉ lộ sau khi revealed.
+-- Lượt đang diễn ra ai cũng xem được, NHƯNG không được thấy a_kbps/b_kbps: biết bên nào bitrate cao hơn là biết đáp án.
+-- Quyền theo cột: client chỉ đọc được các cột liệt kê dưới đây. Âm thanh A/B lấy qua Edge Function playback
+-- (?trial=<id>&side=A), function tự tra mức bitrate bằng secret key.
 create policy "trials are public" on public.blind_trials for select to anon, authenticated using (true);
+revoke select on public.blind_trials from anon, authenticated;
+grant select (id, room_id, no, song_id, excerpt_start, excerpt_sec, a_at, b_at, vote_until, reveal_until, revealed)
+  on public.blind_trials to anon, authenticated;
 create policy "users see their own votes, admins see all" on public.blind_votes for select to authenticated
   using ((select auth.uid()) = user_id or (select public.is_admin()));
 create policy "admins manage blind rooms" on public.blind_rooms for all to authenticated
   using ((select public.is_admin())) with check ((select public.is_admin()));
 
--- Thông tin lượt gửi cho client: giấu mức bitrate tới khi công bố.
+-- Thông tin lượt gửi cho client lúc bắt đầu: không có mức bitrate.
 create or replace function public.blind_trial_json(t public.blind_trials)
 returns jsonb language sql stable set search_path = '' as $$
   select jsonb_build_object(
     'id', t.id, 'no', t.no, 'songId', t.song_id, 'excerptStart', t.excerpt_start, 'excerptSeconds', t.excerpt_sec,
     'aAt', extract(epoch from t.a_at) * 1000, 'bAt', extract(epoch from t.b_at) * 1000,
     'voteFrom', extract(epoch from t.b_at) * 1000, 'voteUntil', extract(epoch from t.vote_until) * 1000,
-    'revealUntil', extract(epoch from t.reveal_until) * 1000,
-    -- tier để client tải đúng file; nhãn "mức nào hay hơn" chỉ có trong sự kiện reveal
-    'aKbps', t.a_kbps, 'bKbps', t.b_kbps)
+    'revealUntil', extract(epoch from t.reveal_until) * 1000)
+    -- không gửi a_kbps/b_kbps: chỉ sự kiện reveal (sau khi hết giờ bỏ phiếu) mới có
 $$;
 
 create or replace function public.vote_blind(p_trial_id uuid, p_choice text)

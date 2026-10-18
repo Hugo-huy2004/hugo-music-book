@@ -10,6 +10,7 @@ import { type, space, GUTTER } from '../../ui/tokens';
 import { useRoomLists } from './useRoomLists';
 import type { LibraryTabProps } from '../Library/LibraryScreen';
 import { Spinner } from 'hugo-music';
+import GroupPanel from './GroupPanel';
 
 // Library › Public listening room. Every room powered by Hugo Music (24/7 channels + blind listening room),
 // admin create/edit on Administration page › Listening room. Personalized top pin: the room you are in,
@@ -50,6 +51,7 @@ export default function RoomsTab({ header }: LibraryTabProps) {
   return (
     <ChromeScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 200 }} showsVerticalScrollIndicator={false}>
       {header}
+      <GroupPanel />
       <View style={styles.pad}>
         <PinnedRow
           icon={liveRoom ? 'radio' : 'sparkles'}

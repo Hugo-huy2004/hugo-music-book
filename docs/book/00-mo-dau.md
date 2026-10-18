@@ -48,6 +48,6 @@ Năm phần, đọc theo thứ tự vì chương sau dùng kết quả của ch�
 
 1. **Nền móng** (chương 1 tới 3): sản phẩm là gì, kiến trúc, môi trường.
 2. **Backend trên Supabase** (chương 4 tới 12): database, API tự sinh, đăng nhập, RLS, lưu file, hàng đợi, worker, phát nhạc, tìm kiếm.
-3. **Nghe cùng nhau** (chương 13 tới 15): đài 24/7, blind test, đồng bộ nhiều thiết bị.
-4. **Giao diện** (chương 16 và 17): một app cho ba nền tảng, trang quản trị.
-5. **Ra production** (chương 18 tới 21): kiểm thử, deploy, vận hành, checklist ra mắt.
+3. **Nghe cùng nhau** (chương 13 tới 15): đài 24/7, blind test, nhóm nghe chung và đồng bộ nhiều thiết bị.
+4. **Giao diện** (chương 16 tới 18): một app cho ba nền tảng, chuẩn giao diện và trải nghiệm, trang quản trị.
+5. **Ra production** (chương 19 tới 22): kiểm thử, deploy, vận hành, checklist ra mắt.

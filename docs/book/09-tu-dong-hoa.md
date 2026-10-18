@@ -2,7 +2,7 @@
 
 ### Chương này làm gì
 
-Admin bấm **Duyệt** → bài chuyển sang *đang xử lý* và một việc được đưa vào hàng đợi, cả hai trong cùng một giao dịch. Một lịch chạy định kỳ dọn tài khoản khách bỏ quên. Không có server API nào ở giữa.
+Admin bấm **Duyệt** → bài chuyển sang *đang xử lý* và một việc được đưa vào hàng đợi, cả hai trong cùng một giao dịch. Việc định kỳ chạy bằng pg_cron, việc dọn tài khoản khách bỏ quên chạy ở worker. Không có server API nào ở giữa.
 
 ### Để làm gì
 
@@ -103,20 +103,33 @@ grant execute on function public.media_read, public.media_archive to service_rol
 
 `pgmq.read(..., p_visibility_sec, ...)` cho việc "ẩn" khỏi worker khác trong khoảng thời gian đó. Worker xử lý xong thì `archive`; worker chết giữa chừng thì hết giờ ẩn, việc tự hiện lại cho worker khác. Không việc nào bị mất.
 
-**Bước 4: việc định kỳ bằng pg_cron.** Khách ẩn danh không quay lại sau 30 ngày thì xóa; hồ sơ, lượt nghe xóa theo nhờ `on delete cascade`.
+**Bước 4: việc định kỳ.** Có hai loại:
 
-```sql
-create extension if not exists pg_cron;
-select cron.schedule(
-  'cleanup-guests',
-  '17 3 * * *',                       -- 3 giờ 17 sáng mỗi ngày (giờ UTC)
-  $$ delete from auth.users where is_anonymous and created_at < now() - interval '30 days' $$
-);
-```
+- Việc thuần SQL (chuyển bài ở đài, dẫn trò blind test ở chương 13, 14): **pg_cron**, chạy được theo giây.
+  ```sql
+  create extension if not exists pg_cron;
+  select cron.schedule('advance-stations', '5 seconds', $$ select public.advance_stations() $$);
+  ```
+- Việc cần API của Supabase Auth, ví dụ xóa khách ẩn danh không quay lại sau 30 ngày: không sửa thẳng schema `auth` bằng SQL. Một hàm SQL chỉ *liệt kê*, worker (đã có secret key) xóa bằng `auth.admin.deleteUser()` mỗi ngày một lần.
+  ```sql
+  create or replace function public.stale_guest_ids(p_days integer default 30, p_limit integer default 500)
+  returns setof uuid language sql stable security definer set search_path = '' as $$
+    select id from auth.users where is_anonymous and created_at < now() - make_interval(days => p_days) limit p_limit
+  $$;
+  grant execute on function public.stale_guest_ids to service_role;
+  ```
+  ```ts
+  // worker/src/cleanup.ts (trích)
+  export async function cleanupGuests() {
+    const { data: ids } = await db.rpc('stale_guest_ids', { p_days: 30, p_limit: 500 });
+    for (const id of ids as string[]) await db.auth.admin.deleteUser(id);
+    return (ids as string[]).length;
+  }
+  ```
 
 ### Kết quả
 
-> 📷 Ảnh: trang quản trị bấm "Duyệt"; trang Integrations → Queues của Supabase hiện một tin nhắn trong hàng đợi `media`; trang Cron hiện lịch `cleanup-guests`.
+> 📷 Ảnh: trang quản trị bấm "Duyệt"; trang Integrations → Queues của Supabase hiện một tin nhắn trong hàng đợi `media`; trang Cron hiện lịch `advance-stations`.
 
 ### Kiểm tra
 
@@ -124,7 +137,7 @@ select cron.schedule(
 -- Sau khi duyệt một bài:
 select status from public.songs where id = '<id bài>';           -- processing
 select msg_id, message from pgmq.q_media;                         -- có một việc với song_id đó
-select * from cron.job;                                           -- có lịch cleanup-guests
+select * from cron.job;                                           -- có các lịch đã đặt
 ```
 
 Bấm duyệt hai lần liền: lần hai báo `song not found or already processed`, hàng đợi vẫn chỉ có một việc.

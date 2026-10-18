@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { Animated, Platform } from 'react-native';
+import { useReducedMotion } from './useReducedMotion';
 
 const USE_NATIVE = Platform.OS !== 'web';
 
@@ -10,9 +11,14 @@ const USE_NATIVE = Platform.OS !== 'web';
  * reverses the deformation by itself.
  */
 export function useDroplet(strength = 1) {
+  const reduced = useReducedMotion();
   const p = useRef(new Animated.Value(0)).current;
-  const onPressIn = () => Animated.spring(p, { toValue: 1, damping: 14, stiffness: 520, mass: 0.6, useNativeDriver: USE_NATIVE }).start();
-  const onPressOut = () => Animated.spring(p, { toValue: 0, damping: 5.5, stiffness: 300, mass: 0.7, useNativeDriver: USE_NATIVE }).start();
+  const onPressIn = () => (reduced
+    ? Animated.timing(p, { toValue: 1, duration: 140, useNativeDriver: USE_NATIVE })
+    : Animated.spring(p, { toValue: 1, damping: 14, stiffness: 520, mass: 0.6, useNativeDriver: USE_NATIVE })).start();
+  const onPressOut = () => (reduced
+    ? Animated.timing(p, { toValue: 0, duration: 140, useNativeDriver: USE_NATIVE })
+    : Animated.spring(p, { toValue: 0, damping: 5.5, stiffness: 300, mass: 0.7, useNativeDriver: USE_NATIVE })).start();
   const style = {
     transform: [
       { scaleX: p.interpolate({ inputRange: [0, 1], outputRange: [1, 1 + 0.08 * strength] }) },

@@ -1,6 +1,7 @@
 // Chương 11: Edge Function cấp quyền nghe và phát playlist HLS.
 //   POST /functions/v1/playback  { song_id }       (kèm phiên đăng nhập)  -> { url, remaining }
 //   GET  /functions/v1/playback?t=<vé>[&kbps=128]  (trình phát gọi)         -> playlist .m3u8
+//   GET  /functions/v1/playback?t=<vé>&trial=<id>&side=A   (blind test)      -> playlist của bên A, không lộ bitrate
 // Trình phát (<audio>, AVPlayer, ExoPlayer) không gửi được header đăng nhập, nên quyền nghe nằm trong
 // một "vé" ký bằng HMAC, sống 2 giờ, chỉ mở đúng một bài.
 import { createClient } from 'npm:@supabase/supabase-js@2';
@@ -37,7 +38,9 @@ async function grant(req: Request) {
 // trong đó đường dẫn file nhạc là link ký của Storage (đi thẳng qua CDN, không qua function).
 async function playlist(u: URL) {
   const { s: songId } = await verify(u.searchParams.get('t') ?? '');
-  const kbps = u.searchParams.get('kbps');
+  let kbps = u.searchParams.get('kbps');
+  const trial = u.searchParams.get('trial');
+  if (trial) kbps = String(await blindSideKbps(trial, songId, u.searchParams.get('side')));
   const m3u8 = { headers: { ...cors, 'content-type': 'application/vnd.apple.mpegurl', 'cache-control': 'private, max-age=60' } };
 
   if (!kbps) {
@@ -59,6 +62,14 @@ async function playlist(u: URL) {
   // Worker ghi playlist với tên file tương đối; thay bằng link ký tuyệt đối.
   const text = (await tpl.text()).replaceAll(`${Number(kbps)}.mp4`, signed.signedUrl);
   return new Response(text, m3u8);
+}
+
+// Blind test: client chỉ biết "bên A", "bên B"; mức bitrate của mỗi bên chỉ server biết tới khi công bố.
+async function blindSideKbps(trialId: string, songId: string, side: string | null) {
+  const { data, error } = await admin.from('blind_trials').select('song_id, a_kbps, b_kbps').eq('id', trialId).single();
+  if (error) throw error;
+  if (data.song_id !== songId || (side !== 'A' && side !== 'B')) throw new Error('ticket does not match trial');
+  return side === 'A' ? data.a_kbps : data.b_kbps;
 }
 
 // ---- vé HMAC (Web Crypto có sẵn trong Deno, không cần thư viện)

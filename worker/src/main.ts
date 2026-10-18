@@ -2,11 +2,13 @@
 // Chạy: node src/main.ts  (Node 26 chạy thẳng TypeScript, không cần bước build)
 import { db } from './supabase.ts';
 import { processSong } from './process-song.ts';
+import { scheduleCleanup } from './cleanup.ts';
 
 const MAX_ATTEMPTS = 3;
 const IDLE_MS = 5_000;
 let running = true;
 process.on('SIGTERM', () => (running = false)); // dừng nhẹ nhàng khi deploy bản mới
+scheduleCleanup();
 
 while (running) {
   // visibility 15 phút: nếu worker chết giữa chừng, việc tự hiện lại cho worker khác sau 15 phút
