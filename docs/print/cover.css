@@ -1,0 +1,16 @@
+@page { size: A4; margin: 0; }
+html, body { margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.cover { width: 210mm; height: 297mm; background: #12151c; color: #f3f4f6; padding: 26mm 22mm 22mm; box-sizing: border-box;
+  display: flex; flex-direction: column; justify-content: space-between; font-family: "Inter", sans-serif;
+  background-image: radial-gradient(circle at 85% 12%, rgba(47,111,214,0.35), transparent 45%), radial-gradient(circle at 10% 95%, rgba(31,157,107,0.18), transparent 40%); }
+.vol { display: inline-block; font: 600 10pt "Inter", sans-serif; letter-spacing: 0.2em; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.45); padding: 2mm 4mm; border-radius: 1mm; }
+.kicker { font: 600 11pt "Inter", sans-serif; letter-spacing: 0.22em; text-transform: uppercase; color: #8fb4f2; margin-bottom: 5mm; }
+h1 { font: 800 58pt/1 "Inter Display", "Inter", sans-serif; margin: 0; letter-spacing: -0.03em; }
+h1 span { color: #8fb4f2; }
+.sub { font: 400 19pt/1.3 "Lora", serif; margin: 6mm 0 12mm; color: #d6dae1; }
+.wave { width: 150mm; fill: #2f6fd6; opacity: 0.9; margin-bottom: 12mm; }
+.wave rect:nth-child(3n) { fill: #8fb4f2; }
+.desc { font: 11pt/1.6 "Lora", serif; color: #c3c8d0; max-width: 140mm; margin: 0; }
+.bottom { border-top: 1px solid rgba(255,255,255,0.25); padding-top: 6mm; display: flex; justify-content: space-between; align-items: baseline; }
+.author { font: 600 13pt "Inter", sans-serif; }
+.meta { font: 10pt "Inter", sans-serif; color: #aab1bb; }
