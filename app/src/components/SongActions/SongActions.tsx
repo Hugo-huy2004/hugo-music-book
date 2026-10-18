@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable, Modal, ScrollView } from 'react-native';
 import { create } from 'zustand';
-import { useStore, Song } from '../../store/useStore';
+import { useStore, Song, useMember } from '../../store/useStore';
 import { useAppTheme } from '../../ui/theme';
 import { shareSong } from '../../lib/share';
 import CoverArt from '../CoverArt';
@@ -71,7 +71,7 @@ function Sheet({ target }: { target: NonNullable<Target> }) {
   const { songs, single, onRemove } = target;
   const song = songs[0];
   const { colors, isDark } = useAppTheme();
-  const user = useStore((s) => s.user);
+  const user = useMember();
   const setLoginModalVisible = useStore((s) => s.setLoginModalVisible);
   const liked = useStore((s) => songs.every((x) => s.likedSongIds.includes(x._id)));
   const toggleLike = useStore((s) => s.toggleLike);

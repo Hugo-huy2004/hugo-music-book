@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import ChromeScrollView from '../../ui/ChromeScrollView';
 import { useNavigation } from '@react-navigation/native';
-import { useStore } from '../../store/useStore';
+import { useStore, useMember } from '../../store/useStore';
 import { useAppTheme } from '../../ui/theme';
 import { joinStation, joinBlindRoom } from '../../rooms/useRooms';
 import { PinnedRow, ListRow, GradientTile } from '../../ui/kit';
@@ -18,7 +18,7 @@ import GroupPanel from './GroupPanel';
 export default function RoomsTab({ header }: LibraryTabProps) {
   const { colors } = useAppTheme();
   const navigation = useNavigation<any>();
-  const user = useStore((s) => s.user);
+  const user = useMember();
   const liveRoom = useStore((s) => s.liveRoom);
   const setLoginModalVisible = useStore((s) => s.setLoginModalVisible);
   const { stations, blindRooms, loading, error } = useRoomLists();

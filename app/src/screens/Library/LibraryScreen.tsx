@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import ChromeScrollView from '../../ui/ChromeScrollView';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useStore } from '../../store/useStore';
+import { useStore, useMember } from '../../store/useStore';
 import { useAppTheme } from '../../ui/theme';
 import { useTranslation } from '../../i18n/i18n';
 import { useIsMobile, ContentWidthContext } from '../../lib/responsive';
@@ -64,7 +64,7 @@ function Root({ onSection, onNavigate }: { onSection: (s: LibrarySection) => voi
   const isMobile = useIsMobile();
   const { width } = useWindowDimensions();
   const measured = React.useContext(ContentWidthContext);
-  const user = useStore((s) => s.user);
+  const user = useMember();
   const setLoginModalVisible = useStore((s) => s.setLoginModalVisible);
   const likedSongs = useStore((s) => s.likedSongs);
   const playOrToggleSong = useStore((s) => s.playOrToggleSong);

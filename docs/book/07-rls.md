@@ -106,7 +106,9 @@ toggleLike: async (songId: string) => {
 
 ### Kết quả
 
-> 📷 Ảnh: Thư viện → Bài hát đã thích hiện các bài vừa thích; trang Authentication → Policies liệt kê chính sách của từng bảng.
+![RLS và quyền theo cột chặn ngay ở database: khách không thấy bài chờ duyệt, admin thấy; không ai đọc được cột bitrate của blind test hay cột riêng của hồ sơ](images/term-07-rls.png)
+
+![Thư viện → Bài hát: chỉ đọc được lượt thích của chính mình](images/library-liked.png)
 
 ### Kiểm tra
 
@@ -127,3 +129,10 @@ Mở *Advisors → Security Advisor* trong dashboard: không còn cảnh báo "R
 
 - **Chia sẻ danh sách phát cho bạn bè:** thêm bảng `playlist_members` và một chính sách đọc `exists (... member ...)`.
 - **Chính sách chậm:** chạy `explain analyze` với vai người dùng; thường thiếu index trên cột dùng trong `using` (ví dụ `playlists.owner_id`).
+
+### Code của chương
+
+Các file chương này viết, trong repo đã clone ở phần Mở đầu:
+
+- `supabase/migrations/20261018000300_library.sql`
+- `app/src/api/api.ts`

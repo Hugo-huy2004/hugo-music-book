@@ -155,7 +155,9 @@ create view public.blind_results with (security_invoker = true) as
 
 ### Kết quả
 
-> 📷 Ảnh: phòng blind test lúc đang nghe B (nút A/B sáng theo đoạn đang phát), lúc bỏ phiếu, và lúc công bố (số phiếu, đáp án, bảng xếp hạng).
+![Cả phòng nghe A rồi nghe B, sau đó chọn bản hay hơn hoặc "Không phân biệt"](images/blind-listen.png)
+
+![Công bố: A là 64 kbps, B là 256 kbps](images/blind-reveal.png)
 
 ### Kiểm tra
 
@@ -170,3 +172,11 @@ select * from public.blind_results;          -- hit_rate gần 0,5 nghĩa là g�
 - **Kết quả blind test lệch nhiều so với PSL:** dùng `blind_results` để chỉnh τ theo từng thể loại thay vì một số cho cả danh mục.
 
 Kiểm tra lỗ hổng: đăng nhập rồi gọi `supabase.from('blind_trials').select('a_kbps')` trong lúc đang bỏ phiếu phải báo lỗi `permission denied for table blind_trials`.
+
+### Code của chương
+
+Các file chương này viết, trong repo đã clone ở phần Mở đầu:
+
+- `supabase/migrations/20261018000900_blind_test.sql`
+- `supabase/functions/playback/index.ts`
+- `app/src/rooms/useRooms.ts`

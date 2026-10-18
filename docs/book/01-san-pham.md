@@ -54,7 +54,9 @@ Code viết trước khi biết sản phẩm cần gì thường phải viết l
 | Trình phát | Ảnh bìa, lời chạy theo nhạc, hàng đợi, chọn chất lượng |
 | Quản trị | Duyệt bài, theo dõi xử lý, quản lý đài |
 
-> 📷 Ảnh: trang chủ trên máy tính và trên điện thoại (chụp khi chạy thật ở chương 16).
+![Trang chủ trên máy tính (bản web chạy với dữ liệu thật trên Supabase)](images/home-desktop.png)
+
+![Trang chủ trên điện thoại](images/home-mobile.png)
 
 ### Kiểm tra
 

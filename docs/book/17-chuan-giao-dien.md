@@ -85,7 +85,9 @@ if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light
 
 ### Kết quả
 
-> 📷 Ảnh: cùng một màn hình ở chế độ sáng và tối; thanh tab dưới trên điện thoại và thanh bên trên máy tính; màn hình ở cỡ chữ lớn nhất của máy vẫn đọc được.
+![Cùng trang chủ ở chế độ tối](images/home-dark.png)
+
+![Điện thoại: chế độ sáng và tối](images/home-mobile-light-dark.png)
 
 ### Kiểm tra
 
@@ -101,3 +103,9 @@ Danh sách soát trước khi một màn hình mới được merge:
 
 - **Muốn thương hiệu riêng mạnh hơn:** chỉ đổi token màu và gradient; cấu trúc, khoảng cách và vùng chạm giữ nguyên vì đó là thói quen của người dùng.
 - **Lên máy tính bảng và màn hình lớn:** thêm bố cục hai cột (danh sách bên trái, chi tiết bên phải) thay vì phóng to giao diện điện thoại.
+
+### Code của chương
+
+Các file chương này viết, trong repo đã clone ở phần Mở đầu:
+
+- `packages/ui/src/glass/useReducedMotion.ts`

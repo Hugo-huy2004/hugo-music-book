@@ -32,7 +32,8 @@ const sessions = {
 
 const desktop = { width: 1440, height: 900 };
 const mobile = { width: 390, height: 844 };
-const click = (text) => async (p) => { await p.getByText(text, { exact: false }).first().click(); await p.waitForTimeout(1500); };
+
+const click = (text, exact = false, nth = 0) => async (p) => { await p.getByText(text, { exact }).nth(nth).click(); await p.waitForTimeout(1500); };
 
 // tên ảnh, đường dẫn, khung hình, ai đăng nhập, thao tác trước khi chụp
 const shots = [
@@ -46,25 +47,42 @@ const shots = [
   ['account', '/account', desktop, 'member'],
   ['admin', '/admin', desktop, 'admin'],
   ['login', '/account', mobile, null],
+  ['library-liked', '/library', desktop, 'member', click('Bài hát')],
+  ['library-playlist', '/library', desktop, 'member', async (p) => { await click('Danh sách phát')(p); await click('Chill buổi tối')(p); }],
+  ['station', '/radio', desktop, 'member', async (p) => { await click('Hugo Chill')(p); await p.waitForTimeout(4000); }],
+  ['station-mobile', '/radio', mobile, 'member', async (p) => { await click('Hugo Chill')(p); await p.waitForTimeout(4000); }],
+  ['blind', '/party', mobile, 'member', async (p) => { await click('Tai vàng')(p); await p.getByText('Đang phát A').waitFor({ timeout: 60000 }); await p.waitForTimeout(2000); }],
+  ['blind-vote', '/party', mobile, 'member', async (p) => { await click('Tai vàng')(p); await p.getByText('Kết quả', { exact: true }).last().waitFor({ timeout: 90000 }); await p.waitForTimeout(1500); }],
+  ['blind-reveal', '/party', mobile, 'member', async (p) => { await click('Tai vàng')(p); await p.getByText(/\d+ kbps/).first().waitFor({ timeout: 120000 }); await p.waitForTimeout(1500); }],
+  ['admin-songs', '/admin', desktop, 'admin', click('Nhạc')],
+  ['admin-publishing', '/admin', desktop, 'admin', click('Trạng thái đăng tải')],
+  ['admin-rooms', '/admin', desktop, 'admin', click('Phòng nghe')],
+  ['admin-users', '/admin', desktop, 'admin', click('Người dùng')],
+  ['admin-catalog', '/admin', desktop, 'admin', click('Nghệ sĩ & album')],
+  ['login-modal', '/account', mobile, null, async (p) => { await p.getByText('Đăng nhập', { exact: true }).last().click(); await p.waitForTimeout(1500); }],
+  ['admin-upload', '/admin', desktop, 'admin', async (p) => { await click('Nhạc')(p); await p.getByText('Tải bài lên', { exact: true }).first().click(); await p.waitForTimeout(1500); }],
+  ['home-dark', '/', desktop, 'member', null, 'dark'],
+  ['home-mobile-dark', '/', mobile, 'member', null, 'dark'],
   ['player-mini', '/search', desktop, 'member', async (p) => { await p.locator('input').first().fill('mua dem'); await p.waitForTimeout(2000); await p.mouse.click(1384, 228); await p.waitForTimeout(6000); }],
   ['player-full', '/search', desktop, 'member', async (p) => { await p.locator('input').first().fill('mua dem'); await p.waitForTimeout(2000); await p.mouse.click(1384, 228); await p.waitForTimeout(5000); await p.getByText('Mưa Đêm Sài Gòn').last().click(); await p.waitForTimeout(3000); }],
 ];
 
 const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', proxy: process.env.HTTPS_PROXY ? { server: process.env.HTTPS_PROXY, bypass: 'localhost' } : undefined });
 fs.mkdirSync(outDir, { recursive: true });
-for (const [name, url, vp, who, act] of shots) {
+for (const [name, url, vp, who, act, scheme = 'light'] of shots) {
   if (only.length && !only.includes(name)) continue;
-  const ctx = await browser.newContext({ viewport: vp, deviceScaleFactor: 2, locale: 'vi-VN' });
+  const ctx = await browser.newContext({ viewport: vp, deviceScaleFactor: 2, locale: 'vi-VN', colorScheme: scheme });
   if (who) await ctx.addInitScript(([k, v]) => localStorage.setItem(k, v), [`sb-${ref}-auth-token`, JSON.stringify(sessions[who])]);
   const p = await ctx.newPage();
   p.on('pageerror', (e) => console.log(name, 'pageerror', String(e).slice(0, 200)));
   await p.goto('http://localhost:8099' + url, { waitUntil: 'networkidle' }).catch(() => {});
   await p.waitForTimeout(2500);
   if (act) await act(p).catch((e) => console.log(name, 'action', String(e).slice(0, 150)));
+  await p.waitForLoadState('networkidle').catch(() => {});
+  await p.waitForTimeout(1500);
   await p.screenshot({ path: path.join(outDir, name + '.png') });
   console.log('shot', name);
   await ctx.close();
 }
 await browser.close();
 srv.close();
-export { click };

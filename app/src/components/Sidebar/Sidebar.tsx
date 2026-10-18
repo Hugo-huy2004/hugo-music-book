@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Image, StyleSheet, Pressable, Animated, Platform } from 'react-native';
-import { useStore } from '../../store/useStore';
+import { useStore, useMember } from '../../store/useStore';
 import { useAppTheme } from '../../ui/theme';
 import { useTranslation } from '../../i18n/i18n';
 import { TabId } from '../../lib/tabRouting';
@@ -33,7 +33,7 @@ export default function Sidebar({ activeTab, onTabChange }: {
 }) {
   const { colors, isDark } = useAppTheme();
   const { t } = useTranslation();
-  const user = useStore((s) => s.user);
+  const user = useMember();
   const setLoginModalVisible = useStore((s) => s.setLoginModalVisible);
   const { full } = useSidebarDock();
   const [peek, setPeek] = useState(false);

@@ -129,7 +129,9 @@ grant execute on function public.media_read, public.media_archive to service_rol
 
 ### Kết quả
 
-> 📷 Ảnh: trang quản trị bấm "Duyệt"; trang Integrations → Queues của Supabase hiện một tin nhắn trong hàng đợi `media`; trang Cron hiện lịch `advance-stations`.
+![Hàng chờ duyệt: kiểm tra bản quyền và thông tin trước khi bấm Duyệt](images/admin-publishing.png)
+
+![Hai lịch pg_cron, số lần chạy trong một phút, và hàng đợi media đã xử lý hết 10 việc](images/term-09-cron.png)
 
 ### Kiểm tra
 
@@ -146,3 +148,9 @@ Bấm duyệt hai lần liền: lần hai báo `song not found or already proces
 
 - **Việc nhẹ, không cần ffmpeg** (gửi email chào mừng, tính lại bảng xếp hạng): để Cron gọi Edge Function đọc hàng đợi, không cần worker riêng.
 - **Hàng chục nghìn việc mỗi phút:** chuyển sang hàng đợi chuyên dụng (Redis, SQS) và dùng mẫu *outbox* (ghi việc vào bảng trong cùng giao dịch, một tiến trình chuyển sang hàng đợi ngoài).
+
+### Code của chương
+
+Các file chương này viết, trong repo đã clone ở phần Mở đầu:
+
+- `supabase/migrations/20261018000500_pipeline.sql`

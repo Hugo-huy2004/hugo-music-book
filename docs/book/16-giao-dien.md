@@ -94,7 +94,11 @@ pnpm build:web                   # bản web tĩnh trong app/dist
 
 ### Kết quả
 
-> 📷 Ảnh: trang chủ trên máy tính (thanh bên trái, kệ bài hát) và trên điện thoại (thanh tab dưới); trình phát đầy đủ ở chế độ sáng và tối; màn hình Thư viện.
+![Màn Mới: bảng xếp hạng và bài mới](images/new.png)
+
+![Thư viện](images/library.png)
+
+![Một danh sách phát](images/library-playlist.png)
 
 ### Kiểm tra
 
@@ -107,3 +111,10 @@ pnpm build:web && npx serve app/dist     # mở bản build tĩnh, mọi màn h�
 
 - **Cần SEO cho trang nghệ sĩ, trang bài hát:** bật xuất web theo từng trang tĩnh của Expo Router (`web.output: "static"`) hoặc thêm một Edge Function chèn thẻ xem trước cho bot mạng xã hội.
 - **Màn hình chậm trên điện thoại cũ:** danh sách dài chuyển sang `FlashList`, ảnh bìa dùng `expo-image` có cache.
+
+### Code của chương
+
+Các file chương này viết, trong repo đã clone ở phần Mở đầu:
+
+- `app/src/screens/Home/useHomeSections.ts`
+- `app/src/App.tsx`

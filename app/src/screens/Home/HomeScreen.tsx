@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useArtistPhoto } from '../../lib/artistPhoto';
 import { useWindowDimensions } from 'react-native';
 import ChromeScrollView from '../../ui/ChromeScrollView';
-import { useStore, Song } from '../../store/useStore';
+import { useStore, Song, useMember } from '../../store/useStore';
 import { useTranslation } from '../../i18n/i18n';
 import { useIsMobile } from '../../lib/responsive';
 import { api } from '../../api/api';
@@ -21,7 +21,7 @@ export default function HomeScreen({ onNavigate }: { onNavigate: (tab: string) =
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const { width } = useWindowDimensions();
-  const user = useStore((s) => s.user);
+  const user = useMember();
   const setLoginModalVisible = useStore((s) => s.setLoginModalVisible);
   const playSong = useStore((s) => s.playSong);
   const playOrToggleSong = useStore((s) => s.playOrToggleSong);

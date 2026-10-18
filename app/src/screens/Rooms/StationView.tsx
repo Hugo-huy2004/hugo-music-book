@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Gradient, Icon, TextField } from 'hugo-music';
 import ChromeScrollView from '../../ui/ChromeScrollView';
-import { useStore } from '../../store/useStore';
+import { useStore, useMember } from '../../store/useStore';
 import { useAppTheme, ThemeColors } from '../../ui/theme';
 import { useIsMobile } from '../../lib/responsive';
 import { formatTime } from '../../lib/format';
@@ -17,7 +17,7 @@ export default function StationView() {
   const { colors } = useAppTheme();
   const isMobile = useIsMobile();
   const station = useRooms((s) => s.station);
-  const user = useStore((s) => s.user);
+  const user = useMember();
   const isPlaying = useStore((s) => s.isPlaying);
   const togglePlay = useStore((s) => s.togglePlay);
   const songs = useStore((s) => s.songs);

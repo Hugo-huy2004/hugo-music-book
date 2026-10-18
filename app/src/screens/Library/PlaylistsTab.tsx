@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Modal, Pressable } from 'react-native';
 import { ActionButton, Gradient, Icon, Spinner, TextField } from 'hugo-music';
 import ChromeScrollView from '../../ui/ChromeScrollView';
-import { useStore } from '../../store/useStore';
+import { useStore, useMember } from '../../store/useStore';
 import { useAppTheme } from '../../ui/theme';
 import { confirmAlert, showAlert } from '../../lib/alert';
 import { PinnedRow, ListRow } from '../../ui/kit';
@@ -23,7 +23,7 @@ export const requestNewPlaylist = () => {
 
 export default function PlaylistsTab({ header }: LibraryTabProps) {
   const { colors } = useAppTheme();
-  const user = useStore((s) => s.user);
+  const user = useMember();
   const setLoginModalVisible = useStore((s) => s.setLoginModalVisible);
   const playlists = useStore((s) => s.playlists);
   const likedSongs = useStore((s) => s.likedSongs);

@@ -75,7 +75,15 @@ supabase.channel('admin-pipeline')
 
 ### Kết quả
 
-> 📷 Ảnh: trang quản trị phần tổng quan; hàng chờ duyệt với nút Duyệt/Từ chối; bảng theo dõi xử lý với bài đang ở bước "psl" rồi chuyển sang "done".
+![Tổng quan](images/admin.png)
+
+![Nhạc: lọc theo trạng thái và giấy phép, duyệt hàng loạt](images/admin-songs.png)
+
+![Phòng nghe: bật tắt, sửa luật chọn bài, ghim bài](images/admin-rooms.png)
+
+![Người dùng](images/admin-users.png)
+
+![Nghệ sĩ và album](images/admin-catalog.png)
 
 ### Kiểm tra
 
@@ -86,3 +94,9 @@ supabase.channel('admin-pipeline')
 
 - **Cần quản lý người dùng (khóa tài khoản, xóa):** các thao tác này cần secret key; viết một Edge Function `admin-users` kiểm `is_admin` rồi gọi `auth.admin.*`.
 - **Nhiều admin, cần biết ai đã làm gì:** thêm bảng nhật ký và trigger ghi lại mọi thay đổi trên `songs`.
+
+### Code của chương
+
+Các file chương này viết, trong repo đã clone ở phần Mở đầu:
+
+- `app/src/api/api.ts`

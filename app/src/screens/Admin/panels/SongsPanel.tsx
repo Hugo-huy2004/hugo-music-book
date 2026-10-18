@@ -14,7 +14,8 @@ type Row = ReviewedSong & { album?: { title?: string }; pipeline: 'queued' | 'ru
 type Page = { total: number; page: number; limit: number; songs: Row[] };
 
 export const STATUS: Record<string, [string, Tone]> = {
-  pending: ['Chờ duyệt', 'amber'], published: ['Đã xuất bản', 'green'], rejected: ['Từ chối', 'red'],
+  pending: ['Chờ duyệt', 'amber'], processing: ['Đang xử lý', 'blue'], published: ['Đã xuất bản', 'green'],
+  rejected: ['Từ chối', 'red'], failed: ['Xử lý lỗi', 'red'],
 };
 const PIPE: Record<string, [string, Tone]> = { queued: ['Đang chờ', 'amber'], running: ['Đang xử lý', 'blue'], ok: ['Xử lý xong', 'gray'], failed: ['Xử lý lỗi', 'red'] };
 

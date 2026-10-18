@@ -473,31 +473,46 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address_detail: string | null
           avatar_url: string | null
           country: string | null
           created_at: string
+          date_of_birth: string | null
           id: string
           music_genres: string[]
           nickname: string | null
+          phone: string | null
+          province: string | null
           username: string | null
+          ward: string | null
         }
         Insert: {
+          address_detail?: string | null
           avatar_url?: string | null
           country?: string | null
           created_at?: string
+          date_of_birth?: string | null
           id: string
           music_genres?: string[]
           nickname?: string | null
+          phone?: string | null
+          province?: string | null
           username?: string | null
+          ward?: string | null
         }
         Update: {
+          address_detail?: string | null
           avatar_url?: string | null
           country?: string | null
           created_at?: string
+          date_of_birth?: string | null
           id?: string
           music_genres?: string[]
           nickname?: string | null
+          phone?: string | null
+          province?: string | null
           username?: string | null
+          ward?: string | null
         }
         Relationships: []
       }
@@ -916,13 +931,18 @@ export type Database = {
       my_profile: {
         Args: never
         Returns: {
+          address_detail: string | null
           avatar_url: string | null
           country: string | null
           created_at: string
+          date_of_birth: string | null
           id: string
           music_genres: string[]
           nickname: string | null
+          phone: string | null
+          province: string | null
           username: string | null
+          ward: string | null
         }
         SetofOptions: {
           from: "*"

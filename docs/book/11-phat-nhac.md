@@ -150,7 +150,9 @@ Trình phát dùng sẵn của app: web dùng `hls.js` (Safari phát HLS gốc),
 
 ### Kết quả
 
-> 📷 Ảnh: trình phát đầy đủ đang phát, nhãn chất lượng "High Quality · 128 kbps"; hộp thông báo hết lượt nghe của khách; tab Network cho thấy các request byte range tới Storage.
+![Đường phát từ đầu tới cuối: vé, master playlist, playlist một mức có byte range, và Storage trả đúng 1 KB (206)](images/term-11-playback.png)
+
+![Trình phát thu nhỏ trên máy tính. Ảnh chụp bằng Chromium không kèm bộ giải mã AAC nên thời gian đứng ở 0:00; trên Chrome, Safari, iOS và Android bài phát bình thường.](images/player-mini.png)
 
 ### Kiểm tra
 
@@ -166,3 +168,12 @@ curl -s "$SUPABASE_URL/functions/v1/playback?t=gia.mao"          # {"error":"inv
 - **Danh mục có nhạc thương mại:** thêm mã hóa nội dung (HLS AES-128 hoặc DRM FairPlay/Widevine); vé ngắn hơn (vài phút).
 - **Băng thông lớn:** đặt CDN riêng phía trước bucket `audio`; function chỉ đổi phần tạo link ký.
 - **Muốn tính lượt nghe chính xác** (nghe từ 30 giây): app gửi số đo vào bảng `plays` (đã có trong migration) và xếp hạng bằng hàm `top_songs()`.
+
+### Code của chương
+
+Các file chương này viết, trong repo đã clone ở phần Mở đầu:
+
+- `supabase/migrations/20261018000600_playback.sql`
+- `supabase/functions/playback/index.ts`
+- `supabase/config.toml`
+- `app/src/api/api.ts`

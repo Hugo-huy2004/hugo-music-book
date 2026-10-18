@@ -143,7 +143,11 @@ const expectedOf = (t: Timeline) => () => t.pos + (t.playing ? (serverNow() - t.
 
 ### Kết quả
 
-> 📷 Ảnh: thẻ "Nghe cùng bạn bè" với nút tạo nhóm và ô nhập mã; thẻ nhóm đang hoạt động với mã và danh sách người nghe; hai trình duyệt của hai tài khoản khác nhau phát cùng một giây; màn hình Tài khoản với công tắc Đồng bộ và dòng "2 thiết bị đang mở".
+![Thẻ "Nghe cùng bạn bè": tạo nhóm hoặc nhập mã](images/group-empty.png)
+
+![Hai tài khoản trong cùng một nhóm: chủ nhóm (trái) và Lan (phải)](images/group-members.png)
+
+![Chủ nhóm phát "Neon Street", máy của Lan tự chuyển sang đúng bài đó. Ảnh chụp bằng Chromium không kèm bộ giải mã AAC nên thời gian đứng ở 0:00; trên Chrome, Safari, iOS và Android bài phát bình thường.](images/group-sync.png)
 
 ### Kiểm tra
 
@@ -156,3 +160,11 @@ const expectedOf = (t: Timeline) => () => t.pos + (t.playing ? (serverNow() - t.
 - **Muốn mọi người trong nhóm cùng điều khiển** (bữa tiệc): thêm cột `everyone_controls` vào `listening_groups` và bỏ điều kiện `group.hostId !== user._id` khi cột bật.
 - **Muốn hàng đợi chung có bỏ phiếu như đài:** dùng lại `station_requests` theo `group_id`.
 - **Muốn "nghe tiếp" cả khi máy kia đã tắt:** lưu trạng thái cuối vào một bảng mỗi 30 giây; máy mới đọc bảng nếu không ai trả lời `state_request`.
+
+### Code của chương
+
+Các file chương này viết, trong repo đã clone ở phần Mở đầu:
+
+- `supabase/migrations/20261018001300_groups.sql`
+- `app/src/rooms/workspace.ts`
+- `app/src/store/useStore.ts`

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import ChromeScrollView from '../../ui/ChromeScrollView';
-import { useStore, RadioStation } from '../../store/useStore';
+import { useStore, RadioStation, useMember } from '../../store/useStore';
 import { useAppTheme } from '../../ui/theme';
 import { useIsMobile } from '../../lib/responsive';
 import { joinStation } from '../../rooms/useRooms';
@@ -18,7 +18,7 @@ import { Spinner } from 'hugo-music';
 export default function RadioScreen({ onNavigate }: { onNavigate: (tab: string) => void }) {
   const { colors } = useAppTheme();
   const isMobile = useIsMobile();
-  const user = useStore((s) => s.user);
+  const user = useMember();
   const setLoginModalVisible = useStore((s) => s.setLoginModalVisible);
   const radioStations = useStore((s) => s.radioStations);
   const fetchRadioStations = useStore((s) => s.fetchRadioStations);

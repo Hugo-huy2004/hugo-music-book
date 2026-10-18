@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import ChromeScrollView from '../../ui/ChromeScrollView';
-import { useStore } from '../../store/useStore';
+import { useStore, useMember } from '../../store/useStore';
 import { useAppTheme, ThemeColors } from '../../ui/theme';
 import { useIsMobile } from '../../lib/responsive';
 import { useRooms, leaveRoom, replaySide, castVote, Choice, Condition, Trial } from '../../rooms/useRooms';
@@ -47,7 +47,7 @@ const rank = (c: Condition) => (c.key === 'original' ? Infinity : c.kbps || 0);
 export default function BlindRoomView() {
   const { colors } = useAppTheme();
   const isMobile = useIsMobile();
-  const user = useStore((s) => s.user);
+  const user = useMember();
   const blind = useRooms((s) => s.blind);
   const myVote = useRooms((s) => s.myVote);
   const reveal = useRooms((s) => s.reveal);

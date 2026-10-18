@@ -107,7 +107,7 @@ supabase db push
 
 ### Kết quả
 
-> 📷 Ảnh: Table Editor hiện bảng `songs` với các cột, và sơ đồ quan hệ ở Database → Schema Visualizer.
+![Các cột của bảng songs](images/term-04-songs.png)
 
 ### Kiểm tra
 
@@ -121,3 +121,9 @@ Thử trong SQL Editor: thêm một bài với `status = 'publised'` (gõ sai) p
 
 - **Một bài có nhiều nghệ sĩ** (feat.): thêm bảng nối `song_artists (song_id, artist_id, role)`.
 - **Danh mục vài triệu bài:** chia `songs` thành bảng danh mục (ít đổi) và bảng số liệu (`likes_count`, lượt nghe; đổi liên tục) để cập nhật số liệu không khóa dòng danh mục.
+
+### Code của chương
+
+Các file chương này viết, trong repo đã clone ở phần Mở đầu:
+
+- `supabase/migrations/20261018000100_catalog.sql`

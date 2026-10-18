@@ -1,5 +1,5 @@
 import { Pressable } from 'react-native';
-import { useStore } from '../../store/useStore';
+import { useStore, useMember } from '../../store/useStore';
 import { useAppTheme } from '../theme';
 import { useIsMobile } from '../../lib/responsive';
 import { UserAvatar } from '../../components/UserAvatar';
@@ -11,7 +11,7 @@ import { Icon } from 'hugo-music';
 export default function AccountButton({ onNavigate }: { /** Navigate to a tab id (e.g. 'account'). */ onNavigate: (tab: string) => void }) {
   const { colors } = useAppTheme();
   const isMobile = useIsMobile();
-  const user = useStore((s) => s.user);
+  const user = useMember();
   const setLoginModalVisible = useStore((s) => s.setLoginModalVisible);
   if (!isMobile) return null;
   return (

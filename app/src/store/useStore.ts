@@ -86,6 +86,7 @@ export interface User {
   role: string; // 'user' | 'admin' — only 'admin' can manage the song catalog
   googleLinked: boolean; // true = signed in via Google
   isGuest?: boolean; // khách ẩn danh (signInAnonymously)
+  hasPassword?: boolean; // đã tự đặt mật khẩu (mật khẩu là tùy chọn, chương 6)
   token: string;
 }
 
@@ -367,7 +368,15 @@ export const useStore = create<StoreState>()(
         set({ registrationVerifiedToken: 'ok' });
       }),
       completeRegistration: async (form) => {
-        await get().completeProfile({ nickname: (form.get('nickname') as string) || undefined });
+        const text = (k: string) => (form.get(k) as string | null)?.trim() || undefined;
+        const password = text('password');
+        if (password) await auth.changePassword('', password); // tài khoản mới: chưa có mật khẩu cũ
+        await get().completeProfile({
+          nickname: text('nickname'), dateOfBirth: text('dateOfBirth'), musicGenres: JSON.parse(text('musicGenres') ?? '[]'),
+          country: text('country'), province: text('province'), ward: text('ward'), addressDetail: text('addressDetail'),
+        });
+        const avatar = form.get('avatar') as Blob | null;
+        if (avatar) await get().updateAvatar(avatar);
         get().resetRegistration();
       },
       resetRegistration: () => set({ registrationEmail: null, registrationOtpToken: null, registrationVerifiedToken: null }),
@@ -408,15 +417,17 @@ export const useStore = create<StoreState>()(
         set({ user: { ...current, ...updated } });
       },
       completeProfile: async (fields) => {
-        const updated = await api.updateProfile({ nickname: fields.nickname, musicGenres: fields.musicGenres, country: fields.country });
+        const updated = await api.updateProfile({
+          nickname: fields.nickname, musicGenres: fields.musicGenres, dateOfBirth: fields.dateOfBirth,
+          address: { country: fields.country, province: fields.province, ward: fields.ward, detail: fields.addressDetail },
+        });
         if (updated) set({ user: updated });
       },
       updateAvatar: async (file) => {
         const updated = await api.updateAvatar(file);
         if (updated) set({ user: updated });
       },
-      // Không còn mật khẩu: hai hàm giữ lại cho đúng kiểu, không làm gì.
-      changePassword: async () => {},
+      changePassword: (current, next) => withAuthState(() => auth.changePassword(current, next)),
       resetPassword: (email, code, newPassword) => withAuthState(() => auth.resetPassword(email, code, newPassword)),
 
       // --- song library ---
@@ -1168,3 +1179,7 @@ if (__DEV__ && Platform.OS === 'web' && typeof window !== 'undefined') {
   (window as any).__hugo = { store: useStore, audioEngine };
 }
 
+
+/** Người dùng đã đăng nhập thật (không phải khách ẩn danh). Khách vẫn có phiên Supabase để nghe thử,
+ *  nhưng màn hình đối xử như chưa đăng nhập: mời đăng nhập thay vì hiện hồ sơ trống. */
+export const useMember = () => useStore((s) => (s.user && !s.user.isGuest ? s.user : null));

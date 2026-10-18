@@ -4,7 +4,7 @@ import { ActionButton, DatePicker, EmptyState, Icon, Spinner, TextField, Toggle 
 import ChromeScrollView from '../../ui/ChromeScrollView';
 import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
-import { useStore } from '../../store/useStore';
+import { useStore, useMember } from '../../store/useStore';
 import { showAlert, confirmAlert } from '../../lib/alert';
 import { usePreferenceGenres } from '../../lib/meta';
 import { useTranslation } from '../../i18n/i18n';
@@ -21,7 +21,7 @@ type Editing = 'nickname' | 'phone' | 'genres' | 'password' | 'dob' | 'address' 
 
 export default function AccountScreen({ onNavigateLibrary }: { onNavigateLibrary: () => void }) {
   const GENRES = usePreferenceGenres(); // GET /api/meta
-  const user = useStore((s) => s.user);
+  const user = useMember();
   const logout = useStore((s) => s.logout);
   const setLoginModalVisible = useStore((s) => s.setLoginModalVisible);
   const likedSongs = useStore((s) => s.likedSongs);
@@ -127,7 +127,7 @@ export default function AccountScreen({ onNavigateLibrary }: { onNavigateLibrary
     }
   };
 
-  const passwordReady = !!currentPassword && newPassword.length >= 6 && newPassword === confirmNew;
+  const passwordReady = (!user?.hasPassword || !!currentPassword) && newPassword.length >= 6 && newPassword === confirmNew;
   const savePassword = async () => {
     if (!passwordReady) return;
     setSaving(true);
@@ -182,7 +182,7 @@ export default function AccountScreen({ onNavigateLibrary }: { onNavigateLibrary
 
   // Delete account: reconfirm with password (Google only account: type username) — the server chooses what to check.
   const removeAccount = async () => {
-    if (!deleteConfirm || !(await confirmAlert(t('deleteAccountConfirm')))) return;
+    if (deleteConfirm.trim() !== user?.email || !(await confirmAlert(t('deleteAccountConfirm')))) return;
     setIsDeletingAccount(true);
     try {
       await deleteAccount({ password: deleteConfirm, confirm: deleteConfirm });
@@ -279,7 +279,7 @@ export default function AccountScreen({ onNavigateLibrary }: { onNavigateLibrary
               accessibilityRole="button"
               hitSlop={8}
             >
-              <Text style={styles.removeAvatar}>Remove image</Text>
+              <Text style={styles.removeAvatar}>Xoá ảnh</Text>
             </Pressable>
           )}
           <Text style={styles.name} numberOfLines={1}>{user.nickname || user.username}</Text>
@@ -290,21 +290,21 @@ export default function AccountScreen({ onNavigateLibrary }: { onNavigateLibrary
         </View>
 
         <Group>
-          <Row icon="heart" tint="#FF375F" label="Your Library" value={`${likedSongs.length} likes · ${playlists.length} list`} onPress={onNavigateLibrary} last />
+          <Row icon="heart" tint="#FF375F" label="Thư viện của bạn" value={`${likedSongs.length} bài thích · ${playlists.length} danh sách`} onPress={onNavigateLibrary} last />
         </Group>
 
-        <Group title="PERSONAL INFORMATION">
-          <Row icon="person" tint="#0A84FF" label={t('nickname')} value={user.nickname || 'Not set'} onPress={() => toggle('nickname')} open={editing === 'nickname'} />
+        <Group title="THÔNG TIN CÁ NHÂN">
+          <Row icon="person" tint="#0A84FF" label={t('nickname')} value={user.nickname || 'Chưa đặt'} onPress={() => toggle('nickname')} open={editing === 'nickname'} />
           {editing === 'nickname' && editor(
             <TextField value={nickname} onChangeText={setNickname} placeholder={t('nickname')} placeholderTextColor={colors.textTertiary} style={styles.input} autoFocus maxLength={40} onSubmitEditing={saveProfile} />,
             saveProfile, !nickname.trim() || nickname.trim() === (user.nickname ?? ''),
           )}
-          <Row icon="call" tint="#30D158" label={t('phoneNumber')} value={user.phone || 'Not available'} onPress={() => toggle('phone')} open={editing === 'phone'} />
+          <Row icon="call" tint="#30D158" label={t('phoneNumber')} value={user.phone || 'Chưa có'} onPress={() => toggle('phone')} open={editing === 'phone'} />
           {editing === 'phone' && editor(
             <TextField value={phone} onChangeText={setPhone} placeholder={t('phonePlaceholder')} placeholderTextColor={colors.textTertiary} style={styles.input} keyboardType="phone-pad" autoFocus onSubmitEditing={saveProfile} />,
             saveProfile, phone.trim() === (user.phone ?? ''),
           )}
-          <Row icon="musical-notes" tint="#BF5AF2" label={t('musicTaste')} value={(user.musicGenres ?? []).length ? `${(user.musicGenres ?? []).length} genre` : 'Not selected'} onPress={() => toggle('genres')} open={editing === 'genres'} />
+          <Row icon="musical-notes" tint="#BF5AF2" label={t('musicTaste')} value={(user.musicGenres ?? []).length ? `${(user.musicGenres ?? []).length} thể loại` : 'Chưa chọn'} onPress={() => toggle('genres')} open={editing === 'genres'} />
           {editing === 'genres' && editor(
             <View style={styles.chips}>
               {GENRES.map((g) => {
@@ -321,14 +321,14 @@ export default function AccountScreen({ onNavigateLibrary }: { onNavigateLibrary
           <Row icon="at" tint="#8E8E93" label={t('username')} value={`@${user.username}`} />
           <Row
             icon="calendar" tint="#FF9F0A" label={t('dateOfBirth')}
-            value={user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString(language === 'en' ? 'en-VN' : 'en-US') : 'Not available yet'}
+            value={user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString(language === 'en' ? 'en-US' : 'vi-VN') : 'Chưa có'}
             onPress={() => toggle('dob')} open={editing === 'dob'}
           />
           {editing === 'dob' && editor(
             <DatePicker value={dob} onChange={setDob} max={new Date()} style={styles.input} />,
             () => saveFields({ dateOfBirth: dob }), !dob,
           )}
-          <Row icon="location" tint="#FF453A" label={t('location')} value={address || 'Not available'} onPress={() => toggle('address')} open={editing === 'address'} last={editing !== 'address'} />
+          <Row icon="location" tint="#FF453A" label={t('location')} value={address || 'Chưa có'} onPress={() => toggle('address')} open={editing === 'address'} last={editing !== 'address'} />
           {editing === 'address' && editor(
             <>
               {([['country', 'Country'], ['province', 'Province / city'], ['ward', 'Ward / commune'], ['detail', 'House number, street']] as const).map(([k, label], i) => (
@@ -339,16 +339,16 @@ export default function AccountScreen({ onNavigateLibrary }: { onNavigateLibrary
           )}
         </Group>
 
-        <Group title="INTERFACE & LANGUAGE">
+        <Group title="GIAO DIỆN & NGÔN NGỮ">
           <Row
             icon="contrast"
             tint="#636366"
-            label="Interface"
+            label="Giao diện"
             right={
               <View style={styles.segment}>
                 {(['auto', 'light', 'dark'] as const).map((m) => (
                   <Pressable key={m} onPress={() => setThemeMode(m)} style={[styles.seg, themeMode === m && styles.segOn]} accessibilityRole="button" accessibilityState={{ selected: themeMode === m }}>
-                    <Text style={[styles.segText, themeMode === m && { color: colors.text }]}>{m === 'auto' ? 'Auto' : m === 'light' ? 'Morning' : 'Evening'}</Text>
+                    <Text style={[styles.segText, themeMode === m && { color: colors.text }]}>{m === 'auto' ? 'Tự động' : m === 'light' ? 'Sáng' : 'Tối'}</Text>
                   </Pressable>
                 ))}
               </View>
@@ -372,7 +372,7 @@ export default function AccountScreen({ onNavigateLibrary }: { onNavigateLibrary
         </Group>
 
         <Group
-          title="MUSIC PLAY"
+          title="PHÁT NHẠC"
           footer={
             transitionMode === 'automix' ? 'Switch songs like a DJ: come in at the end of the song, match the beat.'
             : transitionMode === 'crossfade' ? `The two cards overlap ${crossfadeSeconds} seconds.`
@@ -382,7 +382,7 @@ export default function AccountScreen({ onNavigateLibrary }: { onNavigateLibrary
           <View style={styles.block}>
             <View style={styles.blockHead}>
               <View style={[styles.iconTile, { backgroundColor: '#FF375F' }]}><Icon name="shuffle" size={17} color="#fff" /></View>
-              <Text style={[styles.rowLabel, { marginLeft: space.md }]}>Switch Post</Text>
+              <Text style={[styles.rowLabel, { marginLeft: space.md }]}>Chuyển bài</Text>
             </View>
             <View style={[styles.segment, styles.segmentFull]}>
               {([['gapless', 'Seamless'], ['crossfade', 'Crossfade'], ['automix', 'AutoMix']] as const).map(([m, label]) => (
@@ -404,19 +404,19 @@ export default function AccountScreen({ onNavigateLibrary }: { onNavigateLibrary
           <Row
             icon="volume-high"
             tint="#5E5CE6"
-            label="Volume balance"
+            label="Cân bằng âm lượng"
             right={<Toggle value={soundCheck} onValueChange={setSoundCheck} accessibilityLabel="Volume equalization" />}
           />
           <Row
             icon="infinite"
             tint="#FF9500"
-            label="DJ Autoplay (Automatic BPM Matching)"
+            label="Chuyển bài kiểu DJ (khớp nhịp tự động)"
             right={<Toggle value={djAutoplay} onValueChange={setDjAutoplay} accessibilityLabel="DJ Autoplay" />}
           />
           <View style={styles.block}>
             <View style={styles.blockHead}>
               <View style={[styles.iconTile, { backgroundColor: '#30B0C7' }]}><Icon name="options" size={17} color="#fff" /></View>
-              <Text style={[styles.rowLabel, { marginLeft: space.md }]}>Equalizer</Text>
+              <Text style={[styles.rowLabel, { marginLeft: space.md }]}>Bộ chỉnh âm</Text>
             </View>
             <View style={[styles.segment, styles.segmentFull, { flexWrap: 'wrap', gap: 6 }]}>
               {([
@@ -441,11 +441,11 @@ export default function AccountScreen({ onNavigateLibrary }: { onNavigateLibrary
           </View>
         </Group>
 
-        <Group title="DEVICE" footer={workspaceEnabled ? `${t('workspaceHint')} ${t('devicesSyncing', { count: workspaceMemberCount })}` : t('workspaceHint')}>
+        <Group title="THIẾT BỊ" footer={workspaceEnabled ? `${t('workspaceHint')} ${t('devicesSyncing', { count: workspaceMemberCount })}` : t('workspaceHint')}>
           <Row
             icon="phone-portrait"
             tint="#34C759"
-            label="Sync devices"
+            label="Đồng bộ thiết bị"
             right={<Toggle value={workspaceEnabled} onValueChange={toggleWorkspaceSync} accessibilityLabel="Sync devices" />}
             last
           />
@@ -453,23 +453,23 @@ export default function AccountScreen({ onNavigateLibrary }: { onNavigateLibrary
 
         {user.role === 'admin' && (
           <Group title="ADMIN">
-            <Row icon="shield-checkmark" tint="#FF9F0A" label="Manage music store" onPress={() => navigation.navigate('Admin')} last />
+            <Row icon="shield-checkmark" tint="#FF9F0A" label="Quản lý kho nhạc" onPress={() => navigation.navigate('Admin')} last />
           </Group>
         )}
 
-        <Group title="SECURITY" footer={user.googleLinked ? t('googleLinkedHint') : undefined}>
+        <Group title="BẢO MẬT" footer={user.googleLinked ? t('googleLinkedHint') : undefined}>
           {user.googleLinked ? (
-            <Row icon="logo-google" tint="#4285F4" label="Sign in with Google" value="Linked" last />
+            <Row icon="logo-google" tint="#4285F4" label="Đăng nhập bằng Google" value="Đã liên kết" last />
           ) : (
             <>
               <Row icon="key" tint="#8E8E93" label={t('changePassword')} onPress={() => toggle('password')} open={editing === 'password'} last={editing !== 'password'} />
               {editing === 'password' && editor(
                 <>
-                  <TextField value={currentPassword} onChangeText={setCurrentPassword} placeholder={t('currentPassword')} placeholderTextColor={colors.textTertiary} style={styles.input} secureTextEntry autoFocus />
-                  <TextField value={newPassword} onChangeText={setNewPassword} placeholder={`${t('newPassword')} (≥ 6 characters)`} placeholderTextColor={colors.textTertiary} style={[styles.input, { marginTop: space.sm }]} secureTextEntry />
-                  <TextField value={confirmNew} onChangeText={setConfirmNew} placeholder="Re-enter new password" placeholderTextColor={colors.textTertiary} style={[styles.input, { marginTop: space.sm }]} secureTextEntry onSubmitEditing={savePassword} />
-                  {!!confirmNew && confirmNew !== newPassword && <Text style={styles.fieldError}>The two new passwords do not match</Text>}
-                  <Text style={styles.fieldHint}>Changing the password will log out all other devices.</Text>
+                  {user.hasPassword && <TextField value={currentPassword} onChangeText={setCurrentPassword} placeholder={t('currentPassword')} placeholderTextColor={colors.textTertiary} style={styles.input} secureTextEntry autoFocus />}
+                  <TextField value={newPassword} onChangeText={setNewPassword} placeholder={`${t('newPassword')} (ít nhất 6 ký tự)`} placeholderTextColor={colors.textTertiary} style={[styles.input, { marginTop: space.sm }]} secureTextEntry />
+                  <TextField value={confirmNew} onChangeText={setConfirmNew} placeholder="Nhập lại mật khẩu mới" placeholderTextColor={colors.textTertiary} style={[styles.input, { marginTop: space.sm }]} secureTextEntry onSubmitEditing={savePassword} />
+                  {!!confirmNew && confirmNew !== newPassword && <Text style={styles.fieldError}>Hai mật khẩu mới chưa khớp</Text>}
+                  <Text style={styles.fieldHint}>Lần sau có thể đăng nhập bằng email và mật khẩu này, hoặc vẫn dùng mã 6 số.</Text>
                 </>,
                 savePassword, !passwordReady,
               )}
@@ -490,12 +490,12 @@ export default function AccountScreen({ onNavigateLibrary }: { onNavigateLibrary
           {editing === 'delete' && (
             <View style={styles.editor}>
               <Text style={styles.fieldHint}>
-                {user.googleLinked ? `Type the password, or username "${user.username}" if the account only logs in with Google.` : 'Enter the password to confirm. Playlists and liked songs will be permanently deleted.'}
+                {`Nhập email ${user.email} để xác nhận. Danh sách phát, bài đã thích và lịch sử nghe sẽ bị xoá vĩnh viễn.`}
               </Text>
-              <TextField value={deleteConfirm} onChangeText={setDeleteConfirm} placeholder={user.googleLinked ? 'Password or username' : t('currentPassword')} placeholderTextColor={colors.textTertiary} style={[styles.input, { marginTop: space.sm }]} secureTextEntry={!user.googleLinked} autoFocus />
+              <TextField value={deleteConfirm} onChangeText={setDeleteConfirm} placeholder={user.email} placeholderTextColor={colors.textTertiary} style={[styles.input, { marginTop: space.sm }]} autoCapitalize="none" keyboardType="email-address" autoFocus />
               <View style={styles.editorActions}>
-                <ActionButton variant="glass" size="md" title="Cancel" onPress={() => toggle(null)} />
-                <ActionButton variant="primary" size="md" title="Permanent deletion" onPress={removeAccount} disabled={!deleteConfirm || isDeletingAccount} />
+                <ActionButton variant="glass" size="md" title="Huỷ" onPress={() => toggle(null)} />
+                <ActionButton variant="primary" size="md" title="Xoá vĩnh viễn" onPress={removeAccount} disabled={deleteConfirm.trim() !== user.email || isDeletingAccount} />
               </View>
             </View>
           )}

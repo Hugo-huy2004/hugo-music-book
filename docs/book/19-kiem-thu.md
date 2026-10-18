@@ -90,7 +90,7 @@ test('guest can open home and play a song', async ({ page }) => {
 
 ### Kết quả
 
-> 📷 Ảnh: kết quả `node --test` và `supabase test db` đều xanh; báo cáo Playwright.
+![Test của worker và test bảo mật pgTAP đều qua](images/term-19-tests.png)
 
 ### Kiểm tra
 
@@ -106,3 +106,11 @@ pnpm --filter @hugo/app e2e # Playwright (cần bản build web đang chạy)
 
 - **Test database chậm vì dữ liệu mẫu lớn:** tách dữ liệu mẫu ra `supabase/seed.sql`, chỉ tạo đúng dòng cần cho từng test.
 - **App mobile cần test trên máy thật:** thêm Maestro chạy các luồng chính trên trình giả lập iOS/Android trong CI.
+
+### Code của chương
+
+Các file chương này viết, trong repo đã clone ở phần Mở đầu:
+
+- `worker/test/psl.test.ts`
+- `supabase/tests/rls.test.sql`
+- `app/e2e/smoke.spec.ts`

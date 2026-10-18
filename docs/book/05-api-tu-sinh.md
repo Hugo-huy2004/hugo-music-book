@@ -107,7 +107,9 @@ function must<T>({ data, error }: { data: T; error: any }): T {
 
 ### Kết quả
 
-> 📷 Ảnh: trang chủ hiện bài thật từ Supabase; tab Network của trình duyệt cho thấy một request `GET /rest/v1/songs?select=*,artist:artists(name)...`.
+![Gọi thẳng API tự sinh bằng publishable key: bài kèm tên nghệ sĩ trong một lượt](images/term-05-rest.png)
+
+![Khách mở app: trang chủ đọc bài thật từ Supabase](images/home-guest.png)
 
 ### Kiểm tra
 
@@ -123,3 +125,11 @@ Bài chưa phát hành không bao giờ xuất hiện trong kết quả, dù kh�
 
 - **Một màn hình cần dữ liệu từ năm bảng, tính toán phức tạp:** viết một view hoặc hàm SQL trả đúng hình dạng màn hình cần, thay vì ghép ở client.
 - **Cần cache ở rìa mạng cho dữ liệu công khai:** đặt một Edge Function đọc rồi trả kèm `Cache-Control`.
+
+### Code của chương
+
+Các file chương này viết, trong repo đã clone ở phần Mở đầu:
+
+- `app/src/api/supabase.ts`
+- `app/src/api/api.ts`
+- `supabase/migrations/20261018001400_meta_genres.sql`

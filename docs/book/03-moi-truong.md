@@ -87,7 +87,9 @@ supabase db push                            # chạy mọi file trong supabase/m
 
 ### Kết quả
 
-> 📷 Ảnh: cửa sổ dòng lệnh sau `supabase db push` và trang Table Editor của Supabase hiện các bảng vừa tạo.
+![Node.js 26, pnpm 12 và pnpm install cho cả monorepo](images/term-03-install.png)
+
+![Các bảng có trên project sau khi đẩy hết migration](images/term-03-tables.png)
 
 ### Kiểm tra
 
@@ -101,3 +103,9 @@ supabase migration list      # cột Local và Remote khớp nhau
 
 - **Nhiều người cùng làm:** mỗi người một nhánh database (Supabase Branching) thay vì cùng sửa một project.
 - **Muốn làm việc không cần mạng:** `supabase start` chạy cả bộ Supabase trên máy bằng Docker.
+
+### Code của chương
+
+Các file chương này viết, trong repo đã clone ở phần Mở đầu:
+
+- `pnpm-workspace.yaml`

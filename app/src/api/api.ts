@@ -63,7 +63,13 @@ export const auth = {
   sendResetCode: async (email: string) => must(await supabase.auth.resetPasswordForEmail(email)),
   resetPassword: async (email: string, code: string, password: string) => {
     must(await supabase.auth.verifyOtp({ email, token: code, type: 'recovery' }));
-    must(await supabase.auth.updateUser({ password }));
+    must(await supabase.auth.updateUser({ password, data: { has_password: true } }));
+  },
+  /** Đổi mật khẩu khi đang đăng nhập: kiểm mật khẩu cũ bằng cách đăng nhập lại, rồi đặt mật khẩu mới. */
+  changePassword: async (current: string, password: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user?.user_metadata?.has_password) must(await supabase.auth.signInWithPassword({ email: user.email!, password: current }));
+    must(await supabase.auth.updateUser({ password, data: { has_password: true } }));
   },
 
   /** Google: web chuyển trang; iOS/Android mở trình duyệt hệ thống rồi quay lại app qua deep link. */
@@ -97,6 +103,11 @@ export async function me(): Promise<User | null> {
     email: u.email ?? '',
     avatarUrl: p?.avatar_url ?? undefined,
     musicGenres: p?.music_genres ?? [],
+    phone: p?.phone ?? undefined,
+    dateOfBirth: p?.date_of_birth ?? undefined,
+    country: p?.country ?? undefined,
+    address: { country: p?.country ?? undefined, province: p?.province ?? undefined, ward: p?.ward ?? undefined, detail: p?.address_detail ?? undefined },
+    hasPassword: !!u.user_metadata?.has_password,
     role: u.app_metadata?.role === 'admin' ? 'admin' : 'user',
     googleLinked: u.app_metadata?.provider === 'google',
     isGuest: u.is_anonymous ?? false,
@@ -237,11 +248,17 @@ export const api = {
   },
 
   // hồ sơ
-  updateProfile: async (fields: { nickname?: string; musicGenres?: string[]; username?: string; country?: string }) => {
+  updateProfile: async (f: {
+    nickname?: string; musicGenres?: string[]; username?: string; country?: string; phone?: string; dateOfBirth?: string;
+    address?: { country?: string; province?: string; ward?: string; detail?: string };
+  }) => {
     const { data: { user } } = await supabase.auth.getUser();
-    must(await supabase.from('profiles').update({
-      nickname: fields.nickname, username: fields.username, country: fields.country, music_genres: fields.musicGenres,
-    }).eq('id', user!.id));
+    const row = {
+      nickname: f.nickname, username: f.username, music_genres: f.musicGenres, phone: f.phone, date_of_birth: f.dateOfBirth,
+      country: f.address?.country ?? f.country, province: f.address?.province, ward: f.address?.ward, address_detail: f.address?.detail,
+    };
+    // trường undefined bị bỏ khi gửi đi (JSON), nên chỉ cột được gửi lên mới đổi
+    must(await supabase.from('profiles').update(row).eq('id', user!.id));
     return me();
   },
   updateAvatar: async (file: Blob) => {

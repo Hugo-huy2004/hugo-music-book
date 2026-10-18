@@ -92,7 +92,9 @@ Cột lời không nằm trong `SONG_COLUMNS` của danh sách bài: chỉ tải
 
 ### Kết quả
 
-> 📷 Ảnh: màn hình tìm kiếm với từ khóa "mua dem" ra đúng bài; màn hình lời bài hát với dòng đang hát sáng lên.
+![Gõ "mua dem" (không dấu) ra "Mưa Đêm Sài Gòn"](images/search.png)
+
+![Trình phát đầy đủ với lời bài hát chạy theo nhạc](images/player-full.png)
 
 ### Kiểm tra
 
@@ -107,3 +109,10 @@ explain select * from public.search_songs('neon');   -- có dùng songs_search_t
 
 - **Hàng triệu bài, cần gợi ý khi gõ dưới 50 ms:** chuyển sang Meilisearch hoặc Typesense, đồng bộ bằng trigger đưa việc vào hàng đợi (chương 9).
 - **Tìm theo ý nghĩa** ("nhạc buồn mưa rơi"): thêm cột vector (pgvector) chứa embedding của tên và lời bài hát.
+
+### Code của chương
+
+Các file chương này viết, trong repo đã clone ở phần Mở đầu:
+
+- `supabase/migrations/20261018000100_catalog.sql`
+- `supabase/migrations/20261018000700_search.sql`

@@ -82,7 +82,9 @@ const coverUrl = (path?: string | null) =>
 
 ### Kết quả
 
-> 📷 Ảnh: trang Storage có bốn bucket; thư mục một bài trong `originals` (file gốc) và `covers` (ảnh bìa); màn hình tải bài lên của trang quản trị.
+![Bốn bucket và file gốc, ảnh bìa của bài mẫu](images/term-08-storage.png)
+
+![Form tải bài lên của trang quản trị](images/admin-upload.png)
 
 ### Kiểm tra
 
@@ -95,3 +97,10 @@ const coverUrl = (path?: string | null) =>
 - **File gốc rất lớn, mạng chập chờn:** dùng upload tiếp tục được (TUS, thư viện `tus-js-client` trỏ vào `/storage/v1/upload/resumable`) để mất mạng giữa chừng không phải tải lại từ đầu.
 - **Cần ảnh bìa nhiều kích thước:** bật biến đổi ảnh của Supabase (gói Pro) với `getPublicUrl(path, { transform: { width: 300 } })`, hoặc để worker tạo sẵn vài kích thước.
 - **Băng thông nhạc lớn:** đặt CDN riêng (Cloudflare R2 không tính phí băng thông ra) cho bucket `audio`; Supabase Storage có cổng tương thích S3 để đồng bộ.
+
+### Code của chương
+
+Các file chương này viết, trong repo đã clone ở phần Mở đầu:
+
+- `supabase/migrations/20261018000400_storage.sql`
+- `app/src/api/api.ts`

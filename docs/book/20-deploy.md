@@ -114,7 +114,7 @@ eas update --channel production -m "sửa lỗi"      # sửa JS sau này, khôn
 
 ### Kết quả
 
-> 📷 Ảnh: GitHub Actions với ba job xanh theo thứ tự; trang Fly.io của worker; bản web chạy trên tên miền thật.
+![Bản build web: một thư mục dist tĩnh](images/term-20-build.png)
 
 ### Kiểm tra
 
@@ -128,3 +128,10 @@ curl -sI https://<tên miền web> | head -1
 
 - **Cần môi trường thử trước production:** bật Supabase Branching: mỗi pull request có một nhánh database riêng với migration của nó.
 - **Worker xử lý không kịp:** `fly scale count 3`; hàng đợi tự chia việc.
+
+### Code của chương
+
+Các file chương này viết, trong repo đã clone ở phần Mở đầu:
+
+- `worker/fly.toml`
+- `.github/workflows/deploy.yml`

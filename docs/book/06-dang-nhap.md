@@ -2,7 +2,7 @@
 
 ### Chương này làm gì
 
-Ba cách vào app, không có mật khẩu nào: **nghe thử ngay với tư cách khách**, **nhập email nhận mã 6 số**, hoặc **bấm "Tiếp tục với Google"**. Mỗi tài khoản tự có một hồ sơ trong database.
+Ba cách vào app không cần mật khẩu: **nghe thử ngay với tư cách khách**, **nhập email nhận mã 6 số**, hoặc **bấm "Tiếp tục với Google"**. Ai thích mật khẩu thì đặt thêm được, nhưng không bắt buộc. Mỗi tài khoản tự có một hồ sơ trong database.
 
 ### Để làm gì
 
@@ -44,6 +44,10 @@ otp_expiry = 600
 ```
 
 Mẫu email gửi mã đặt ở *Authentication → Email Templates → Magic Link*, dùng biến `{{ .Token }}` để hiện mã 6 số thay vì đường link.
+
+> **Lưu ý gói miễn phí.** Với bộ gửi mail mặc định, Supabase không cho sửa mẫu email và chỉ gửi vài email mỗi giờ (đủ để thử, không đủ chạy thật). Nối một dịch vụ SMTP ở *Authentication → Emails → SMTP Settings* (Resend, Postmark, Amazon SES đều có gói miễn phí) thì sửa được mẫu và hết giới hạn.
+
+Mẫu *Reset Password* cũng dùng `{{ .Token }}`: người muốn có mật khẩu bấm "Quên mật khẩu", nhận mã 6 số, đặt mật khẩu mới (bước 4b).
 
 **Bước 2: ba hàm đăng nhập.**
 
@@ -87,6 +91,18 @@ supabase.auth.onAuthStateChange((event) => {
 supabase.auth.getSession().then(({ data }) => {
   if (!data.session) auth.continueAsGuest();
 });
+```
+
+**Bước 4b: mật khẩu là tùy chọn.** Cùng một ô mã 6 số dùng cho việc đặt mật khẩu: `resetPasswordForEmail` gửi mã, `verifyOtp` với `type: 'recovery'` đăng nhập bằng mã đó, rồi `updateUser` đặt mật khẩu. Supabase băm và kiểm mật khẩu, app không bao giờ thấy bản băm.
+
+```ts
+// app/src/api/api.ts (trích)
+signInWithPassword: async (email: string, password: string) => must(await supabase.auth.signInWithPassword({ email, password })),
+sendResetCode: async (email: string) => must(await supabase.auth.resetPasswordForEmail(email)),
+resetPassword: async (email: string, code: string, password: string) => {
+  must(await supabase.auth.verifyOtp({ email, token: code, type: 'recovery' }));
+  must(await supabase.auth.updateUser({ password, data: { has_password: true } }));
+},
 ```
 
 **Bước 5: hồ sơ tự tạo cùng tài khoản.** `auth.users` do Supabase quản lý; dữ liệu riêng của app nằm ở `public.profiles`. Một trigger tạo hồ sơ ngay khi có tài khoản mới, lấy sẵn tên và ảnh nếu đăng nhập bằng Google.
@@ -162,7 +178,11 @@ deleteAccount: async () => must(await supabase.functions.invoke('delete-account'
 
 ### Kết quả
 
-> 📷 Ảnh: hộp đăng nhập của app (ô email, nút Google, dòng "nghe thử không cần tài khoản"), email chứa mã 6 số, và trang Authentication → Users có một người dùng ẩn danh và một người dùng email.
+![Hộp đăng nhập: Google, mã 6 số qua email, hoặc mật khẩu nếu đã đặt](images/login-modal.png)
+
+![Khách mở Tài khoản: được mời đăng nhập thay vì thấy hồ sơ trống](images/login.png)
+
+![Tài khoản sau khi đăng nhập: hồ sơ đọc qua my_profile()](images/account.png)
 
 ### Kiểm tra
 
@@ -175,3 +195,13 @@ deleteAccount: async () => must(await supabase.functions.invoke('delete-account'
 - **Muốn đăng nhập bằng vân tay/Face ID:** Supabase Auth đang có passkey (bản beta từ 5/2026); thêm làm cách thứ tư khi ra bản chính thức.
 - **Nhiều khách ảo do bot:** bật CAPTCHA (hCaptcha hoặc Cloudflare Turnstile) cho đăng nhập ẩn danh và hạ giới hạn theo IP ở *Authentication → Rate Limits*.
 - **Khách muốn giữ dữ liệu khi đăng ký:** dùng `linkIdentity()` (Google) hoặc `updateUser({ email })` để biến tài khoản ẩn danh thành tài khoản thật thay vì tạo tài khoản mới.
+
+### Code của chương
+
+Các file chương này viết, trong repo đã clone ở phần Mở đầu:
+
+- `supabase/config.toml`
+- `app/src/api/api.ts`
+- `app/src/store/useStore.ts`
+- `supabase/migrations/20261018000200_profiles.sql`
+- `supabase/functions/delete-account/index.ts`

@@ -191,16 +191,23 @@ await asAdmin.rpc('review_song', { p_song_id: song.id, p_decision: 'publish' });
 
 ### Kết quả
 
-Đo thật một bài nguồn lossless (1411 kbps) với bốn mức ứng viên:
+Đo thật bài mẫu "Mưa Đêm Sài Gòn" (FLAC, 816 kbps) với bảy mức ứng viên, τ = 0,10:
 
-| Mức | MOS (ViSQOL) | Giữ? |
-|---|---|---|
-| 64 kbps | 1,53 | Có (mức thấp nhất luôn giữ) |
-| 96 kbps | 2,81 | Có (+1,28) |
-| 128 kbps | 3,66 | Có (+0,84) |
-| 192 kbps | 4,55 | Có (+0,90) |
+| Mức | MOS (ViSQOL) | Hơn mức đã giữ | Giữ? |
+|---|---|---|---|
+| 64 kbps | 2,44 | | Có (mức thấp nhất luôn giữ) |
+| 96 kbps | 3,56 | +1,12 | Có |
+| 128 kbps | 3,92 | +0,36 | Có |
+| 160 kbps | 4,27 | +0,35 | Có |
+| 192 kbps | 4,48 | +0,22 | Có |
+| 256 kbps | 4,72 | +0,24 | Có |
+| 320 kbps | 4,72 | +0,005 | **Không**: tai người không nghe ra khác biệt |
 
-> 📷 Ảnh: cửa sổ dòng lệnh của worker in `✓ <id bài> { ladder: [...] }`; bucket `audio` có thư mục của bài với các file `.mp4` và `.m3u8`; trang quản trị hiện bài chuyển từ "Đang xử lý" sang "Đã phát hành".
+![Worker xử lý từng bài. Dòng ✗ là lần chạy bị ngắt giữa chừng: hàng đợi tự trả việc lại và lần sau thành công](images/term-10-worker.png)
+
+![PSL trên 10 bài mẫu: "Sóng Xa" (ambient, ít chi tiết) chỉ cần mức 64 kbps; mức 320 bị bỏ ở mọi bài vì hơn 256 chưa tới 0,10 điểm](images/term-10-psl.png)
+
+![Mỗi mức một file .mp4 và một playlist .m3u8 trong bucket audio](images/term-10-audio.png)
 
 ### Kiểm tra
 
@@ -219,3 +226,15 @@ select status, step, error from public.pipeline_runs order by id desc limit 5;
 - **Nhiều bài chờ xử lý:** chạy thêm worker. Hàng đợi tự chia việc, không cần sửa code.
 - **Muốn tự động hóa hoàn toàn trên Supabase:** tách bước nhẹ (đọc metadata, tìm lời bài hát) sang Edge Function, giữ worker cho ffmpeg và ViSQOL.
 - **Dữ liệu blind test (chương 14) cho thấy τ = 0,10 vẫn giữ mức thừa:** tăng τ, chạy lại PSL cho cả danh mục bằng cách đưa lại việc vào hàng đợi.
+
+### Code của chương
+
+Các file chương này viết, trong repo đã clone ở phần Mở đầu:
+
+- `worker/package.json`
+- `worker/src/supabase.ts`
+- `worker/src/psl.ts`
+- `worker/src/ffmpeg.ts`
+- `worker/src/process-song.ts`
+- `worker/src/main.ts`
+- `supabase/seed/seed.ts`
