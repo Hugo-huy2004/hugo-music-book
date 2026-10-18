@@ -1,4 +1,4 @@
-# Hugo Music: xây app nghe nhạc thực chiến với Supabase, Node.js 26 và Expo
+# Hugo Music: thực chiến với Supabase, Node.js 26 và Expo
 
 ## Cách dùng cuốn sách này
 
