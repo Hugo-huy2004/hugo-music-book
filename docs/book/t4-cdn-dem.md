@@ -86,4 +86,4 @@ Lần thứ hai gọi, `cf-cache-status: HIT` cho biết file được phục v�
 ### Khi nào đổi
 
 - Người nghe ở nhiều châu lục: thêm bản sao Storage ở vùng khác, hoặc đặt CDN riêng trước Storage với khóa cache đã bỏ token.
-- Chi phí băng thông Storage chiếm phần lớn hóa đơn: đưa file âm thanh sang kho có băng thông ra miễn phí (ví dụ Cloudflare R2), giữ Supabase cho database và playlist.
+- Chi phí băng thông Storage chiếm phần lớn hóa đơn: đưa file âm thanh sang kho có băng thông ra miễn phí (ví dụ Cloudflare R2; Cloudflare, n.d.a), giữ Supabase cho database và playlist.

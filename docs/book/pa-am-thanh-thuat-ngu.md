@@ -10,7 +10,7 @@
 | Bitrate | Số bit cho mỗi giây âm thanh | PCM CD: 44 100 × 16 × 2 = 1 411 200 bit/giây |
 | Nén mất dữ liệu | Bỏ phần tai người khó nghe (AAC, MP3, Opus) | 128–256 kbps cho nhạc |
 | Nén không mất dữ liệu | Nén như file zip, giải ra giống hệt (FLAC, ALAC) | 700–1 000 kbps |
-| Loudness (LUFS) | Độ to cảm nhận, theo ITU-R BS.1770 | −14 LUFS là mục tiêu phổ biến |
+| Loudness (LUFS) | Độ to cảm nhận, theo ITU-R BS.1770 (ITU-R, 2023; EBU, 2023) | −14 LUFS là mục tiêu phổ biến |
 | MOS | Điểm chất lượng trung bình 1–5 | ViSQOL cho điểm theo thang này |
 
 Dung lượng một bài:

@@ -37,3 +37,4 @@ r1-thi-nghiem.md
 r2-doc-bai-bao.md
 pa-am-thanh-thuat-ngu.md
 pb-ky-thuat-cu-moi.md
+tl-tai-lieu-tham-khao.md

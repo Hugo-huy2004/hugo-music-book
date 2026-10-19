@@ -75,7 +75,7 @@ select tier_kbps, count(*), avg(startup_ms), sum(rebuffer_count) from public.pla
 
 ### Ví dụ tính tay
 
-**Cần bao nhiêu phiếu cho một cặp mức.** Muốn phân biệt tỉ lệ đoán đúng 60 % với 50 % (đoán bừa), mức ý nghĩa 5 %, độ mạnh 80 %:
+**Cần bao nhiêu phiếu cho một cặp mức.** Muốn phân biệt tỉ lệ đoán đúng 60 % với 50 % (đoán bừa), mức ý nghĩa 5 %, độ mạnh 80 %, theo công thức cỡ mẫu cho một tỉ lệ (Chow, Shao and Wang, 2008):
 
 ```text
 n ≈ (z₀,₀₂₅·√(p₀(1−p₀)) + z₀,₂·√(p₁(1−p₁)))² ÷ (p₁ − p₀)²

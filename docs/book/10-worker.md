@@ -31,7 +31,7 @@ Trình phát cần nhiều mức chất lượng để tự hạ xuống khi m�
 |---|---|
 | Bitrate | Không nói gì về việc tai người nghe ra hay không |
 | PEAQ | Chuẩn cũ, ít công cụ mở |
-| **ViSQOL** (Google) | Cho điểm MOS từ 1 tới 5, gần với đánh giá của người nghe; có bản Python |
+| **ViSQOL** (Hines et al., 2015; Chinen et al., 2020) | Cho điểm MOS từ 1 tới 5, gần với đánh giá của người nghe; có bản Python |
 
 ### Chọn gì, vì sao
 

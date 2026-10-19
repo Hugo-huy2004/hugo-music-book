@@ -23,7 +23,7 @@ Ba vấn đề: chờ gần ba phút mới nghe được nốt đầu; bỏ bài
 
 ### HTTP Range: lấy đúng phần cần
 
-RFC 9110 cho phép client xin một khoảng byte. Server trả mã **206 Partial Content** kèm `Content-Range`:
+RFC 9110 (Fielding, Nottingham and Reschke, 2022) cho phép client xin một khoảng byte. Server trả mã **206 Partial Content** kèm `Content-Range`:
 
 ```http
 GET /audio/abc.mp4 HTTP/1.1

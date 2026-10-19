@@ -2,7 +2,7 @@
 
 ### Chương này làm gì
 
-Giải phẫu hai loại playlist của HLS bằng dữ liệu thật của Hugo Music, rồi so HLS với các cách phát khác để thấy vì sao chọn nó.
+Giải phẫu hai loại playlist của HLS (Pantos and May, 2017) bằng dữ liệu thật của Hugo Music, rồi so HLS với các cách phát khác để thấy vì sao chọn nó.
 
 ### Để làm gì
 
@@ -63,11 +63,11 @@ Edge Function thay tên file bằng **signed URL** (link có chữ ký, hết h�
 | **HLS** | Playlist + đoạn qua HTTP thường | Nhạc theo yêu cầu: chạy trên mọi trình duyệt (qua hls.js hoặc gốc trên Safari), iOS, Android |
 | MPEG-DASH | Như HLS, manifest XML | Android, web; iOS không hỗ trợ gốc |
 | WebRTC | Luồng thời gian thực, độ trễ dưới giây | Gọi thoại, phát trực tiếp tương tác |
-| Media over QUIC (MoQ) | Đang được IETF chuẩn hóa, trên QUIC | Tương lai: độ trễ thấp mà vẫn mở rộng như CDN |
+| Media over QUIC (MoQ) | Đang được IETF chuẩn hóa, trên QUIC (Iyengar and Thomson, 2021; IETF, n.d.) | Tương lai: độ trễ thấp mà vẫn mở rộng như CDN |
 
 ### Chọn gì, vì sao
 
-**HLS với fMP4 và AAC.** Đây là định dạng duy nhất chạy gốc trên iOS (bắt buộc với app nghe nhạc trên App Store), chạy trên Android qua ExoPlayer/Media3, trên web qua hls.js. Đi qua HTTP thường nên mọi CDN đều cache được, không cần server phát chuyên dụng. Nghe chung "đúng giây" ở đài 24/7 (chương 13) không cần độ trễ dưới giây của WebRTC: mỗi máy tự tính vị trí theo giờ máy chủ.
+**HLS với fMP4 và AAC.** Theo hướng dẫn soạn nội dung HLS (Apple Inc., n.d.), đây là định dạng duy nhất chạy gốc trên iOS (bắt buộc với app nghe nhạc trên App Store), chạy trên Android qua ExoPlayer/Media3, trên web qua hls.js. Đi qua HTTP thường nên mọi CDN đều cache được, không cần server phát chuyên dụng. Nghe chung "đúng giây" ở đài 24/7 (chương 13) không cần độ trễ dưới giây của WebRTC: mỗi máy tự tính vị trí theo giờ máy chủ.
 
 ### Ví dụ tính tay
 

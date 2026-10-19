@@ -33,7 +33,7 @@ Người dùng không đọc hướng dẫn. Họ mong một nút trông như n�
 | 7 | **Danh sách nhóm trong thẻ bo góc** (inset grouped) cho cài đặt và biểu mẫu | `InsetGroup` + `ListRow` ở Tài khoản, nhóm nghe chung, trang quản trị |
 | 8 | **Chế độ sáng, tối và theo hệ thống** | `HugoProvider scheme="system"`; mọi màu lấy từ `useHugoTheme().colors`, không viết mã màu trong màn hình |
 | 9 | **Chuyển động có ý nghĩa và ngắn** (140 tới 420 ms); tôn trọng cài đặt *giảm chuyển động* | Hiệu ứng "giọt nước" khi chạm (`useDroplet`); khi máy bật giảm chuyển động thì bỏ hiệu ứng nảy |
-| 10 | **Trợ năng là mặc định**: nút chỉ có biểu tượng phải có nhãn đọc màn hình; tương phản chữ đủ cao; cỡ chữ to theo cài đặt máy | `accessibilityLabel` bắt buộc cho `GlassButton`; màu chữ phụ đạt tỉ lệ tương phản 4.5:1 |
+| 10 | **Trợ năng là mặc định**: nút chỉ có biểu tượng phải có nhãn đọc màn hình; tương phản chữ đủ cao; cỡ chữ to theo cài đặt máy | `accessibilityLabel` bắt buộc cho `GlassButton`; màu chữ phụ đạt tỉ lệ tương phản 4.5:1 (W3C, 2023) |
 
 ### Làm từng bước
 

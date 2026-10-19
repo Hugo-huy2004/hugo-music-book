@@ -2,7 +2,7 @@
 
 ### Chương này làm gì
 
-Tách bài toán "ai được nghe bài nào" thành hai tầng: mô hình quyền (quyết định) và cơ chế thi hành ở nơi phát file (chặn). So các lựa chọn ở mỗi tầng và giải thích thiết kế của Hugo Music.
+Tách bài toán "ai được nghe bài nào" thành hai tầng theo cách chia của NIST (Hu et al., 2014): mô hình quyền (quyết định) và cơ chế thi hành ở nơi phát file (chặn). So các lựa chọn ở mỗi tầng và giải thích thiết kế của Hugo Music.
 
 ### Để làm gì
 

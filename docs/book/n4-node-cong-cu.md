@@ -25,7 +25,7 @@ Repo ghi phiên bản cần dùng ở hai chỗ: `.nvmrc` (ghi `26`, trình qu�
 
 | Việc | Trước đây | Node.js 26 |
 |---|---|---|
-| Chạy TypeScript | `ts-node`, `tsx`, hoặc build bằng `tsc` | `node file.ts` (type stripping) |
+| Chạy TypeScript | `ts-node`, `tsx`, hoặc build bằng `tsc` | `node file.ts` (type stripping; Node.js, n.d.) |
 | Đọc file `.env` | `dotenv` | `node --env-file-if-exists=.env` |
 | Viết test | Jest, Vitest | `node --test` |
 | Tự chạy lại khi sửa code | `nodemon` | `node --watch` |

@@ -16,24 +16,28 @@ Phần tổng quan tài liệu của luận văn phải chỉ ra đề tài đ�
 | 2 (20 phút) | Phương pháp, thiết lập thí nghiệm, bảng kết quả | So với cái gì, đo trên dữ liệu nào, giả định gì |
 | 3 (khi cần) | Chứng minh, phụ lục | Có thể làm lại được không, chỗ nào yếu |
 
-Sau mỗi bài, ghi một dòng vào bảng: bài toán, phương pháp, dữ liệu, kết quả, giới hạn, liên quan tới đề tài thế nào.
+Sau mỗi bài, ghi ngay mục tham khảo kiểu Harvard (tác giả, năm, tiêu đề, nơi đăng, trang, DOI) để không phải tìm lại lúc viết luận văn, rồi ghi một dòng vào bảng: bài toán, phương pháp, dữ liệu, kết quả, giới hạn, liên quan tới đề tài thế nào.
 
 ### Bài nền của lĩnh vực
 
 | Chủ đề | Tài liệu |
 |---|---|
-| HLS | R. Pantos, W. May, *HTTP Live Streaming*, RFC 8216 (2017); Apple, *HLS Authoring Specification for Apple Devices* |
-| HTTP, Range | R. Fielding và cộng sự, *HTTP Semantics*, RFC 9110 (2022) |
-| QUIC | J. Iyengar, M. Thomson, RFC 9000 (2021) |
-| ABR theo thông lượng | J. Jiang, V. Sekar, H. Zhang, *Improving Fairness, Efficiency, and Stability in HTTP-based Adaptive Video Streaming with FESTIVE*, CoNEXT 2012 |
-| ABR theo bộ đệm | T.-Y. Huang và cộng sự, *A Buffer-Based Approach to Rate Adaptation*, SIGCOMM 2014; K. Spiteri, R. Urgaonkar, R. Sitaraman, *BOLA: Near-Optimal Bitrate Adaptation for Online Videos*, INFOCOM 2016 |
-| ABR dự báo | X. Yin và cộng sự, *A Control-Theoretic Approach for Dynamic Adaptive Video Streaming over HTTP*, SIGCOMM 2015 |
-| ABR học máy | H. Mao, R. Netravali, M. Alizadeh, *Neural Adaptive Video Streaming with Pensieve*, SIGCOMM 2017 |
-| Đo chất lượng âm thanh | A. Hines và cộng sự, *ViSQOLAudio: An objective audio quality metric for low bitrate codecs*, JASA 2015; M. Chinen và cộng sự, *ViSQOL v3*, QoMEX 2020 |
-| Thang bitrate theo nội dung | Netflix Technology Blog, *Per-Title Encode Optimization* (2015) |
-| Đo loudness | ITU-R BS.1770; EBU R 128 |
+| HLS | Pantos and May (2017); Apple Inc. (n.d.) |
+| HTTP, Range | Fielding, Nottingham and Reschke (2022) |
+| QUIC | Iyengar and Thomson (2021) |
+| ABR theo thông lượng | Jiang, Sekar and Zhang (2012) |
+| ABR theo bộ đệm | Huang et al. (2014); Spiteri, Urgaonkar and Sitaraman (2016) |
+| ABR dự báo | Yin et al. (2015) |
+| ABR học máy | Mao, Netravali and Alizadeh (2017) |
+| Đo chất lượng âm thanh | Hines et al. (2015); Chinen et al. (2020) |
+| Thang bitrate theo nội dung | Aaron et al. (2015) |
+| Đo loudness | ITU-R (2023); EBU (2023) |
+| Kiểm soát truy cập theo thuộc tính | Hu et al. (2014) |
+| Đồng bộ đồng hồ | Cristian (1989) |
 
-Netflix tối ưu thang theo từng phim cho video; PSL làm điều tương tự cho nhạc với thước đo cảm nhận âm thanh. Đây là chỗ đề tài đứng.
+Thông tin đầy đủ của từng tài liệu nằm ở mục Tài liệu tham khảo cuối sách, theo chuẩn Harvard.
+
+Netflix tối ưu thang theo từng phim cho video (Aaron et al., 2015); PSL làm điều tương tự cho nhạc với thước đo cảm nhận âm thanh. Đây là chỗ đề tài đứng.
 
 ### Số liệu nên thuộc
 
@@ -60,6 +64,7 @@ Chọn một bài trong bảng, đọc hai lượt đầu, ghi đủ sáu cột 
 3. Netflix Per-Title và PSL giống và khác nhau ở đâu?
 4. 128 kbps trong 1 phút là khoảng bao nhiêu MB? Tính nhẩm.
 5. Vì sao RFC 7233 không còn là tài liệu chính cho HTTP Range?
+6. Viết mục tài liệu tham khảo kiểu Harvard cho một bài báo hội nghị có bốn tác giả. Trong bài trích dẫn nó thế nào?
 
 ### Khi nào đổi
 

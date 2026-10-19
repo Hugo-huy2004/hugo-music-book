@@ -16,7 +16,7 @@ Publishable key nằm ngay trong app, ai cũng lấy được. Nếu bảo vệ 
 | Middleware ở server API | Quen thuộc | Phải nhớ ở mọi route; thêm route mới quên kiểm là lộ |
 | **RLS trong PostgreSQL** | Luật gắn với bảng: mọi đường vào (API tự sinh, Realtime, Storage, SQL) đều qua cùng luật | Phải nghĩ theo kiểu "dòng nào được thấy" thay vì "route nào được gọi" |
 
-Một chính sách RLS trả lời đúng một câu: **AI** (`to authenticated`) được làm **GÌ** (`for select`, `insert`, `update`, `delete`) với **DÒNG NÀO** (`using`: dòng có sẵn; `with check`: dòng mới hoặc sau khi sửa).
+Một chính sách RLS (PostgreSQL Global Development Group, n.d.; Supabase, n.d.a) trả lời đúng một câu: **AI** (`to authenticated`) được làm **GÌ** (`for select`, `insert`, `update`, `delete`) với **DÒNG NÀO** (`using`: dòng có sẵn; `with check`: dòng mới hoặc sau khi sửa).
 
 ### Chọn gì, vì sao
 

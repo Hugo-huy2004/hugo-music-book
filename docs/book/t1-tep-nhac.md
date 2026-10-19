@@ -15,7 +15,7 @@ Ba quyết định của Hugo Music dựa trên chương này: lưu bản gốc 
 | Đuôi | Hộp | Codec thường gặp | Mất dữ liệu | Ghi chú |
 |---|---|---|---|---|
 | `.mp3` | MP3 | MPEG-1 Layer III | Có | Phát ở mọi nơi; kém ở bitrate thấp |
-| `.m4a` / `.mp4` | MP4 (ISO BMFF) | AAC, ALAC | Tùy | AAC là chuẩn của HLS |
+| `.m4a` / `.mp4` | MP4 (ISO BMFF; ISO/IEC, 2022) | AAC, ALAC | Tùy | AAC là chuẩn của HLS |
 | `.flac` | FLAC | FLAC | **Không** | Nhẹ hơn WAV khoảng 40 % |
 | `.wav` | RIFF | PCM | **Không** | Không nén, thẻ yếu |
 | `.ogg` / `.opus` | Ogg | Vorbis, Opus | Có | Opus tốt nhất ở bitrate thấp, nhưng không thuộc HLS của Apple |

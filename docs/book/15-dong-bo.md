@@ -19,7 +19,7 @@ Nghe nhạc là việc xã hội: nghe cùng người yêu ở xa, cùng nhóm b
 |---|---|
 | Ghi trạng thái vào bảng, máy khác nghe Postgres Changes | Mỗi lần tua là một lượt ghi database; chậm, tốn |
 | Server WebSocket riêng giữ "phòng" | Thêm server; khởi động lại là mất phòng |
-| **Kênh Realtime riêng tư + Broadcast + Presence** | Tin nhắn đi thẳng giữa các máy qua Realtime, không ghi database; quyền vào kênh là chính sách RLS trên `realtime.messages` |
+| **Kênh Realtime riêng tư + Broadcast + Presence** (Supabase, n.d.b) | Tin nhắn đi thẳng giữa các máy qua Realtime, không ghi database; quyền vào kênh là chính sách RLS trên `realtime.messages` |
 
 **Cách giữ đúng giây:** không gửi "đang ở giây 42" mà gửi **"ở giây 42 tại thời điểm T theo giờ máy chủ"**. Máy nhận tự cộng thời gian đã trôi qua, nên tin tới chậm vài trăm mili giây vẫn khớp. Sau đó mỗi vài giây so vị trí thật với vị trí mong đợi: lệch ít thì chỉnh tốc độ phát rất nhẹ (tai không nhận ra), lệch nhiều thì tua.
 

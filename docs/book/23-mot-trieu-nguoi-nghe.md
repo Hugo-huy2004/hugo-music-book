@@ -35,7 +35,7 @@ Bảng giá thay đổi theo thời gian, nên sách không in số tiền; tín
 |---|---|---|---|
 | Supabase Storage | Tính theo GB | Có | Đơn giản nhất, đang dùng |
 | Amazon S3 + CloudFront | Tính theo GB | Có | Linh hoạt, đắt ở băng thông |
-| **Cloudflare R2 + Worker** | **Không tính** | Mạng Cloudflare | Tính theo số lần đọc ghi; Worker tính theo lượt gọi |
+| **Cloudflare R2 + Worker** | **Không tính** (Cloudflare, n.d.a) | Mạng Cloudflare | Tính theo số lần đọc ghi; Worker tính theo lượt gọi |
 
 **Vì sao danh mục nhỏ là lợi thế.** 100 bài × 6 mức = 600 file, ai cũng nghe cùng những file đó. Nếu cache dùng chung được, gần như mọi request trúng cache ở điểm biên, R2 chỉ bị đọc khi một điểm biên lần đầu cần file.
 
@@ -43,7 +43,7 @@ Bảng giá thay đổi theo thời gian, nên sách không in số tiền; tín
 
 ### Chọn gì, vì sao
 
-**File âm thanh lên R2; một Cloudflare Worker kiểm vé ở điểm biên và dùng khóa cache không chứa vé.** Supabase chỉ còn cấp vé (mỗi lượt nghe một lần `claim_playback()`) và trả playlist vài KB. Vé dùng lại đúng định dạng HMAC của chương 11 và cùng khóa bí mật, nên không thêm hệ thống phân quyền nào.
+**File âm thanh lên R2; một Cloudflare Worker kiểm vé ở điểm biên và dùng khóa cache không chứa vé** (Cloudflare, n.d.b). Supabase chỉ còn cấp vé (mỗi lượt nghe một lần `claim_playback()`) và trả playlist vài KB. Vé dùng lại đúng định dạng HMAC của chương 11 và cùng khóa bí mật, nên không thêm hệ thống phân quyền nào.
 
 Thêm một lợi ích: đường dẫn file trên Worker không chứa bitrate (`/a/<bài>/<tok>.mp4`, `tok` là 16 ký tự HMAC), nên blind test không lộ đáp án qua tên file như link ký của Supabase (`…/64.mp4`).
 

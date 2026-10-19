@@ -16,7 +16,7 @@ Cấu trúc thư mục rõ ràng từ đầu giúp người mới tìm đúng ch
 |---|---|
 | Biên dịch bằng `tsc` rồi chạy file `.js` | Thêm bước build và thư mục `dist/` |
 | Công cụ chạy thẳng (`tsx`, `ts-node`) | Thêm một thư viện, chậm hơn khi khởi động |
-| **Node.js 26 chạy thẳng file `.ts`** | Node tự bỏ phần kiểu khi chạy (type stripping). Không build, không thư viện thêm. Chỉ cần viết TypeScript "xóa được" (không dùng `enum`, `namespace`) |
+| **Node.js 26 chạy thẳng file `.ts`** | Node tự bỏ phần kiểu khi chạy (type stripping; Node.js, n.d.). Không build, không thư viện thêm. Chỉ cần viết TypeScript "xóa được" (không dùng `enum`, `namespace`) |
 
 **Quản lý thư viện cho monorepo:**
 

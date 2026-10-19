@@ -16,10 +16,10 @@ Trước mỗi đoạn, trình phát quyết định tải đoạn kế ở mứ
 
 | Trường phái | Quyết định dựa trên | Đại diện | Điểm mạnh | Điểm yếu |
 |---|---|---|---|---|
-| Thông lượng | Tốc độ tải ước lượng (trung bình trượt) | FESTIVE (Jiang và cộng sự, 2012), mặc định của nhiều trình phát | Đơn giản, phản ứng nhanh | Ước lượng sai khi mạng dao động mạnh |
-| Bộ đệm | Lượng nhạc trong buffer | BBA (Huang và cộng sự, 2014), BOLA (Spiteri và cộng sự, 2016) | Ít ngắt tiếng, có chứng minh toán học (BOLA) | Lúc mới bắt đầu buffer rỗng nên chọn thấp lâu |
-| Dự báo | Tối ưu vài đoạn tới theo dự báo thông lượng | MPC (Yin và cộng sự, 2015) | Cân bằng tốt khi dự báo đúng | Tính nặng hơn, phụ thuộc dự báo |
-| Học tăng cường | Mạng nơ-ron học từ dữ liệu mạng thật | Pensieve (Mao và cộng sự, 2017) | Tốt nhất trên tập dữ liệu nó học | Khó giải thích, khó chuyển sang môi trường khác |
+| Thông lượng | Tốc độ tải ước lượng (trung bình trượt) | FESTIVE (Jiang, Sekar and Zhang, 2012), mặc định của nhiều trình phát | Đơn giản, phản ứng nhanh | Ước lượng sai khi mạng dao động mạnh |
+| Bộ đệm | Lượng nhạc trong buffer | BBA (Huang et al., 2014), BOLA (Spiteri, Urgaonkar and Sitaraman, 2016) | Ít ngắt tiếng, có chứng minh toán học (BOLA) | Lúc mới bắt đầu buffer rỗng nên chọn thấp lâu |
+| Dự báo | Tối ưu vài đoạn tới theo dự báo thông lượng | MPC (Yin et al., 2015) | Cân bằng tốt khi dự báo đúng | Tính nặng hơn, phụ thuộc dự báo |
+| Học tăng cường | Mạng nơ-ron học từ dữ liệu mạng thật | Pensieve (Mao, Netravali and Alizadeh, 2017) | Tốt nhất trên tập dữ liệu nó học | Khó giải thích, khó chuyển sang môi trường khác |
 
 Hầu hết trình phát hiện đại dùng lai: thông lượng lúc đầu, bộ đệm khi đã có buffer. hls.js là kiểu này.
 
@@ -38,7 +38,7 @@ Hệ quả: với nhạc, **tránh ngắt tiếng quan trọng hơn leo mức ca
 
 Cả bốn trường phái coi thang mức là **cho sẵn**: chọn tốt nhất trong các mức đang có. Không thuật toán nào hỏi các mức đó có đáng tồn tại không. Nếu 256 và 320 kbps nghe như nhau, thuật toán vẫn cố leo lên 320, tốn băng thông mà người nghe không được gì.
 
-Đó là chỗ của **PSL** (Perceptual Stepped Ladder, chương 10): đo từng bài bằng ViSQOL, chỉ giữ mức hơn mức đã giữ ít nhất τ = 0,10 điểm. Thuật toán ABR nào cũng hưởng lợi, vì nó chỉ còn chọn giữa những mức khác nhau thật. Số đo thật trên 10 bài mẫu: mức 320 bị bỏ ở mọi bài; "Sóng Xa" chỉ còn một mức.
+Đó là chỗ của **PSL** (Perceptual Stepped Ladder, chương 10): đo từng bài bằng ViSQOL (Hines et al., 2015; Chinen et al., 2020), chỉ giữ mức hơn mức đã giữ ít nhất τ = 0,10 điểm. Thuật toán ABR nào cũng hưởng lợi, vì nó chỉ còn chọn giữa những mức khác nhau thật. Số đo thật trên 10 bài mẫu: mức 320 bị bỏ ở mọi bài; "Sóng Xa" chỉ còn một mức.
 
 ### Chọn gì, vì sao
 

@@ -75,3 +75,4 @@ figure img, figure svg { max-width: 100%; max-height: 150mm; width: auto; height
 figure.diagram img, figure.diagram svg { width: 100%; }
 figure.shot img { border: 1px solid var(--rule); border-radius: 3px; }
 figcaption { font: italic 8.5pt/1.4 "Lora", serif; color: var(--quiet); margin-top: 1.5mm; }
+#tl-tai-lieu-tham-khao p:not(:first-of-type){padding-left:8mm;text-indent:-8mm;margin:0 0 2.5mm;overflow-wrap:anywhere}
