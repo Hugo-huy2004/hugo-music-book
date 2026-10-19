@@ -1,9 +1,10 @@
 // Phát file âm thanh từ R2 qua CDN của Cloudflare.
 //   GET /a/<id bài>/<tok>.mp4?t=<vé>   (Range được hỗ trợ)
-// 1. Kiểm vé tại điểm biên: không hỏi về database.
+// 1. Kiểm vé tại điểm biên bằng verifyToken của hugo-stream: không hỏi về database.
 // 2. Khóa cache KHÔNG chứa vé: mọi người nghe cùng một file dùng chung một bản cache.
 // 3. Cache trượt thì đọc R2 (R2 không tính phí băng thông ra).
-import { verifyTicket, tierToken, TIERS } from './ticket';
+import { verifyToken } from 'hugo-stream';
+import { tierToken, TIERS } from './ticket';
 
 interface Env { AUDIO: R2Bucket; PLAYBACK_SECRET: string }
 
@@ -23,8 +24,8 @@ export default {
     if (!m) return fail(404);
     const [, songId, tok] = m;
 
-    const ticket = await verifyTicket(env.PLAYBACK_SECRET, url.searchParams.get('t') ?? '');
-    if (!ticket || ticket.s !== songId) return fail(403);
+    // Cùng hàm kiểm vé với Edge Function (hugo-stream): vé ký cho "hls/<bài>/" mở mọi mức của đúng bài đó.
+    if (!(await verifyToken(`hls/${songId}/`, url.searchParams.get('t'), env.PLAYBACK_SECRET))) return fail(403);
 
     // tok -> kbps: thử 7 mức có thể (rẻ hơn nhiều so với một lần hỏi database)
     let kbps = 0;

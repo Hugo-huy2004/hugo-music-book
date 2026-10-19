@@ -1,14 +1,19 @@
 // Chương 11: Edge Function cấp quyền nghe và phát playlist HLS.
 //   POST /functions/v1/playback  { song_id }       (kèm phiên đăng nhập)  -> { url, remaining }
-//   GET  /functions/v1/playback?t=<vé>[&kbps=128]  (trình phát gọi)         -> playlist .m3u8
-//   GET  /functions/v1/playback?t=<vé>&trial=<id>&side=A   (blind test)      -> playlist của bên A, không lộ bitrate
+//   GET  /functions/v1/playback?song=<id>&t=<vé>[&kbps=128]  (trình phát gọi)  -> playlist .m3u8
+//   GET  /functions/v1/playback?song=<id>&t=<vé>&trial=<id>&side=A  (blind test) -> playlist bên A, không lộ bitrate
 // Trình phát (<audio>, AVPlayer, ExoPlayer) không gửi được header đăng nhập, nên quyền nghe nằm trong
-// một "vé" ký bằng HMAC, sống 2 giờ, chỉ mở đúng một bài.
+// một "vé" ký bằng HMAC, chỉ mở đúng một bài. Vé ký và kiểm bằng hugo-stream (mintToken/verifyToken):
+// cùng một hàm chạy ở đây, ở Cloudflare Worker (chương 23) và trong test.
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { mintToken, verifyToken } from 'npm:hugo-stream@0.1.1';
 
 const url = Deno.env.get('SUPABASE_URL')!;
 const admin = createClient(url, Deno.env.get('SUPABASE_SECRET_KEY') ?? Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
-const TICKET_TTL = 2 * 60 * 60; // giây
+const TICKET_TTL = 2 * 60 * 60;   // giây: hạn link ký của Storage
+const TICKET_WINDOW = 60 * 60;    // giây: vé sống 1–2 giờ; mọi vé xin trong cùng một giờ là MỘT chuỗi
+const SECRET = Deno.env.get('PLAYBACK_SECRET')!;
+const scope = (songId: string) => `hls/${songId}/`;   // vé gắn với cả bài: playlist và mọi mức
 const cors = { 'access-control-allow-origin': '*', 'access-control-allow-headers': 'authorization, x-client-info, apikey, content-type' };
 
 Deno.serve(async (req) => {
@@ -30,14 +35,16 @@ async function grant(req: Request) {
   if (error) throw error;
   if (!data.allowed) return Response.json(data, { status: 403, headers: cors });
 
-  const ticket = await sign({ s: song_id, e: Math.floor(Date.now() / 1000) + TICKET_TTL });
-  return Response.json({ url: `${url}/functions/v1/playback?t=${ticket}`, remaining: data.remaining }, { headers: cors });
+  const ticket = await mintToken(scope(song_id), SECRET, { ttl: TICKET_WINDOW });
+  return Response.json({ url: `${url}/functions/v1/playback?song=${song_id}&t=${ticket}`, remaining: data.remaining }, { headers: cors });
 }
 
 // Bước 2: phát playlist. Không có kbps -> master (danh sách các mức); có kbps -> playlist của mức đó,
 // trong đó đường dẫn file nhạc là link ký của Storage (đi thẳng qua CDN, không qua function).
 async function playlist(u: URL) {
-  const { s: songId } = await verify(u.searchParams.get('t') ?? '');
+  const songId = u.searchParams.get('song') ?? '';
+  const t = u.searchParams.get('t') ?? '';
+  if (!/^[0-9a-f-]{36}$/.test(songId) || !(await verifyToken(scope(songId), t, SECRET))) throw new Error('invalid ticket');
   let kbps = u.searchParams.get('kbps');
   const trial = u.searchParams.get('trial');
   if (trial) kbps = String(await blindSideKbps(trial, songId, u.searchParams.get('side')));
@@ -48,7 +55,7 @@ async function playlist(u: URL) {
     if (error) throw error;
     const lines = ['#EXTM3U', '#EXT-X-VERSION:7'];
     for (const k of song.hls_tiers as number[]) {
-      lines.push(`#EXT-X-STREAM-INF:BANDWIDTH=${k * 1100},CODECS="mp4a.40.2"`, `?t=${u.searchParams.get('t')}&kbps=${k}`);
+      lines.push(`#EXT-X-STREAM-INF:BANDWIDTH=${k * 1100},CODECS="mp4a.40.2"`, `?song=${songId}&t=${t}&kbps=${k}`);
     }
     return new Response(lines.join('\n') + '\n', m3u8);
   }
@@ -58,7 +65,7 @@ async function playlist(u: URL) {
   // Có CDN (Cloudflare Worker + R2, chương 23): link file không chứa bitrate, dùng chung vé, cache được ở điểm biên.
   // Chưa có: link ký của Supabase Storage.
   const fileUrl = CDN
-    ? `${CDN}/a/${songId}/${await tierToken(songId, Number(kbps))}.mp4?t=${u.searchParams.get('t')}`
+    ? `${CDN}/a/${songId}/${await tierToken(songId, Number(kbps))}.mp4?t=${t}`
     : await signedUrl(`${base}.mp4`);
   return new Response(tpl.replaceAll(`${Number(kbps)}.mp4`, fileUrl), m3u8);
 }
@@ -92,20 +99,7 @@ async function blindSideKbps(trialId: string, songId: string, side: string | nul
   return side === 'A' ? data.a_kbps : data.b_kbps;
 }
 
-// ---- vé HMAC (Web Crypto có sẵn trong Deno, không cần thư viện)
+// ---- tên file theo mức (chương 23): tok = 16 ký tự đầu của HMAC("tier:<bài>:<kbps>"), không lộ bitrate
 const enc = new TextEncoder();
-const key = crypto.subtle.importKey('raw', enc.encode(Deno.env.get('PLAYBACK_SECRET')!), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify']);
+const key = crypto.subtle.importKey('raw', enc.encode(SECRET), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
 const b64 = (b: ArrayBuffer | Uint8Array) => btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-const unb64 = (s: string) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0));
-
-async function sign(payload: { s: string; e: number }) {
-  const body = b64(enc.encode(JSON.stringify(payload)));
-  return `${body}.${b64(await crypto.subtle.sign('HMAC', await key, enc.encode(body)))}`;
-}
-async function verify(ticket: string) {
-  const [body, mac] = ticket.split('.');
-  if (!body || !mac || !(await crypto.subtle.verify('HMAC', await key, unb64(mac), enc.encode(body)))) throw new Error('invalid ticket');
-  const p = JSON.parse(new TextDecoder().decode(unb64(body))) as { s: string; e: number };
-  if (p.e < Date.now() / 1000) throw new Error('ticket expired');
-  return p;
-}
