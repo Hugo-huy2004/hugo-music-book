@@ -154,6 +154,58 @@ export async function resolvePlayback(song: PlayableSong, quality: string) {
 
 Trình phát dùng sẵn của app: web dùng `hls.js` (Safari phát HLS gốc), iOS và Android dùng `expo-audio`.
 
+### Nối lên app: bộ máy phát và trình phát
+
+**Một lớp phát nhạc, hai cách chạy.** Trên web dùng thẻ `<audio>`: Safari phát HLS gốc, các trình duyệt khác cần hls.js. Trên iOS và Android dùng `expo-audio`, vốn phát HLS gốc. Phần còn lại của app chỉ gọi `audioEngine.load/play/pause/seek`, không cần biết đang chạy ở đâu.
+
+```ts
+// app/src/audio/deck.ts (trích)
+export const createDeck = () => (Platform.OS === 'web' ? new WebDeck() : new NativeDeck());
+
+// WebDeck.load: trình duyệt không tự phát HLS thì nạp hls.js (chỉ tải thư viện khi cần)
+if (isHls(url) && el.canPlayType('application/vnd.apple.mpegurl') === '') {
+  const Hls = (await import('hls.js')).default;
+  this.hls = new Hls();
+  this.hls.loadSource(url);
+  this.hls.attachMedia(el);
+}
+```
+
+**Bấm một bài: store lo mọi thứ.** `playSong(song, queue)` ghi hàng chờ, bài hiện tại và lịch sử. Sau đó nó xin link phát (vé, ở trên), nạp vào `audioEngine`, rồi tải trước phần đầu của bài kế tiếp.
+
+```ts
+// app/src/store/useStore.ts (rút gọn)
+playSong: async (song, queue = [song]) => {
+  set({ queue, currentSong: song, position: 0, isBuffering: true });
+  const { url } = await resolvePlayback(song, get().audioQuality);   // Edge Function playback
+  await audioEngine.load(url, true);
+  const next = queue[queue.indexOf(song) + 1];
+  if (next) prefetchNext(next, get().audioQuality);
+},
+```
+
+Ô bài ở Trang chủ (chương Ứng dụng 2) giờ có `onPress={() => playOrToggleSong(song, list)}`: bấm bài đang phát thì tạm dừng, bấm bài khác thì phát bài đó, và cả kệ thành hàng chờ.
+
+**Trình phát nhỏ nằm trên mọi màn hình.** `BottomPlayer` đọc `currentSong` và `isPlaying` từ store, nằm trong `AppLayout` (chương Ứng dụng 1) nên chuyển trang không làm ngắt nhạc. Bấm vào thì mở trình phát toàn màn hình.
+
+```tsx
+// app/src/components/Player/BottomPlayer.tsx (rút gọn)
+const song = useStore((s) => s.currentSong);
+const isPlaying = useStore((s) => s.isPlaying);
+const { togglePlay, next } = useStore.getState();
+if (!song) return null;
+return (
+  <Pressable onPress={onOpenFullPlayer} style={styles.bar}>
+    <CoverArt uri={song.coverArt} size={44} radius={8} />
+    <Text numberOfLines={1}>{song.title}</Text>
+    <GlassButton icon={isPlaying ? 'pause' : 'play'} label={isPlaying ? 'Tạm dừng' : 'Phát'} onPress={togglePlay} />
+    <GlassButton icon="play-forward" label="Bài tiếp" onPress={next} />
+  </Pressable>
+);
+```
+
+`useStore.getState()` lấy hàm mà không đăng ký vẽ lại, vì hàm không đổi. Trên máy tính, phím cách cũng tạm dừng hoặc phát tiếp.
+
 ### Kết quả
 
 ![Đường phát từ đầu tới cuối: vé, master playlist, playlist một mức có byte range, và Storage trả đúng 1 KB (206)](images/term-11-playback.png)
@@ -207,3 +259,7 @@ Các file chương này viết, trong repo đã clone ở phần Mở đầu:
 - `supabase/functions/playback/index.ts`
 - `supabase/config.toml`
 - `app/src/api/api.ts`
+- `app/src/audio/deck.ts`
+- `app/src/audio/audioEngine.ts`
+- `app/src/components/Player/BottomPlayer.tsx`
+- `app/src/screens/Player/FullPlayer.tsx`

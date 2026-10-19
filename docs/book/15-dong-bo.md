@@ -147,6 +147,33 @@ const expectedOf = (t: Timeline) => () => t.pos + (t.playing ? (serverNow() - t.
 
 **Bước 7: giao diện nhóm.** Ở Thư viện → Phòng nghe chung: nút *Tạo nhóm mới*, ô nhập mã, và khi đã vào nhóm thì có danh sách người đang nghe, nút *Mời* (chia sẻ mã) và *Rời nhóm* (chủ nhóm: *Kết thúc nhóm*). Màn hình dựng bằng `InsetGroup`, `ListRow`, `TextField`, `ActionButton` của kit (chương 17).
 
+### Nối lên app: bảng Nhóm nghe chung
+
+`GroupPanel` có hai trạng thái. Chưa ở nhóm nào: nút "Tạo nhóm mới" và ô nhập mã 6 ký tự. Đang ở nhóm: tên nhóm, mã, danh sách người trong nhóm, nút "Mời" (điện thoại mở bảng chia sẻ, web chép mã) và nút rời nhóm.
+
+```tsx
+// app/src/screens/Rooms/GroupPanel.tsx (rút gọn)
+if (group) {
+  const isHost = group.hostId === user?._id;
+  return (
+    <InsetGroup header="Nhóm nghe chung" footer={isHost ? 'Bạn điều khiển: mọi người nghe đúng bài, đúng giây bạn đang phát.' : '...'}>
+      <ListRow icon="people" title={group.name} subtitle={`${group.code} · ${members.length} người`} />
+      {members.map((m, i) => <ListRow key={i} icon="person-circle-outline" title={m.name || 'Người nghe'} />)}
+      <ActionButton variant="danger" title={isHost ? 'Kết thúc nhóm' : 'Rời nhóm'} onPress={() => run(leaveGroup)} />
+    </InsetGroup>
+  );
+}
+return (
+  <InsetGroup header="Nghe cùng bạn bè">
+    <ActionButton icon="add-circle-outline" title="Tạo nhóm mới" onPress={() => run(() => createGroup(`Nhóm của ${user.nickname}`))} />
+    <TextField value={code} onChangeText={(t) => setCode(t.toUpperCase())} placeholder="Nhập mã nhóm" maxLength={6} />
+    <ActionButton variant="glass" title="Vào" disabled={code.length !== 6} onPress={() => run(() => joinGroup(code))} />
+  </InsetGroup>
+);
+```
+
+Bảng này không chứa logic đồng bộ nào. Chủ nhóm vẫn dùng trình phát như bình thường. Store thấy đang ở nhóm thì tự gửi `play_sync` mỗi khi đổi bài, tạm dừng hay tua. Phía thành viên, bộ chỉnh lệch ở trên làm phần còn lại. Thành viên vẫn thấy các nút của trình phát, nhưng lệnh của họ không được gửi đi: store bỏ qua bước gửi khi người bấm không phải chủ nhóm (`if (group && group.hostId !== user._id) return;`).
+
 ### Kết quả
 
 ![Thẻ "Nghe cùng bạn bè": tạo nhóm hoặc nhập mã](images/group-empty.png)
@@ -199,3 +226,4 @@ Các file chương này viết, trong repo đã clone ở phần Mở đầu:
 - `supabase/migrations/20261018001300_groups.sql`
 - `app/src/rooms/workspace.ts`
 - `app/src/store/useStore.ts`
+- `app/src/screens/Rooms/GroupPanel.tsx`

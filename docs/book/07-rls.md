@@ -104,6 +104,48 @@ toggleLike: async (songId: string) => {
 },
 ```
 
+### Nối lên app: nút thích và màn hình Thư viện
+
+**Store giữ danh sách id đã thích, nút chỉ đọc từ đó.** Mọi nơi có nút tim (hàng bài hát, trình phát, menu bài) gọi cùng một hàm `toggleLike`. Khách bấm thì mở hộp thoại đăng nhập (chương Ứng dụng 3). Việc chặn thật vẫn nằm ở RLS: dù app quên kiểm tra, database cũng từ chối.
+
+```ts
+// app/src/store/useStore.ts (trích)
+toggleLike: async (songId) => {
+  if (!get().user) return set({ isLoginModalVisible: true });
+  const { liked } = await api.toggleLike(songId);
+  set((st) => ({
+    likedSongIds: liked ? [...st.likedSongIds, songId] : st.likedSongIds.filter((id) => id !== songId),
+    likedSongs: liked ? st.likedSongs : st.likedSongs.filter((s) => s._id !== songId),
+  }));
+  if (liked) get().fetchLikedSongs();   // lấy đủ thông tin bài vừa thích
+},
+```
+
+```tsx
+// nút tim ở bất kỳ đâu
+const liked = useStore((s) => s.likedSongIds.includes(song._id));
+<GlassButton icon={liked ? 'heart' : 'heart-outline'} label={liked ? 'Bỏ thích' : 'Thích'}
+  tint={liked ? '#FF375F' : undefined} onPress={() => toggleLike(song._id)} />
+```
+
+**Màn hình Thư viện là một danh mục các mục**: Danh sách phát, Nghệ sĩ, Album, Bài hát, Đã tải về. Bấm một mục thì mở trang của mục đó, có nút quay lại. Danh sách dài dùng `FlatList`: chỉ vẽ những hàng đang hiện trên màn hình, nên 1 000 bài vẫn cuộn mượt.
+
+```tsx
+// app/src/screens/Library/LibraryScreen.tsx (trích)
+const SECTIONS = {
+  playlists: { label: 'Danh sách phát', icon: 'list', view: PlaylistsTab },
+  songs: { label: 'Bài hát', icon: 'musical-note', view: SongsTab },
+  // nghệ sĩ, album, đã tải về...
+};
+if (section) {
+  const Page = SECTIONS[section].view;
+  return <Page header={<><BackButton onPress={() => onSection(null)} label="Thư viện" />
+    <LargeTitle title={SECTIONS[section].label} /></>} />;
+}
+```
+
+Tạo danh sách phát gọi `createPlaylist(name)` của store; store gọi `insert` vào bảng `playlists`, rồi tải lại danh sách. `owner_id` có giá trị mặc định là `auth.uid()`, và chính sách `with check` chỉ cho ghi dòng có `owner_id` là chính mình, nên app không cần gửi và cũng không giả được.
+
 ### Kết quả
 
 ![RLS và quyền theo cột chặn ngay ở database: khách không thấy bài chờ duyệt, admin thấy; không ai đọc được cột bitrate của blind test hay cột riêng của hồ sơ](images/term-07-rls.png)
@@ -147,3 +189,6 @@ Các file chương này viết, trong repo đã clone ở phần Mở đầu:
 
 - `supabase/migrations/20261018000300_library.sql`
 - `app/src/api/api.ts`
+- `app/src/screens/Library/LibraryScreen.tsx`
+- `app/src/screens/Library/SongsTab.tsx`
+- `app/src/screens/Library/PlaylistsTab.tsx`

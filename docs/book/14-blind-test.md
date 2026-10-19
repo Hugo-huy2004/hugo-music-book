@@ -159,6 +159,41 @@ create view public.blind_results with (security_invoker = true) as
 
 `security_invoker = true` cho view chạy bằng quyền của người đọc, nên RLS của `blind_votes` vẫn áp dụng: người thường chỉ thấy số của mình, admin thấy tất cả.
 
+### Nối lên app: phòng blind test
+
+**Giai đoạn của lượt chơi tính từ thời gian, không chờ tin nhắn.** Mỗi lượt có sẵn các mốc `aAt`, `bAt`, `voteUntil`. Máy nào cũng tự biết mình đang ở giai đoạn nào bằng giờ máy chủ, nên người vào giữa lượt vẫn thấy đúng.
+
+```ts
+// app/src/screens/Rooms/BlindRoomView.tsx (trích)
+function phaseOf(t: Trial | null, now: number) {
+  if (!t) return 'waiting';
+  const L = t.excerptSeconds * 1000;
+  if (now < t.aAt) return 'prepare';
+  if (now < t.aAt + L) return 'A';
+  if (now < t.bAt) return 'gap';
+  if (now < t.bAt + L) return 'B';
+  if (now < t.voteUntil) return 'vote';
+  return 'reveal';
+}
+```
+
+**Giao diện đổi theo giai đoạn:** thanh tiến trình bốn bước (Chuẩn bị, Nghe A, Nghe B, Chọn), hai ô A và B sáng lên theo bên đang phát, rồi ba nút "A hay hơn", "Không phân biệt", "B hay hơn". Tới khi `reveal` thì mỗi ô hiện bitrate, kèm mũi tên chỉ bên cao hơn.
+
+```tsx
+// (rút gọn)
+{phase === 'vote' && (
+  <View style={styles.choices}>
+    {CHOICES.map(([c, label]) => (      // [['A', 'A hay hơn'], ['same', 'Không phân biệt'], ['B', 'B hay hơn']]
+      <ActionButton key={c} title={label}
+        variant={myVote === c ? 'primary' : 'glass'} onPress={() => vote(c)} />
+    ))}
+  </View>
+)}
+<Text>{votesIn ? `${votesIn.voted}/${votesIn.listeners} người đã chọn` : ''}</Text>
+```
+
+Đổi ý được tới hết giờ: bấm nút khác thì gửi lại phiếu, database giữ phiếu mới nhất (khóa chính `trial_id, user_id`).
+
 ### Kết quả
 
 ![Cả phòng nghe A rồi nghe B, sau đó chọn bản hay hơn hoặc "Không phân biệt"](images/blind-listen.png)
@@ -215,3 +250,4 @@ Các file chương này viết, trong repo đã clone ở phần Mở đầu:
 - `supabase/migrations/20261018000900_blind_test.sql`
 - `supabase/functions/playback/index.ts`
 - `app/src/rooms/useRooms.ts`
+- `app/src/screens/Rooms/BlindRoomView.tsx`

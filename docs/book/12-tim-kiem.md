@@ -90,6 +90,38 @@ getLyrics: async (songId: string) => {
 
 Cột lời không nằm trong `SONG_COLUMNS` của danh sách bài: chỉ tải khi mở màn hình lời.
 
+### Nối lên app: màn hình Tìm kiếm và lời bài hát
+
+**Hai tầng tìm kiếm.** Gõ phím nào là lọc ngay danh sách bài đã có trên máy (bỏ dấu, khớp từng từ), nên kết quả hiện tức thì, kể cả khi mạng chậm. Ngừng gõ 250 ms thì gọi `search_songs()`: database bắt được cả lỗi gõ nhờ trigram. Những bài server tìm thêm được nối vào cuối danh sách.
+
+```tsx
+// app/src/screens/Search/SearchScreen.tsx (trích)
+const [serverHits, setServerHits] = useState<{ q: string; songs: Song[] }>({ q: '', songs: [] });
+useEffect(() => {
+  const q = query.trim();
+  if (q.length < 2) return;
+  const timer = setTimeout(() => {
+    api.searchSongs(q).then((songs) => setServerHits({ q, songs })).catch(() => {});
+  }, 250);
+  return () => clearTimeout(timer);       // gõ tiếp trước 250 ms: hủy lượt gọi cũ
+}, [query]);
+```
+
+Kết quả server chỉ được dùng khi `serverHits.q` trùng từ khóa đang gõ. Nhờ vậy câu trả lời về trễ cho từ khóa cũ không ghi đè kết quả mới.
+
+**Lời bài hát chạy theo nhạc.** `LyricsView` tìm dòng đang hát từ vị trí phát, rồi cuộn để dòng đó nằm khoảng một phần ba từ trên xuống. Người dùng vừa tự cuộn thì tạm ngừng tự cuộn vài giây, để không giật tay họ.
+
+```tsx
+// app/src/screens/Player/LyricsView.tsx (trích)
+const current = lyrics.synced ? activeLine(lyrics.synced, live) : -1;
+useEffect(() => {
+  if (current < 0 || Date.now() - userScrollAt.current < FOLLOW_PAUSE_MS) return;
+  scrollRef.current?.scrollTo({ y: Math.max(0, offsets.current[current] - boxHeight * 0.3), animated: true });
+}, [current, boxHeight]);
+```
+
+`activeLine` (trong `packages/stream/src/lyrics.js`) là tìm nhị phân trên mảng mốc thời gian của LRC. Bấm một dòng thì tua tới đúng giây của dòng đó.
+
 ### Kết quả
 
 ![Gõ "mua dem" (không dấu) ra "Mưa Đêm Sài Gòn"](images/search.png)
@@ -139,3 +171,5 @@ Các file chương này viết, trong repo đã clone ở phần Mở đầu:
 
 - `supabase/migrations/20261018000100_catalog.sql`
 - `supabase/migrations/20261018000700_search.sql`
+- `app/src/screens/Search/SearchScreen.tsx`
+- `app/src/screens/Player/LyricsView.tsx`

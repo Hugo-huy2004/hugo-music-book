@@ -80,6 +80,31 @@ const coverUrl = (path?: string | null) =>
   path ? supabase.storage.from('covers').getPublicUrl(path).data.publicUrl : undefined;
 ```
 
+### Nối lên app: biểu mẫu tải bài
+
+Trang quản trị có biểu mẫu "Tải bài lên". Biểu mẫu chỉ chạy trên web, vì cần chọn file từ máy tính; trên điện thoại hiện lời nhắc mở bằng trình duyệt.
+
+**Kiểm tra file ngay trên máy trước khi tải.** Sai định dạng hay quá cỡ thì báo ngay, không tốn băng thông tải 50 MB lên rồi mới bị Storage từ chối. Giới hạn trong app (50 MB) chặt hơn giới hạn của bucket `originals` (300 MB): app chặn sớm cho trường hợp thường gặp, còn bucket là lớp chặn cuối, phòng khi ai đó gọi thẳng API.
+
+```tsx
+// app/src/screens/Admin/components/UploadForm.tsx (trích)
+const pickAudio = (e: any) => {
+  const file: File | undefined = e.target.files?.[0];
+  if (!file) return setAudio(null);
+  if (!file.type.startsWith('audio/')) return setError('Tệp nhạc phải là định dạng âm thanh');
+  if (file.size > 50 * 1024 * 1024) return setError('Tối đa 50 MB');
+  setAudio(file);
+};
+// ...
+<input type="file" accept="audio/*" onChange={pickAudio} />
+<FormField label="Tên bài" value={f.title} onChange={set('title')} />
+<FormField label="URL nguồn *" value={f.sourceUrl} onChange={set('sourceUrl')} />
+<ActionButton icon="cloud-upload-outline" title="Tải lên và đưa vào hàng chờ duyệt"
+  onPress={submit} disabled={!ready} loading={isUploading} />
+```
+
+`ready` chỉ đúng khi đã có file nhạc, đã chọn giấy phép và URL nguồn hợp lệ, nên nút bị khóa cho tới khi đủ thông tin. `submit` gom mọi trường vào một `FormData` rồi gọi `api.uploadSong`: tải file lên `originals/<id>/`, ảnh bìa lên `covers/`, rồi thêm dòng `songs` ở trạng thái `pending`.
+
 ### Kết quả
 
 ![Bốn bucket và file gốc, ảnh bìa của bài mẫu](images/term-08-storage.png)
@@ -128,3 +153,4 @@ Các file chương này viết, trong repo đã clone ở phần Mở đầu:
 
 - `supabase/migrations/20261018000400_storage.sql`
 - `app/src/api/api.ts`
+- `app/src/screens/Admin/components/UploadForm.tsx`

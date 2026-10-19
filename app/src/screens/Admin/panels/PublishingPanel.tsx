@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { supabase } from '../../../api/supabase';
 import { View, Text } from 'react-native';
 import CoverArt from '../../../components/CoverArt';
 import { api } from '../../../api/api';
@@ -49,7 +50,8 @@ const STAGE_ICON: Record<Stage['status'], [keyof typeof Icon.glyphMap, string]> 
   ok: ['checkmark-circle', C.accent], failed: ['close-circle', C.danger], running: ['sync-circle', C.info],
   pending: ['ellipse-outline', C.faint], skipped: ['remove-circle-outline', C.faint],
 };
-const JOB_LABEL: Record<string, string> = { release: 'Phát hành & bìa', psl: 'PSL', transition: 'Chuyển bài', hls: 'HLS', global: 'Độ phổ biến' };
+// Bốn bước worker ghi vào pipeline_runs.step (worker/src/process-song.ts).
+const JOB_LABEL: Record<string, string> = { download: 'Tải file gốc', analyze: 'Phân tích', psl: 'PSL', hls: 'HLS' };
 
 function Pipeline() {
   const [status, setStatus] = useState('failed');
@@ -58,6 +60,13 @@ function Pipeline() {
   const { data, error, reload } = useLoader<{ total: number; page: number; limit: number; counts: Record<string, number>; runs: Run[] }>(
     () => api.admin.pipeline({ status, page, limit: 20 }), [status, page],
   );
+  // Worker ghi pipeline_runs → Postgres Changes báo về (RLS chỉ gửi cho admin) → tải lại danh sách.
+  useEffect(() => {
+    const channel = supabase.channel('admin-pipeline')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'pipeline_runs' }, () => reload())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [reload]);
   const retry = async (songId: string) => {
     setRetrying(songId);
     try {

@@ -195,6 +195,34 @@ const { data: song } = await admin.from('songs').insert({ title: it.title, artis
 await asAdmin.rpc('review_song', { p_song_id: song.id, p_decision: 'publish' });   // bài vào hàng đợi media
 ```
 
+### Nối lên app: theo dõi xử lý
+
+Tab "Xử lý sau duyệt" trong trang quản trị liệt kê `pipeline_runs`. Mỗi bài hiện bốn bước với biểu tượng: xong, đang chạy, lỗi, chưa tới. Bước nào đang chạy hay bị lỗi được suy từ cột `step` mà worker ghi trước mỗi bước.
+
+```ts
+// app/src/api/api.ts (trích): từ một dòng pipeline_runs ra bốn bước
+const steps = ['download', 'analyze', 'psl', 'hls'];
+stages: steps.map((job) => {
+  const at = steps.indexOf(r.step ?? ''), me = steps.indexOf(job);
+  const status = r.status === 'done' ? 'ok' : me < at ? 'ok' : me === at ? (r.status === 'failed' ? 'failed' : 'running') : 'pending';
+  return { job, status, note: me === at && r.error ? r.error : '' };
+}),
+```
+
+**Tự cập nhật, không cần bấm làm mới.** Màn hình nghe thay đổi trên `pipeline_runs` qua Realtime. Worker ghi một dòng là màn hình tải lại ngay. RLS chỉ gửi thay đổi này cho admin.
+
+```tsx
+// app/src/screens/Admin/panels/PublishingPanel.tsx (trích)
+useEffect(() => {
+  const channel = supabase.channel('admin-pipeline')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'pipeline_runs' }, () => reload())
+    .subscribe();
+  return () => { supabase.removeChannel(channel); };   // rời màn hình thì hủy đăng ký
+}, [reload]);
+```
+
+Hàm trả về trong `useEffect` chạy khi component bị gỡ. Quên hủy đăng ký thì mỗi lần mở lại màn hình lại thêm một kết nối, và một thay đổi sẽ làm danh sách tải lại nhiều lần.
+
 ### Kết quả
 
 Đo thật bài mẫu "Mưa Đêm Sài Gòn" (FLAC, 816 kbps) với bảy mức ứng viên, τ = 0,10:
@@ -269,3 +297,4 @@ Các file chương này viết, trong repo đã clone ở phần Mở đầu:
 - `worker/src/process-song.ts`
 - `worker/src/main.ts`
 - `supabase/seed/seed.ts`
+- `app/src/screens/Admin/panels/PublishingPanel.tsx`

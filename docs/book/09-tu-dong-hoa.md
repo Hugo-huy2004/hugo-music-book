@@ -133,6 +133,26 @@ grant execute on function public.media_read, public.media_archive to service_rol
   }
   ```
 
+### Nối lên app: nút duyệt và từ chối
+
+Mỗi bài trong hàng chờ có hai nút. "Duyệt và xuất bản" gọi `review_song(id, 'publish')`. "Từ chối" mở ô nhập lý do trước khi gọi `review_song(id, 'reject', lý do)`. Lý do được lưu vào `review_note` và hiện lại dưới tên bài.
+
+```tsx
+// app/src/screens/Admin/components/SongListItem.tsx (trích)
+{song.status !== 'published' && (
+  <Action label="Duyệt và xuất bản" onPress={() => onReview(song._id, 'publish')} />
+)}
+{song.status === 'pending' && <Action label="Từ chối" color="#FF3B30" onPress={() => setMode('reject')} />}
+{mode === 'reject' && (
+  <>
+    <TextField value={note} onChangeText={setNote} placeholder="Lý do từ chối" />
+    <Action label="Xác nhận từ chối" color="#FF3B30" onPress={() => onReview(song._id, 'reject', note)} />
+  </>
+)}
+```
+
+App không tự đổi `status`: nó chỉ gọi hàm SQL rồi tải lại danh sách. Bấm "Duyệt" hai lần liền thì lần thứ hai báo lỗi `song not found or already processed`, vì hàm chỉ nhận bài ở `pending`, `failed` hoặc `rejected`. Nhờ vậy không bao giờ có hai việc xử lý cho cùng một bài.
+
 ### Kết quả
 
 ![Hàng chờ duyệt: kiểm tra bản quyền và thông tin trước khi bấm Duyệt](images/admin-publishing.png)
@@ -171,3 +191,5 @@ Bấm duyệt hai lần liền: lần hai báo `song not found or already proces
 Các file chương này viết, trong repo đã clone ở phần Mở đầu:
 
 - `supabase/migrations/20261018000500_pipeline.sql`
+- `app/src/screens/Admin/components/SongListItem.tsx`
+- `app/src/screens/Admin/hooks/useSongManager.ts`

@@ -1,4 +1,5 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
+import { api } from '../../api/api';
 import { useArtistPhoto } from '../../lib/artistPhoto';
 import { View, Text, StyleSheet, Pressable, Platform, useWindowDimensions } from 'react-native';
 import ChromeScrollView from '../../ui/ChromeScrollView';
@@ -83,6 +84,18 @@ export default function SearchScreen(_: { onNavigate?: (tab: string) => void }) 
 
   const indexed = useMemo(() => songs.map((s) => ({ song: s, text: fold(`${s.title} ${s.artist} ${s.genre || ''}`) })), [songs]);
 
+  // Tìm trên máy cho kết quả tức thì; search_songs() trên database (chương 12: bỏ dấu + trigram) bắt cả lỗi gõ
+  // như "mua deem". Gọi sau 250 ms ngừng gõ, kết quả nào về trễ hơn từ khóa hiện tại thì bỏ.
+  const [serverHits, setServerHits] = useState<{ q: string; songs: Song[] }>({ q: '', songs: [] });
+  useEffect(() => {
+    const q = query.trim();
+    if (q.length < 2) return;
+    const timer = setTimeout(() => {
+      api.searchSongs(q).then((songs) => setServerHits({ q, songs })).catch(() => {});
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [query]);
+
   const results = useMemo(() => {
     const q = fold(query.trim());
     if (!q) return { songs: [] as Song[], artists: [] as Song[] };
@@ -90,10 +103,14 @@ export default function SearchScreen(_: { onNavigate?: (tab: string) => void }) 
     const hit = indexed.filter((x) => words.every((w) => x.text.includes(w))).map((x) => x.song);
     // The name starts with the pre-ranked keyword.
     hit.sort((a, b) => Number(!fold(a.title).startsWith(q)) - Number(!fold(b.title).startsWith(q)));
+    if (serverHits.q === query.trim()) {
+      const seen = new Set(hit.map((x) => x._id));
+      for (const x of serverHits.songs) if (!seen.has(x._id)) hit.push(x);
+    }
     const artistMap = new Map<string, Song>();
     for (const s of songs) if (fold(s.artist).includes(q) && !artistMap.has(s.artist)) artistMap.set(s.artist, s);
     return { songs: hit.slice(0, 60), artists: [...artistMap.values()].slice(0, 12) };
-  }, [query, indexed, songs]);
+  }, [query, indexed, songs, serverHits]);
 
   // Browse built from real data: categories (Orchestra, Youth music...), all original genres have ≥ 2 songs
   // (replacing the old "Genre" screen) and country.
