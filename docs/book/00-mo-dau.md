@@ -57,12 +57,12 @@ pnpm web                                                # mở http://localhost:
 
 ### Lộ trình đọc
 
-Một cuốn, tám phần. Ai đã biết lập trình web có thể bỏ qua phần Nền tảng; ai chỉ cần dựng app có thể đọc phần Truyền phát sau.
+Một cuốn, tám phần. Mỗi tính năng làm backend trước rồi nối lên app ngay trong chương đó (hoặc chương Ứng dụng ngay sau), nên chương nào cũng kết thúc bằng thứ chạy được trên màn hình. Ai đã biết lập trình web có thể bỏ qua phần Nền tảng; ai chỉ cần dựng app có thể đọc phần Truyền phát sau.
 
 1. **Nền tảng** (Nền tảng 1 tới 5): terminal, HTTP, API và JSON; JavaScript và TypeScript; bất đồng bộ; Node.js 26 và pnpm; Git và gỡ lỗi.
 2. **Hiểu truyền phát nhạc** (Truyền phát 1 tới 6): tệp nhạc, Range và cắt đoạn, HLS, CDN và bộ đệm, thuật toán chọn chất lượng, kiểm soát truy cập.
-3. **Nền móng dự án** (chương 1 tới 3): sản phẩm là gì, kiến trúc, môi trường.
-4. **Backend trên Supabase** (chương 4 tới 12): database, API tự sinh, đăng nhập, RLS, lưu file, hàng đợi, worker, phát nhạc, tìm kiếm.
+3. **Nền móng dự án** (chương 1 tới 3, Ứng dụng 1): sản phẩm là gì, kiến trúc, môi trường, khung app Expo chạy trên web và điện thoại.
+4. **Backend trên Supabase, nối dần vào app** (chương 4 tới 12, Ứng dụng 2 và 3): database, API tự sinh, trang chủ, đăng nhập và màn hình Tài khoản, RLS, lưu file, hàng đợi, worker, phát nhạc, tìm kiếm.
 5. **Nghe cùng nhau** (chương 13 tới 15): đài 24/7, blind test, nhóm nghe chung và đồng bộ nhiều thiết bị.
 6. **Giao diện** (chương 16 tới 18): một app cho ba nền tảng, chuẩn giao diện và trải nghiệm, trang quản trị.
 7. **Ra production** (chương 19 tới 23): kiểm thử, deploy, vận hành, checklist ra mắt, và mở rộng tới một triệu người nghe với Cloudflare R2.

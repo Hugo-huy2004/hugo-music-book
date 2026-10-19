@@ -105,6 +105,8 @@ function must<T>({ data, error }: { data: T; error: any }): T {
 }
 ```
 
+**Tiếp theo:** chương Ứng dụng 2 đưa `getSongs()` lên màn hình Trang chủ.
+
 ### Kết quả
 
 ![Gọi thẳng API tự sinh bằng publishable key: bài kèm tên nghệ sĩ trong một lượt](images/term-05-rest.png)

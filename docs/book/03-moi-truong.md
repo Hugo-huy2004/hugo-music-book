@@ -102,7 +102,7 @@ supabase migration list      # cột Local và Remote khớp nhau
 ### Thực hành
 
 1. Clone repo, `pnpm install`, `supabase link` vào project của bạn, `supabase db push`. Mở Table Editor xem các bảng.
-2. Đổi `app/.env` sang project của bạn, chạy `pnpm web`. Trang chủ trống (chưa có nhạc) là đúng.
+2. Nếu bạn clone repo: đổi `app/.env` sang project của bạn, chạy `pnpm web`; Trang chủ trống (chưa có nhạc) là đúng. Nếu bạn code lại từ đầu: thư mục `app/` được tạo ở chương kế tiếp (Ứng dụng 1).
 
 ### Tự kiểm
 

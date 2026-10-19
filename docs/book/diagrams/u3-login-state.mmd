@@ -1,0 +1,19 @@
+stateDiagram-v2
+  direction LR
+  [*] --> email: mở hộp thoại
+  email --> otp: Gửi mã (signInWithOtp)
+  otp --> email: Quay lại / đổi email
+  otp --> otp: Gửi lại mã (sau 60 giây)
+  otp --> [*]: Mã đúng → SIGNED_IN, đóng
+  email --> pw_id: Dùng mật khẩu
+  pw_id --> pw: Tiếp
+  pw --> [*]: Đúng mật khẩu
+  pw --> forgot: Quên mật khẩu
+  forgot --> reset: Gửi mã khôi phục
+  reset --> [*]: Đặt mật khẩu mới
+  state "Nhập email" as email
+  state "Nhập mã 6 số" as otp
+  state "Nhập email (mật khẩu)" as pw_id
+  state "Nhập mật khẩu" as pw
+  state "Quên mật khẩu" as forgot
+  state "Mã + mật khẩu mới" as reset

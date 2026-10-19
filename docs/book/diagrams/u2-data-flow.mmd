@@ -1,0 +1,8 @@
+flowchart LR
+  db[("Supabase<br/>bảng songs + RLS")] -- "select … published" --> api["api.getSongs()<br/>toSong: snake_case → camelCase"]
+  api --> store["useStore<br/>songs, isLoadingSongs, songsError"]
+  store --> hook["useHomeSections<br/>useMemo: các kệ"]
+  hook --> screen["HomeScreen"]
+  screen --> ui["Shelf · MediaTile<br/>Spinner · EmptyState"]
+  layout["AppLayout<br/>useEffect lúc mở app"] -. "fetchSongs()" .-> store
+  ui -. "bấm (chương 11: playSong)" .-> store

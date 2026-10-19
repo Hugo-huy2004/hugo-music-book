@@ -57,3 +57,6 @@ dg-15-seq-group blob/b41c7812-35fc
 dg-16-navigation blob/b45a0677-35a3
 dg-20-deployment blob/59a09e04-28c3
 dg-23-seq-cdn blob/c0660d08-8087
+dg-u1-component-tree blob/cbf86097-2d79
+dg-u2-data-flow blob/7516abb6-2665
+dg-u3-login-state blob/44fa8175-29fd

@@ -182,6 +182,8 @@ await admin.auth.admin.deleteUser(data.user.id);
 deleteAccount: async () => must(await supabase.functions.invoke('delete-account', { method: 'POST' })),
 ```
 
+**Tiếp theo:** chương Ứng dụng 3 đưa các hàm này lên giao diện: hộp thoại đăng nhập, nút Tài khoản, màn hình Tài khoản.
+
 ### Kết quả
 
 ![Hộp đăng nhập: Google, mã 6 số qua email, hoặc mật khẩu nếu đã đặt](images/login-modal.png)

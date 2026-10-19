@@ -36,7 +36,7 @@ for f in files:
     title = title_m.group(1)
     body = render(re.sub(r'^#{1,2} .+\n', '', text, count=1))
     sid = Path(f).stem
-    m = re.match(r'((?:Chương|Nền tảng|Truyền phát|Nghiên cứu|Phụ lục) \w+)\. (.+)', title)
+    m = re.match(r'((?:Chương|Nền tảng|Truyền phát|Ứng dụng|Nghiên cứu|Phụ lục) \w+)\. (.+)', title)
     label = m.group(1) if m else ''
     heading = m.group(2) if m else title
     toc.append(f'<a class="toc-ch" href="#{sid}"><span class="n">{html.escape(label)}</span><span class="t">{html.escape(heading)}</span></a>')

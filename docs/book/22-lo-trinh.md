@@ -15,9 +15,12 @@ Làm theo thứ tự mà không có mốc rất dễ sa đà vào phần thú v�
 | 1 | Đặc tả sản phẩm | | Mỗi tính năng thuộc một trong bốn luồng |
 | 2 | Kiến trúc | Supabase + worker Node + Expo | Mọi tính năng có chỗ trên sơ đồ |
 | 3 | Repo, project Supabase | Node 26, pnpm 12, Supabase CLI | `supabase migration list` khớp |
+| Ứng dụng 1 | Khung app chạy web và điện thoại | Expo SDK 58, React Navigation, zustand | Mở thẳng `/radio` ra đúng màn hình |
 | 4 | Bảng danh mục | Migration SQL, enum, index một phần | Thêm bài trạng thái sai bị từ chối |
 | 5 | Trang chủ có dữ liệu thật | API tự sinh, RPC, kiểu sinh tự động | `curl /rest/v1/songs` trả JSON |
+| Ứng dụng 2 | Trang chủ có kệ bài | Store, `useMemo`, ba trạng thái phụ | Tắt mạng hiện lỗi thay vì màn hình trắng |
 | 6 | Đăng nhập 1 chạm | Supabase Auth: OTP email, Google, ẩn danh | Ba cách đăng nhập đều tạo dòng `profiles` |
+| Ứng dụng 3 | Hộp thoại đăng nhập, màn hình Tài khoản | `onAuthStateChange`, `useMember`, `Sheet` | Tải lại trang vẫn còn đăng nhập |
 | 7 | Thư viện cá nhân | RLS, trigger | Người A không ghi được dữ liệu của B |
 | 8 | Tải bài lên | Storage, chính sách trên `storage.objects` | Tài khoản thường không tải được vào `originals` |
 | 9 | Duyệt bài | Hàm SQL, Supabase Queues, Cron | Duyệt hai lần vẫn chỉ một việc trong hàng đợi |
@@ -47,7 +50,7 @@ Làm theo thứ tự mà không có mốc rất dễ sa đà vào phần thú v�
 
 ### Bộ sơ đồ thiết kế
 
-Mười bốn sơ đồ đi theo vòng đời dự án, từ yêu cầu tới vận hành. Mã nguồn nằm ở `docs/book/diagrams/` (Mermaid `.mmd`, riêng use case là SVG sinh từ `scripts/use-case.py`); sửa rồi chạy `node scripts/diagrams.mjs` để vẽ lại ảnh.
+Mười bảy sơ đồ đi theo vòng đời dự án, từ yêu cầu tới vận hành. Mã nguồn nằm ở `docs/book/diagrams/` (Mermaid `.mmd`, riêng use case là SVG sinh từ `scripts/use-case.py`); sửa rồi chạy `node scripts/diagrams.mjs` để vẽ lại ảnh.
 
 | Giai đoạn | Sơ đồ | Trả lời câu hỏi | Chương |
 |---|---|---|---|
@@ -62,6 +65,9 @@ Mười bốn sơ đồ đi theo vòng đời dự án, từ yêu cầu tới v�
 | Hành vi | Trình tự đài 24/7 | Database chuyển bài và báo cho mọi máy thế nào | 13 |
 | Hành vi | Trình tự blind test | Một lượt chơi, khi nào lộ bitrate | 14 |
 | Hành vi | Trình tự nghe chung | Tạo nhóm, vào nhóm, giữ đồng bộ | 15 |
+| Giao diện | Cây component | Khung app gồm những tầng nào | Ứng dụng 1 |
+| Giao diện | Luồng dữ liệu | Dữ liệu đi từ database tới màn hình thế nào | Ứng dụng 2 |
+| Giao diện | Trạng thái hộp thoại đăng nhập | Các bước đăng nhập, quay lại đi đâu | Ứng dụng 3 |
 | Giao diện | Điều hướng | Màn hình nào dẫn tới màn hình nào | 16 |
 | Vận hành | Triển khai | Mỗi phần chạy ở đâu, deploy theo thứ tự nào | 20 |
 | Quy mô | Trình tự qua CDN | File nhạc đi qua Cloudflare thế nào | 23 |

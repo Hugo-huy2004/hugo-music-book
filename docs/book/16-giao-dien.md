@@ -48,39 +48,9 @@ app/src/
 └─ ui/           phần mở rộng của hugo-music riêng cho app
 ```
 
-**Bước 2: biến môi trường.** Biến bắt đầu bằng `EXPO_PUBLIC_` được đưa vào app lúc build; chỉ đặt ở đây những thứ công khai được.
+**Bước 2: khung app, biến môi trường, Metro, gốc của app** đã dựng ở chương Ứng dụng 1; trang chủ và đăng nhập ở Ứng dụng 2 và 3. Chương này ráp phần còn lại và thêm hai thứ vào `App.tsx`: chế độ sáng, tối theo lựa chọn của người dùng (`themeMode` trong store) và `loadMeta()` nạp thể loại, giấy phép từ `get_meta()` lúc mở app.
 
-```bash
-# app/.env
-EXPO_PUBLIC_SUPABASE_URL=https://<project-ref>.supabase.co
-EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
-```
-
-**Bước 3: Metro đọc thư viện nội bộ từ mã nguồn.** `hugo-music` và `hugo-stream` nằm trong `packages/`; Metro được chỉ thẳng vào file nguồn, nên sửa giao diện là thấy ngay, không cần build thư viện trước.
-
-```js
-// app/metro.config.js (trích)
-const sources = /* { 'hugo-music': '../packages/ui/src/index.ts', 'hugo-stream': '...' } */;
-config.resolver.resolveRequest = (context, moduleName, platform) =>
-  sources[moduleName] ? { type: 'sourceFile', filePath: sources[moduleName] } : resolve(context, moduleName, platform);
-```
-
-**Bước 4: gốc của app.** `HugoProvider` cấp token giao diện (sáng, tối, theo hệ thống); `loadMeta()` nạp thể loại và giấy phép từ `get_meta()`.
-
-```tsx
-// app/src/App.tsx (trích)
-export default function App() {
-  const themeMode = useStore((s) => s.themeMode);
-  useEffect(() => { loadMeta(); }, []);
-  return (
-    <HugoProvider scheme={themeMode === 'auto' ? 'system' : themeMode} renderArtwork={renderArtwork}>
-      <AppNavigator />
-    </HugoProvider>
-  );
-}
-```
-
-**Bước 5: trang chủ chỉ ghép dữ liệu đã có.** Các kệ (mix theo thể loại, mới phát hành, nghệ sĩ) tính từ danh sách bài trong store bằng `useMemo`, không gọi thêm API. Mix theo thể loại dùng chính regex trong bảng `genre_groups`, nên thêm một nhóm thể loại trong database là trang chủ có thêm một mix.
+**Bước 3: thêm mix theo thể loại vào trang chủ.** Các kệ (mix theo thể loại, mới phát hành, nghệ sĩ) tính từ danh sách bài trong store bằng `useMemo`, không gọi thêm API. Mix theo thể loại dùng chính regex trong bảng `genre_groups`, nên thêm một nhóm thể loại trong database là trang chủ có thêm một mix.
 
 ```ts
 // app/src/screens/Home/useHomeSections.ts (trích)
@@ -90,7 +60,7 @@ const mixes = groups.map((g) => ({
 })).filter((m) => m.songs.length >= 5);
 ```
 
-**Bước 6: chạy.**
+**Bước 4: chạy.**
 
 ```bash
 pnpm web                         # trình duyệt, http://localhost:8081

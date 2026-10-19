@@ -1,0 +1,12 @@
+flowchart TB
+  idx["index.ts<br/>registerRootComponent"] --> app["App.tsx"]
+  app --> prov["HugoProvider<br/>màu, token, sáng/tối"]
+  prov --> nav["NavigationContainer<br/>đường dẫn ↔ màn hình"]
+  nav --> stack["Stack.Navigator<br/>Home · Search · Radio · Library · Account"]
+  stack --> layout["AppLayout (tab)"]
+  layout --> side["Sidebar<br/>khi rộng ≥ 768"]
+  layout --> screen["Màn hình theo tab<br/>HomeScreen, RadioScreen, ..."]
+  layout --> tabbar["GlassTabBar<br/>khi rộng &lt; 768"]
+  layout --> login["LoginModal<br/>(Ứng dụng 3)"]
+  layout --> player["Trình phát<br/>(chương 11)"]
+  store[("useStore (zustand)")] -. "đọc" .-> layout & screen & login & player

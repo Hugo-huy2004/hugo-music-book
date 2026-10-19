@@ -13,9 +13,12 @@ t6-kiem-soat-truy-cap.md
 01-san-pham.md
 02-kien-truc.md
 03-moi-truong.md
+u1-khung-app.md
 04-database.md
 05-api-tu-sinh.md
+u2-trang-chu.md
 06-dang-nhap.md
+u3-dang-nhap.md
 07-rls.md
 08-storage.md
 09-tu-dong-hoa.md
