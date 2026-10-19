@@ -29,6 +29,7 @@ cd hugo-music-book
 pnpm install
 cp app/.env.example app/.env          # URL + publishable key của project Supabase
 cp worker/.env.example worker/.env    # URL + secret key (chỉ dùng ở server)
+# mỗi biến lấy ở đâu, đặt vào đâu, lỗi hay gặp: Phụ lục C
 ```
 
 Chạy toàn bộ trên project Supabase của bạn (mỗi lệnh được giải thích ở chương tương ứng):

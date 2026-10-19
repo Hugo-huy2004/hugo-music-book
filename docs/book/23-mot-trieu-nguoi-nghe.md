@@ -95,17 +95,98 @@ if (r2 && !isPlaylist) {
 }
 ```
 
-**Bước 4: triển khai.**
+**Bước 4: nối Cloudflare R2, từng bước.** Phần này làm một lần, mất khoảng 20 phút. Từ đầu tới bước 4.6, app vẫn phát nhạc từ Supabase như cũ. Chỉ bước 4.7 mới chuyển đường phát sang Cloudflare, và bước đó gỡ ra được trong một lệnh.
+
+![Thứ tự nối R2: chuẩn bị, chạy thử, rồi mới chuyển đường phát](images/dg-23-r2-setup.png)
+
+*4.1. Tạo tài khoản và bật R2.* Đăng ký tại cloudflare.com. Vào *Storage & databases → R2 → Overview* và hoàn tất bước đăng ký gói R2. Gói có phần dùng miễn phí hằng tháng, vượt mới tính tiền (Cloudflare, n.d.a). Ghi lại **Account ID** ở cột phải trang Overview của tài khoản.
+
+*4.2. Cho máy của bạn quyền điều khiển Cloudflare.*
+
+```bash
+cd edge
+npx wrangler login     # mở trình duyệt, bấm Allow
+npx wrangler whoami    # in ra email và Account ID: đúng tài khoản là được
+```
+
+Trên CI không có trình duyệt, nên dùng API token thay cho `login`. Tạo ở *My Profile → API Tokens → Create Token*, chọn mẫu *Edit Cloudflare Workers*, thêm quyền *Account → Workers R2 Storage → Edit*. Đặt token vào secret `CLOUDFLARE_API_TOKEN` của GitHub (chương 20).
+
+*4.3. Tạo bucket.*
 
 ```bash
 npx wrangler r2 bucket create hugo-music-audio
-cd edge && npx wrangler secret put PLAYBACK_SECRET && npx wrangler deploy   # cùng giá trị với secret của Supabase
-supabase secrets set AUDIO_CDN_URL=https://hugo-music-audio.<tài khoản>.workers.dev
-# worker/.env: thêm R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY
-node --env-file=worker/.env scripts/move-audio-to-r2.mjs                       # chuyển file đã có
+npx wrangler r2 bucket list          # thấy hugo-music-audio
 ```
 
-Thứ tự quan trọng: chuyển file lên R2 **trước** khi đặt `AUDIO_CDN_URL`, để không có lúc playlist trỏ tới file chưa có.
+Tên bucket phải trùng với `bucket_name` trong `edge/wrangler.toml` và `R2_BUCKET` trong `worker/.env`. Bucket để riêng tư, không bật *Public access*: mọi lượt đọc phải đi qua Worker để được kiểm vé.
+
+*4.4. Tạo khóa cho worker xử lý âm thanh.* Worker xử lý âm thanh chạy trên Fly.io, nằm ngoài Cloudflare, nên nó ghi file qua API kiểu S3 bằng một cặp khóa riêng. Vào *R2 → Overview → API Tokens → Manage*, tạo token với quyền **Object Read & Write**, giới hạn ở bucket `hugo-music-audio`. Màn hình hiện **Access Key ID** và **Secret Access Key** đúng một lần (Cloudflare, n.d.c). Chép ngay vào `worker/.env`:
+
+```bash
+# worker/.env (thêm vào)
+R2_ACCOUNT_ID=<Account ID ở bước 4.1>
+R2_ACCESS_KEY_ID=<Access Key ID>
+R2_SECRET_ACCESS_KEY=<Secret Access Key>
+R2_BUCKET=hugo-music-audio
+```
+
+Chỉ cấp quyền *Object*, không cấp *Admin*: worker chỉ cần ghi file, không cần tạo hay xóa bucket. Lộ khóa này thì người ta cũng chỉ ghi được vào đúng một bucket.
+
+*4.5. Đặt khóa ký vé cho Cloudflare Worker, rồi deploy.* Worker kiểm vé bằng **đúng chuỗi** `PLAYBACK_SECRET` mà Edge Function dùng để ký vé (Phụ lục C, bước 1). Khác một ký tự là mọi vé bị từ chối.
+
+```bash
+npx wrangler secret put PLAYBACK_SECRET     # dán chuỗi, Enter
+npx wrangler deploy
+# → Deployed hugo-music-audio … https://hugo-music-audio.<tên-tài-khoản>.workers.dev
+```
+
+Ghi lại địa chỉ `workers.dev` ở dòng cuối: đó là `AUDIO_CDN_URL`.
+
+Nếu không còn giữ chuỗi `PLAYBACK_SECRET` cũ, sinh chuỗi mới rồi đặt cho **cả hai bên** trong cùng một lúc. Vé cũ hết hiệu lực, người đang nghe chỉ cần bấm phát lại.
+
+```bash
+NEW=$(openssl rand -hex 32)
+echo "$NEW" | npx wrangler secret put PLAYBACK_SECRET
+supabase secrets set PLAYBACK_SECRET="$NEW"
+```
+
+*4.6. Chuyển file đã có lên R2, rồi kiểm tra.*
+
+```bash
+cd ..
+node --env-file=worker/.env scripts/move-audio-to-r2.mjs
+# → mỗi bài một dòng "chép <bài>/<mức>.mp4"; chạy lại thì file đã có được bỏ qua
+npx wrangler r2 object get hugo-music-audio/<song_id>/64.mp4 --file /tmp/thu.mp4 --remote   # tải thử một file
+```
+
+Từ giờ, bài mới duyệt cũng được worker ghi thẳng lên R2, vì `worker/.env` đã có khóa R2. Nhớ khởi động lại worker. Worker trên Fly.io cũng cần các biến này: `fly secrets set R2_ACCOUNT_ID=... R2_ACCESS_KEY_ID=... R2_SECRET_ACCESS_KEY=... --config worker/fly.toml`.
+
+*4.7. Chuyển đường phát sang Cloudflare.* Chỉ làm sau khi bước 4.6 xong, để không có lúc playlist trỏ tới file chưa có.
+
+```bash
+supabase secrets set AUDIO_CDN_URL=https://hugo-music-audio.<tên-tài-khoản>.workers.dev
+```
+
+Edge Function đọc biến này lúc khởi động, nên giá trị mới có hiệu lực khi tiến trình mới chạy, thường sau vài giây. Chưa thấy đổi thì deploy lại cho chắc: `supabase functions deploy playback`. Muốn quay về Supabase Storage thì chạy `supabase secrets unset AUDIO_CDN_URL`. File trên Supabase vẫn còn nguyên, nên hai hướng đều an toàn.
+
+*4.8. (Tùy chọn) Tên miền riêng.* Nếu tên miền của bạn đã quản lý trên Cloudflare: *Workers & Pages → hugo-music-audio → Settings → Domains & Routes → Add → Custom domain*, nhập ví dụ `audio.tenmien.vn`. Sau đó đặt lại `AUDIO_CDN_URL` sang địa chỉ này.
+
+**Bước 5: kiểm tra đầu cuối.** Xin vé như app, lấy link file trong playlist, rồi gọi hai lần với hai vé khác nhau:
+
+```bash
+node --env-file=worker/.env scripts/try-playback.mjs <email> <mật khẩu>
+# link đoạn âm thanh trong playlist phải là hugo-music-audio.<…>.workers.dev, dòng GET cuối trả 206
+curl -sI "<link file trong playlist>" -H "range: bytes=0-1023" | grep -iE "^HTTP|content-range|x-cache"
+# lần đầu x-cache: MISS, lần sau (kể cả với vé khác): x-cache: HIT
+```
+
+| Hiện tượng | Nguyên nhân | Sửa |
+|---|---|---|
+| Worker trả 403 với mọi vé | `PLAYBACK_SECRET` hai bên khác nhau | Đặt lại cùng một chuỗi (bước 4.5) |
+| Worker trả 404 | File chưa có trên R2, hoặc sai tên bucket | Chạy lại bước 4.6; so `bucket_name` trong `wrangler.toml` |
+| Playlist vẫn trỏ về `supabase.co` | Chưa đặt `AUDIO_CDN_URL`, hoặc gõ sai tên | `supabase secrets list` để xem đã có biến chưa |
+| `move-audio-to-r2` báo 403 | Khóa R2 thiếu quyền ghi, hoặc giới hạn sai bucket | Tạo lại token *Object Read & Write* (bước 4.4) |
+| Trình duyệt báo lỗi CORS | Worker cũ chưa có header CORS | `npx wrangler deploy` lại từ thư mục `edge/` |
 
 ### Ví dụ tính tay
 

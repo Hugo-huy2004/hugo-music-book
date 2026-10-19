@@ -9,6 +9,12 @@ const IDLE_MS = 5_000;
 let running = true;
 process.on('SIGTERM', () => (running = false)); // dừng nhẹ nhàng khi deploy bản mới
 scheduleCleanup();
+// Một lượt đọc thử để biết ngay khóa có đúng không, thay vì im lặng chờ.
+{
+  const { error } = await db.rpc('media_read', { p_count: 0, p_visibility_sec: 0 });
+  if (error) { console.error('Không nối được Supabase:', error.message); process.exit(1); }
+  console.log('worker sẵn sàng, đang chờ việc từ hàng đợi media');
+}
 
 while (running) {
   // visibility 15 phút: nếu worker chết giữa chừng, việc tự hiện lại cho worker khác sau 15 phút

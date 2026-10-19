@@ -1,0 +1,11 @@
+flowchart TB
+  subgraph P1["Chuẩn bị"]
+    direction LR
+    a["4.1 Bật R2<br/>ghi Account ID"] --> b["4.2 wrangler login"] --> c["4.3 Tạo bucket<br/>hugo-music-audio"]
+    c --> d["4.4 Khóa R2<br/>→ worker/.env"] --> e["4.5 PLAYBACK_SECRET<br/>+ wrangler deploy"] --> f["4.6 Chuyển file<br/>move-audio-to-r2"]
+  end
+  subgraph P2["Chuyển đường phát"]
+    direction LR
+    g["4.7 Đặt AUDIO_CDN_URL<br/>nhạc đi qua Cloudflare"] -. "gỡ: supabase secrets unset AUDIO_CDN_URL" .-> sb[("Supabase Storage<br/>file vẫn còn")]
+  end
+  P1 --> P2

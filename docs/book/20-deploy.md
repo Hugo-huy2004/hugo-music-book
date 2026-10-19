@@ -61,51 +61,49 @@ fly secrets set SUPABASE_URL=https://<ref>.supabase.co SUPABASE_SECRET_KEY=sb_se
 fly deploy --config worker/fly.toml
 ```
 
-**Bước 2: quy trình tự động.** Hai bí mật cần đặt trong GitHub: `SUPABASE_ACCESS_TOKEN` (personal access token) và `SUPABASE_DB_PASSWORD`.
+**Bước 2: quy trình tự động.** Có hai workflow. `ci.yml` chạy ở mọi lần push và pull request: cài đặt, kiểm tra kiểu, test, build web. Nó không cần khóa nào. `deploy.yml` chạy khi push lên `main`. Mỗi phần chỉ deploy khi bạn đã đặt biến bật phần đó; chưa đặt thì job được bỏ qua, không báo lỗi.
 
 ```yaml
 # .github/workflows/deploy.yml (trích)
-name: Deploy
 on:
-  push:
-    branches: [main]
+  push: { branches: [main] }
+  workflow_dispatch:                 # chạy tay: Actions → Deploy → Run workflow
 jobs:
   supabase:
-    runs-on: ubuntu-latest
+    if: ${{ vars.SUPABASE_PROJECT_REF != '' }}
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
     steps:
-      - uses: actions/checkout@v5
-      - uses: supabase/setup-cli@v1
-      - run: supabase link --project-ref ${{ vars.SUPABASE_PROJECT_REF }}
-      - run: supabase db push                    # migration trước
-      - run: supabase functions deploy playback  # rồi Edge Function
-
+      - run: supabase link --project-ref "${{ vars.SUPABASE_PROJECT_REF }}" --password "$SUPABASE_DB_PASSWORD"
+      - run: supabase db push                     # 1. migration trước
+      - run: supabase functions deploy --project-ref "${{ vars.SUPABASE_PROJECT_REF }}"   # 2. mọi Edge Function
   worker:
     needs: supabase
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --config worker/fly.toml --remote-only
-        env: { FLY_API_TOKEN: '${{ secrets.FLY_API_TOKEN }}' }
-
+    if: ${{ vars.DEPLOY_WORKER == 'true' }}
+    # 3. flyctl deploy --config worker/fly.toml
+  edge:
+    needs: supabase
+    if: ${{ vars.DEPLOY_EDGE == 'true' }}
+    # 4. wrangler deploy (Cloudflare Worker phát nhạc, chương 23)
   web:
     needs: supabase
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v5
-        with: { node-version: 26, cache: pnpm }
-      - run: pnpm install --frozen-lockfile && pnpm build:web
-        env:
-          EXPO_PUBLIC_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
-          EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY }}
-      - run: npx wrangler pages deploy app/dist --project-name hugo-music
-        env: { CLOUDFLARE_API_TOKEN: '${{ secrets.CLOUDFLARE_API_TOKEN }}' }
+    if: ${{ vars.CLOUDFLARE_PAGES_PROJECT != '' }}
+    # 5. build web với EXPO_PUBLIC_*, rồi wrangler pages deploy
 ```
+
+Vì sao không để job báo lỗi khi thiếu biến: repo công khai, ai fork về cũng chạy workflow. Báo lỗi đỏ ở mỗi lần push vì một phần chưa dùng tới chỉ làm người ta quen bỏ qua dấu đỏ, kể cả dấu đỏ thật.
+
+**Đặt biến trên GitHub.** Vào repo → *Settings → Secrets and variables → Actions*. Thứ gì bí mật thì đặt ở tab *Secrets* (bị che trong log); thứ công khai thì đặt ở tab *Variables*.
+
+| Bật phần | Variables | Secrets |
+|---|---|---|
+| Database + Edge Function | `SUPABASE_PROJECT_REF` | `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD` |
+| Worker (Fly.io) | `DEPLOY_WORKER` = `true` | `FLY_API_TOKEN` |
+| Cloudflare Worker | `DEPLOY_EDGE` = `true`, `CLOUDFLARE_ACCOUNT_ID` | `CLOUDFLARE_API_TOKEN` |
+| Web (Cloudflare Pages) | `CLOUDFLARE_PAGES_PROJECT`, `CLOUDFLARE_ACCOUNT_ID`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` | `CLOUDFLARE_API_TOKEN` |
+
+Mỗi giá trị lấy ở đâu: Phụ lục C. Đặt xong, vào *Actions → Deploy → Run workflow* để chạy thử mà không cần push.
 
 **Bước 3: cấu hình Auth cho production.** Ở *Authentication → URL Configuration*: Site URL là tên miền web thật; thêm `hugomusic://auth` vào Redirect URLs cho app. Ở Google Cloud Console, thêm `https://<ref>.supabase.co/auth/v1/callback` vào Authorized redirect URIs.
 

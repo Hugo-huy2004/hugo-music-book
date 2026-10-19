@@ -72,9 +72,34 @@ hugo-music-book/
 packages:
   - app
   - worker
+  - edge          # Cloudflare Worker, chương 23
   - packages/*
 # Expo/React Native cần node_modules phẳng như npm để Metro tìm thấy module native
 nodeLinker: hoisted
+# pnpm chỉ chạy script cài đặt (postinstall) của gói có tên ở đây, để chặn mã độc trong gói phụ thuộc.
+# Thiếu dòng này, `pnpm install` trên CI báo ERR_PNPM_IGNORED_BUILDS.
+allowBuilds:
+  esbuild: true   # wrangler dùng để đóng gói Worker
+  workerd: true   # chạy Worker trên máy (wrangler dev)
+```
+
+Thư mục `app/` và `edge/` chưa có cũng không sao: pnpm bỏ qua đường dẫn chưa tồn tại. Chương Ứng dụng 1 tạo `app/`, chương 23 tạo `edge/`.
+
+`package.json` ở gốc repo gom các lệnh hay dùng, để lệnh nào cũng chạy được từ gốc:
+
+```json
+{
+  "name": "hugo-music", "private": true, "type": "module",
+  "packageManager": "pnpm@12.14.0",
+  "engines": { "node": ">=26" },
+  "scripts": {
+    "web": "pnpm --filter @hugo/app web",
+    "worker": "pnpm --filter @hugo/worker dev",
+    "test": "pnpm -r test",
+    "db:push": "supabase db push",
+    "db:types": "supabase gen types typescript --linked > app/src/api/database.types.ts"
+  }
+}
 ```
 
 **Bước 5: nối repo với project.**
@@ -84,6 +109,28 @@ supabase login                              # mở trình duyệt để đăng n
 supabase link --project-ref <project-ref>   # project-ref là phần đầu của Project URL
 supabase db push                            # chạy mọi file trong supabase/migrations lên project
 ```
+
+`supabase link` hỏi mật khẩu database: đó là mật khẩu bạn đặt lúc tạo project ở bước 2.
+
+**Bước 6: khóa và biến môi trường.** Mỗi phần của hệ thống đọc địa chỉ project và khóa từ một file `.env` riêng. Thiếu file này là phần đó không nối được với Supabase. Tạo ngay từ bây giờ:
+
+```bash
+cp app/.env.example app/.env          # EXPO_PUBLIC_SUPABASE_URL, EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+cp worker/.env.example worker/.env    # SUPABASE_URL, SUPABASE_SECRET_KEY, SUPABASE_PUBLISHABLE_KEY
+supabase secrets set PLAYBACK_SECRET=$(openssl rand -hex 32)   # khóa ký vé nghe, chương 11
+```
+
+Code lại từ đầu thì chưa có hai file `.env.example`. Tạo thẳng `app/.env` và `worker/.env` với các biến ghi ở trên.
+
+```bash
+# .gitignore: không bao giờ commit khóa
+node_modules/
+.env
+supabase/.env.deploy
+edge/.dev.vars
+```
+
+Bảng đầy đủ mọi biến, lấy giá trị ở đâu, phần nào đọc, và các lỗi hay gặp khi đặt sai nằm ở **Phụ lục C**. Mỗi khi một chương nhắc tới biến mới, quay lại phụ lục đó.
 
 ### Kết quả
 
@@ -108,7 +155,8 @@ supabase migration list      # cột Local và Remote khớp nhau
 
 1. `nodeLinker: hoisted` trong pnpm-workspace.yaml để làm gì?
 2. Publishable key và secret key khác nhau thế nào? Key nào được phép nằm trong app?
-3. Vì sao file `supabase/.env.deploy` phải nằm trong .gitignore?
+3. Vì sao các file `.env` phải nằm trong `.gitignore`? Biến nào trong `app/.env` thì công khai được, vì sao?
+4. Thiếu `allowBuilds` trong `pnpm-workspace.yaml` thì `pnpm install` trên CI báo lỗi gì?
 
 ### Khi nào đổi
 

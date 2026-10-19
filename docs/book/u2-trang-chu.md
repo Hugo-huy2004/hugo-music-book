@@ -37,6 +37,17 @@ Mũi tên liền là dữ liệu đi xuống, chỉ một chiều. Màn hình kh
 
 ### Làm từng bước
 
+**Bước 0: vài bài để thử giao diện.** Bài thật có file nhạc chỉ xuất hiện sau chương 10, khi worker xử lý xong. Để có dữ liệu xem ngay, chạy đoạn SQL này trong *SQL Editor* của dashboard. Bài thử chưa có file nhạc nên chưa phát được, nhưng đủ để dựng giao diện.
+
+```sql
+insert into public.artists (name) values ('Nghệ sĩ thử') on conflict (name) do nothing;
+insert into public.songs (title, artist_id, license, source_url, status, published_at, genre)
+select t, (select id from public.artists where name = 'Nghệ sĩ thử'), 'cc0', 'https://example.com', 'published', now(), 'Pop'
+  from unnest(array['Bài thử 1', 'Bài thử 2', 'Bài thử 3']) as t;
+```
+
+Tới chương 10, khi đã có nhạc thật, xóa chúng đi: `delete from public.songs where title like 'Bài thử%';`.
+
 **Bước 1: store giữ danh sách bài.** zustand tạo một hook (`useStore`). Mọi component gọi hook này để đọc hoặc gọi hàm.
 
 ```ts

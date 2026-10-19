@@ -1,9 +1,14 @@
 name: Deploy
+# Mỗi phần chỉ deploy khi đã cấu hình biến và secret của nó (chương 20, mục "Biến cho GitHub Actions").
+# Chưa cấu hình phần nào thì job đó được bỏ qua, không báo lỗi. Chạy tay: Actions → Deploy → Run workflow.
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+
 jobs:
   supabase:
+    if: ${{ vars.SUPABASE_PROJECT_REF != '' }}
     runs-on: ubuntu-latest
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
@@ -11,30 +16,49 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: supabase/setup-cli@v1
-      - run: supabase link --project-ref ${{ vars.SUPABASE_PROJECT_REF }}
-      - run: supabase db push                    # migration trước
-      - run: supabase functions deploy playback  # rồi Edge Function
+      - run: supabase link --project-ref "${{ vars.SUPABASE_PROJECT_REF }}" --password "$SUPABASE_DB_PASSWORD"
+      - run: supabase db push                                                  # 1. migration trước
+      - run: supabase functions deploy --project-ref "${{ vars.SUPABASE_PROJECT_REF }}"   # 2. mọi Edge Function
 
   worker:
     needs: supabase
+    if: ${{ vars.DEPLOY_WORKER == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --config worker/fly.toml --remote-only
+      - run: flyctl deploy --config worker/fly.toml --remote-only              # 3. worker xử lý âm thanh
         env: { FLY_API_TOKEN: '${{ secrets.FLY_API_TOKEN }}' }
 
-  web:
+  edge:
     needs: supabase
+    if: ${{ vars.DEPLOY_EDGE == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v5
         with: { node-version: 26, cache: pnpm }
-      - run: pnpm install --frozen-lockfile && pnpm build:web
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @hugo/edge exec wrangler deploy                      # 4. Worker phát nhạc (R2, chương 23)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+
+  web:
+    needs: supabase
+    if: ${{ vars.CLOUDFLARE_PAGES_PROJECT != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with: { node-version: 26, cache: pnpm }
+      - run: pnpm install --frozen-lockfile && pnpm build:web                  # 5. web tĩnh
         env:
           EXPO_PUBLIC_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY }}
-      - run: npx wrangler pages deploy app/dist --project-name hugo-music
-        env: { CLOUDFLARE_API_TOKEN: '${{ secrets.CLOUDFLARE_API_TOKEN }}' }
+      - run: npx wrangler pages deploy app/dist --project-name "${{ vars.CLOUDFLARE_PAGES_PROJECT }}"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}

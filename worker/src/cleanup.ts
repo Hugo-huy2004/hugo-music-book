@@ -11,6 +11,6 @@ export async function cleanupGuests() {
 const DAY = 24 * 60 * 60 * 1000;
 export function scheduleCleanup() {
   const run = () => cleanupGuests().then((n) => n && console.log(`cleanup: removed ${n} stale guests`)).catch((e) => console.error('cleanup failed', e.message));
-  setTimeout(run, 60_000);          // chạy lần đầu sau 1 phút
+  setTimeout(run, 60_000).unref();  // chạy lần đầu sau 1 phút
   setInterval(run, DAY).unref();    // rồi mỗi ngày; unref: không giữ tiến trình sống chỉ vì hẹn giờ này
 }

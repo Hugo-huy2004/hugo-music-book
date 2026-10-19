@@ -7,3 +7,8 @@ packages:
 minimumReleaseAgeExclude:
   - '@cloudflare/workers-types@5.20261018.1'
 nodeLinker: hoisted
+# pnpm chỉ chạy script cài đặt của gói được liệt kê ở đây (chống mã độc trong postinstall).
+# esbuild: wrangler dùng để đóng gói Worker; workerd: chạy Worker trên máy (wrangler dev).
+allowBuilds:
+  esbuild: true
+  workerd: true

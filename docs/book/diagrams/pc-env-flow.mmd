@@ -1,0 +1,28 @@
+flowchart LR
+  subgraph SRC["Lấy giá trị ở đâu"]
+    direction TB
+    sbd["Dashboard Supabase<br/>URL · publishable · secret"]
+    cfd["Dashboard Cloudflare<br/>Account ID · khóa R2"]
+    gen["openssl rand -hex 32<br/>PLAYBACK_SECRET"]
+  end
+  subgraph DST["Đặt vào đâu"]
+    direction TB
+    appenv["app/.env<br/>EXPO_PUBLIC_SUPABASE_URL<br/>EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY"]
+    wenv["worker/.env<br/>SUPABASE_URL · SUPABASE_SECRET_KEY<br/>R2_* (tùy chọn)"]
+    gh["GitHub Actions<br/>Variables · Secrets"]
+    fsec["supabase secrets<br/>PLAYBACK_SECRET · AUDIO_CDN_URL"]
+    wsec["wrangler secret<br/>PLAYBACK_SECRET"]
+  end
+  sbd -- "công khai" --> appenv
+  sbd -- "bí mật" --> wenv
+  sbd --> gh
+  cfd --> wenv
+  cfd --> gh
+  gen -- "cùng một chuỗi" --> fsec
+  gen -- "cùng một chuỗi" --> wsec
+  appenv --> app(["App web/iOS/Android"])
+  wenv --> wk(["Worker xử lý âm thanh"])
+  gh --> ci(["CI/CD deploy"])
+  fsec --> ef(["Edge Function playback"])
+  wsec --> cw(["Cloudflare Worker"])
+  ef -. "vé ký bằng PLAYBACK_SECRET" .-> cw

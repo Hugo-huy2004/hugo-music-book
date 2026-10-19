@@ -14,6 +14,8 @@ Cloudflare (n.d.a) *R2 pricing*. Available at: https://developers.cloudflare.com
 
 Cloudflare (n.d.b) *Cache API (Workers runtime APIs)*. Available at: https://developers.cloudflare.com/workers/runtime-apis/cache/ (Accessed: 19 October 2026).
 
+Cloudflare (n.d.c) *Authentication (R2 API tokens)*. Available at: https://developers.cloudflare.com/r2/api/tokens/ (Accessed: 19 October 2026).
+
 Cristian, F. (1989) 'Probabilistic clock synchronization', *Distributed Computing*, 3(3), pp. 146–158. doi: 10.1007/BF01784024.
 
 EBU (2023) *EBU R 128: loudness normalisation and permitted maximum level of audio signals*. Version 5.0. Geneva: European Broadcasting Union.
