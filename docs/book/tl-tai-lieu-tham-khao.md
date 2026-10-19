@@ -38,6 +38,10 @@ Iyengar, J. and Thomson, M. (2021) *QUIC: a UDP-based multiplexed and secure tra
 
 Jiang, J., Sekar, V. and Zhang, H. (2012) 'Improving fairness, efficiency, and stability in HTTP-based adaptive video streaming with FESTIVE', in *Proceedings of the 8th International Conference on Emerging Networking Experiments and Technologies (CoNEXT '12)*. Nice: ACM, pp. 97–108. doi: 10.1145/2413176.2413189.
 
+Lê, G.H. (2026a) *hugo-music* (Version 0.6.0) [Computer program]. Available at: https://www.npmjs.com/package/hugo-music (Accessed: 19 October 2026).
+
+Lê, G.H. (2026b) *hugo-stream* (Version 0.1.1) [Computer program]. Available at: https://www.npmjs.com/package/hugo-stream (Accessed: 19 October 2026).
+
 Mao, H., Netravali, R. and Alizadeh, M. (2017) 'Neural adaptive video streaming with Pensieve', in *Proceedings of the Conference of the ACM Special Interest Group on Data Communication (SIGCOMM '17)*. Los Angeles, CA: ACM, pp. 197–210. doi: 10.1145/3098822.3098843.
 
 Node.js (n.d.) *Modules: TypeScript*. Available at: https://nodejs.org/api/typescript.html (Accessed: 19 October 2026).

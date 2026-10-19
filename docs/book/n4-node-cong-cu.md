@@ -99,14 +99,14 @@ node --test --watch test/    # chạy lại khi sửa
 
 **Stream** đáng nói thêm: đọc một file nhạc 300 MB bằng `readFile` nạp cả 300 MB vào bộ nhớ; đọc bằng stream thì xử lý từng khúc nhỏ. Worker để ffmpeg đọc thẳng file trên đĩa, nên không cần tự viết stream, nhưng đây là lý do Node.js xử lý được file lớn với ít RAM.
 
-**Bước 4: pnpm cho repo nhiều phần.** Repo có ba phần chạy riêng (`app`, `worker`, `packages/*`). pnpm cài thư viện một lần cho tất cả, mỗi phần tự khai báo thứ nó cần.
+**Bước 4: pnpm cho repo nhiều phần.** Repo có ba phần chạy riêng (`app`, `worker`, `edge`). pnpm cài thư viện một lần cho tất cả, mỗi phần tự khai báo thứ nó cần.
 
 ```yaml
 # pnpm-workspace.yaml
 packages:
   - app
   - worker
-  - packages/*
+  - edge
 nodeLinker: hoisted
 ```
 

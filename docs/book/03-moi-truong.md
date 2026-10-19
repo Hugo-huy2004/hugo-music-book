@@ -60,9 +60,11 @@ hugo-music-book/
 │  └─ config.toml       cấu hình Auth, Edge Function...
 ├─ worker/              Node.js 26: xử lý âm thanh, chạy trên server của bạn
 ├─ app/                 Expo: một mã nguồn cho web, iOS, Android
-└─ packages/
-   ├─ ui/               hugo-music: bộ giao diện kính mờ tự làm
-   └─ stream/           hugo-stream: đồng hồ máy chủ, lời bài hát LRC
+└─ edge/                Cloudflare Worker phát nhạc từ R2 (chương 23)
+
+Thư viện của tác giả cài từ npm, không nằm trong repo:
+   hugo-music           bộ giao diện kính mờ
+   hugo-stream          vé phát nhạc, chọn CDN, lời bài hát LRC, đồng bộ nhiều máy
 ```
 
 **Bước 4: khai báo workspace.**
@@ -73,7 +75,6 @@ packages:
   - app
   - worker
   - edge          # Cloudflare Worker, chương 23
-  - packages/*
 # Expo/React Native cần node_modules phẳng như npm để Metro tìm thấy module native
 nodeLinker: hoisted
 # pnpm chỉ chạy script cài đặt (postinstall) của gói có tên ở đây, để chặn mã độc trong gói phụ thuộc.
@@ -89,7 +90,7 @@ Thư mục `app/` và `edge/` chưa có cũng không sao: pnpm bỏ qua đườn
 
 ```json
 {
-  "name": "hugo-music", "private": true, "type": "module",
+  "name": "hugo-music-book", "private": true, "type": "module",
   "packageManager": "pnpm@12.14.0",
   "engines": { "node": ">=26" },
   "scripts": {

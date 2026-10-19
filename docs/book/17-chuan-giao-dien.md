@@ -56,22 +56,16 @@ const { colors } = useHugoTheme();
 </InsetGroup>
 ```
 
-**Bước 3: tôn trọng cài đặt giảm chuyển động.** React Native báo cài đặt này qua `AccessibilityInfo`; khi bật, hiệu ứng chạm chỉ đổi độ mờ thay vì nảy.
+**Bước 3: tôn trọng cài đặt giảm chuyển động.** Thư viện `hugo-music` đọc cài đặt này một lần cho cả app, qua `AccessibilityInfo` trên điện thoại và `prefers-reduced-motion` trên trình duyệt. Mọi điều khiển của thư viện tự đổi hiệu ứng nảy thành đổi độ mờ khi cài đặt bật. Hiệu ứng tự viết trong app thì hỏi cùng một cờ:
 
 ```ts
-// packages/ui/src/glass/useReducedMotion.ts
-import { useEffect, useState } from 'react';
-import { AccessibilityInfo } from 'react-native';
+import { reduceMotionOn, motion } from 'hugo-music';
 
-export function useReducedMotion() {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    AccessibilityInfo.isReduceMotionEnabled().then(setReduced);
-    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduced);
-    return () => sub.remove();
-  }, []);
-  return reduced;
-}
+Animated.timing(scale, {
+  toValue: 1,
+  duration: reduceMotionOn() ? 0 : motion.normal,   // motion: thời lượng chuẩn 140/220/320/420 ms
+  useNativeDriver: true,
+}).start();
 ```
 
 **Bước 4: phản hồi bằng rung nhẹ cho thao tác quan trọng** (thích bài, vào nhóm, bỏ phiếu). Chỉ trên điện thoại, chỉ cho thao tác người dùng chủ động.
@@ -119,4 +113,4 @@ Danh sách soát trước khi một màn hình mới được merge:
 
 Các file chương này viết, trong repo đã clone ở phần Mở đầu:
 
-- `packages/ui/src/glass/useReducedMotion.ts`
+- `hugo-music` trên npm: `reduceMotionOn`, `motion`, token giao diện

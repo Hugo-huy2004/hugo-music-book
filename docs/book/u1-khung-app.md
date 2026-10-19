@@ -36,9 +36,20 @@ Có khung sớm thì mỗi tính năng backend làm xong là thấy ngay trên m
 
 ### Chọn gì, vì sao
 
-**Expo SDK 58, React Navigation với `linking`, zustand, và thư viện giao diện `hugo-music` trong `packages/ui`.** Expo cho một mã nguồn TypeScript chạy cả web lẫn điện thoại. React Navigation cho mỗi màn hình một đường dẫn web (`/radio`, `/library`) mà vẫn để app tự quyết bố cục. Thư viện giao diện tách riêng nên màn hình không bao giờ viết màu hay khoảng cách bằng số (chương 17).
+**Expo SDK 58, React Navigation với `linking`, zustand, và hai thư viện của tác giả cài từ npm: `hugo-music` (giao diện) và `hugo-stream` (phát nhạc).** Expo cho một mã nguồn TypeScript chạy cả web lẫn điện thoại. React Navigation cho mỗi màn hình một đường dẫn web (`/radio`, `/library`) mà vẫn để app tự quyết bố cục. Thư viện giao diện tách riêng nên màn hình không bao giờ viết màu hay khoảng cách bằng số (chương 17).
 
-**Khi code lại từ đầu:** chép nguyên hai thư mục `packages/ui` (thư viện giao diện `hugo-music`) và `packages/stream` (đồng bộ, lời bài hát) từ repo. Hai thư viện này không phải trọng tâm của sách. Phần app trong `app/src` thì bạn tự viết theo các chương.
+### Hai thư viện của dự án
+
+Hugo Music dựng trên hai thư viện mã nguồn mở do chính tác giả viết và đăng lên npm, giấy phép MIT (Lê, 2026a; 2026b). Cả hai được tách ra từ chính dự án này, nên mọi thành phần trong đó đều đã chạy thật trong app.
+
+| Thư viện | Bản | Cung cấp | Dùng ở |
+|---|---|---|---|
+| [`hugo-music`](https://www.npmjs.com/package/hugo-music) | 0.6.0 | Bộ giao diện kính mờ cho React Native và Expo, chạy cả web: token (khoảng cách, cỡ chữ, màu sáng/tối), `HugoProvider`, kính mờ (`Glass`, `LiquidGlass`), điều khiển (`ActionButton`, `GlassButton`, `TextField`, `SegmentedControl`), bố cục (`LargeTitle`, `Shelf`, `MediaTile`, `ListRow`, `InsetGroup`), điều hướng (`GlassTabBar`, `Sheet`), trạng thái (`Spinner`, `EmptyState`, `ErrorText`) | Mọi màn hình của app |
+| [`hugo-stream`](https://www.npmjs.com/package/hugo-stream) | 0.1.1 | Khối dựng cho app nghe nhạc, không phụ thuộc thư viện nào, chạy trên server, edge và trong app: vé phát nhạc có chữ ký (`mintToken`, `verifyToken`), chọn CDN có ngắt mạch (`createSteering`), lời bài hát LRC (`parseLrc`, `activeLine`), đồng hồ máy chủ và bộ chỉnh lệch nhịp (`createServerClock`, `controlStep`, `SYNC`) | Edge Function (chương 11), Cloudflare Worker (23), lời bài hát (12), đài và nhóm nghe (13, 15), chọn CDN trong app |
+
+![Phần nào của hệ thống dùng thư viện nào](images/dg-u1-libraries.png)
+
+Hai thư viện cài như mọi gói npm khác, không chép mã nguồn vào repo. Muốn sửa một thành phần thì sửa ở repo của thư viện, đăng bản mới, rồi nâng phiên bản trong app. Cách này giữ một nguồn sự thật cho mỗi đoạn code: hàm ký vé trong Edge Function và hàm kiểm vé trong Cloudflare Worker là cùng một đoạn code, không thể lệch nhau.
 
 ### React trong mười phút
 
@@ -89,16 +100,21 @@ npx expo install react-dom react-native-web @expo/metro-runtime \
   @supabase/supabase-js expo-sqlite zustand
 ```
 
-**Bước 2: nối thư viện giao diện.** Thêm `"hugo-music": "workspace:*"` và `"hugo-stream": "workspace:*"` vào `dependencies` của app, chạy `pnpm install`. Metro (trình đóng gói của Expo) được chỉ thẳng vào mã nguồn của hai thư viện, nên sửa thư viện là thấy ngay mà không phải build trước:
+**Bước 2: cài hai thư viện.** `npx expo install` chọn phiên bản các gói đi kèm cho đúng với SDK 58:
 
-```js
-// app/metro.config.js (trích)
-const sources = /* { 'hugo-music': '../packages/ui/src/index.ts', 'hugo-stream': '...' } */;
-config.resolver.resolveRequest = (context, moduleName, platform) =>
-  sources[moduleName] ? { type: 'sourceFile', filePath: sources[moduleName] } : resolve(context, moduleName, platform);
+```bash
+npx expo install hugo-music hugo-stream \
+  @expo/vector-icons expo-blur expo-glass-effect expo-linear-gradient expo-camera
 ```
 
-TypeScript cũng cần biết hai thư viện này nằm đâu: thêm `"paths"` trong `app/tsconfig.json`, trỏ tới cùng hai file nguồn.
+Các gói đi kèm là *peer dependency* của `hugo-music`: thư viện dùng chúng nhưng để app tự cài, để cả app chỉ có một bản của mỗi gói. `expo-camera` phục vụ thành phần quét mã QR. Bản 0.6.0 khai báo nó là bắt buộc, nên app chưa quét QR cũng phải cài.
+
+Không cần cấu hình Metro hay TypeScript gì thêm: thư viện có sẵn khai báo kiểu, và Metro tự đọc mã nguồn của thư viện qua trường `react-native` trong `package.json` của nó.
+
+```ts
+import { HugoProvider, LargeTitle, Shelf, MediaTile, space, useHugoTheme } from 'hugo-music';
+import { parseLrc, activeLine, createServerClock } from 'hugo-stream';
+```
 
 **Bước 3: biến môi trường.** Biến bắt đầu bằng `EXPO_PUBLIC_` được đưa vào app lúc build, ai mở app cũng đọc được, nên chỉ đặt ở đây những thứ công khai được.
 
@@ -248,6 +264,7 @@ Một phần ô thứ ba lộ ra là cố ý: người dùng biết kệ này vu
 3. Hook là gì? Vì sao không được gọi hook trong câu `if`?
 4. App quyết định hiện thanh bên hay thanh tab dựa vào gì? Cửa sổ rộng 800 điểm thì hiện gì?
 5. Vì sao dùng `npx expo install` thay vì `pnpm add` để cài thư viện cho app?
+6. `hugo-music` và `hugo-stream` mỗi thư viện cung cấp gì? Vì sao cài từ npm thay vì chép mã nguồn vào repo?
 
 ### Khi nào đổi
 
@@ -256,9 +273,9 @@ Một phần ô thứ ba lộ ra là cố ý: người dùng biết kệ này vu
 
 ### Code của chương
 
-- `app/index.ts`, `app/app.json`, `app/metro.config.js`, `app/tsconfig.json`
+- `app/index.ts`, `app/app.json`, `app/tsconfig.json`
 - `app/src/App.tsx`
 - `app/src/navigation/AppNavigator.tsx`, `app/src/navigation/AppLayout.tsx`
 - `app/src/lib/responsive.ts`
-- `packages/ui/src/index.ts` (thư viện giao diện, chép nguyên)
+- `app/package.json`: `hugo-music` và `hugo-stream` từ npm
 - `examples/app-ung-dung/`: app gõ đúng theo ba chương Ứng dụng, đã kiểm tra kiểu và chạy với dữ liệu thật; dùng để đối chiếu

@@ -43,7 +43,7 @@ Bảng giá thay đổi theo thời gian, nên sách không in số tiền; tín
 
 ### Chọn gì, vì sao
 
-**File âm thanh lên R2; một Cloudflare Worker kiểm vé ở điểm biên và dùng khóa cache không chứa vé** (Cloudflare, n.d.b). Supabase chỉ còn cấp vé (mỗi lượt nghe một lần `claim_playback()`) và trả playlist vài KB. Vé dùng lại đúng định dạng HMAC của chương 11 và cùng khóa bí mật, nên không thêm hệ thống phân quyền nào.
+**File âm thanh lên R2; một Cloudflare Worker kiểm vé ở điểm biên và dùng khóa cache không chứa vé** (Cloudflare, n.d.b). Supabase chỉ còn cấp vé (mỗi lượt nghe một lần `claim_playback()`) và trả playlist vài KB. Vé là vé của chương 11, ký bằng `mintToken` của `hugo-stream`; Worker kiểm bằng `verifyToken` của cùng thư viện, với cùng khóa bí mật. Không thêm hệ thống phân quyền nào, và không có đoạn code ký vé thứ hai để giữ cho khớp.
 
 Thêm một lợi ích: đường dẫn file trên Worker không chứa bitrate (`/a/<bài>/<tok>.mp4`, `tok` là 16 ký tự HMAC), nên blind test không lộ đáp án qua tên file như link ký của Supabase (`…/64.mp4`).
 
@@ -59,8 +59,8 @@ So với sơ đồ ở chương 11, phần xin vé và playlist không đổi; c
 
 ```ts
 // edge/src/index.ts (trích)
-const ticket = await verifyTicket(env.PLAYBACK_SECRET, url.searchParams.get('t') ?? '');
-if (!ticket || ticket.s !== songId) return fail(403);
+import { verifyToken } from 'hugo-stream';   // cùng thư viện với Edge Function
+if (!(await verifyToken(`hls/${songId}/`, url.searchParams.get('t'), env.PLAYBACK_SECRET))) return fail(403);
 
 const key = `${songId}/${kbps}.mp4`;
 const cacheKey = new Request(`https://audio-cache/${key}`, { headers: range ? { range } : {} });  // không có vé

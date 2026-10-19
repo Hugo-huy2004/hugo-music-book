@@ -190,7 +190,7 @@ Bảng này không chứa logic đồng bộ nào. Chủ nhóm vẫn dùng trìn
 
 ### Ví dụ tính tay
 
-**Chỉnh lệch nhịp giữa hai máy trong nhóm.** Cứ 250 ms máy thành viên so vị trí của nó với vị trí mong đợi. Hằng số trong `packages/stream/src/sync.js`: tua nếu lệch quá 0,35 giây; dưới đó thì đổi tốc độ phát, tối đa ±10 %, để đuổi kịp trong khoảng 1 giây; lệch dưới 5 ms thì bỏ qua.
+**Chỉnh lệch nhịp giữa hai máy trong nhóm.** Cứ 250 ms máy thành viên so vị trí của nó với vị trí mong đợi. Hằng số `SYNC` của thư viện `hugo-stream`: tua nếu lệch quá 0,35 giây; dưới đó thì đổi tốc độ phát, tối đa ±10 %, để đuổi kịp trong khoảng 1 giây; lệch dưới 5 ms thì bỏ qua.
 
 ```text
 lệch +0,8 giây (đi trước)   → quá 0,35 → tua về đúng vị trí

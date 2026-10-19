@@ -1,0 +1,20 @@
+flowchart LR
+  subgraph NPM["npm"]
+    direction TB
+    hm["<b>hugo-music</b> 0.6.0<br/>token · kính mờ · điều khiển<br/>bố cục · điều hướng"]
+    hs["<b>hugo-stream</b> 0.1.1<br/>vé ký HMAC · chọn CDN<br/>lời LRC · đồng bộ nhiều máy"]
+  end
+  subgraph APP["App Expo"]
+    direction TB
+    ui["Mọi màn hình"]
+    ly["Lời bài hát<br/>parseLrc · activeLine"]
+    sy["Đài, nhóm nghe<br/>createServerClock · controlStep"]
+    st["Chọn CDN<br/>createSteering"]
+  end
+  ef["Edge Function playback<br/>mintToken · verifyToken"]
+  cw["Cloudflare Worker<br/>verifyToken"]
+  hm --> ui
+  hs --> ly & sy & st
+  hs --> ef
+  hs --> cw
+  ef -. "cùng một vé" .-> cw

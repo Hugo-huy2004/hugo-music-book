@@ -20,13 +20,13 @@ Có một khó khăn: trình phát (`<audio>` trên web, AVPlayer trên iOS, Exo
 
 ### Chọn gì, vì sao
 
-**Edge Function `playback` làm hai việc:** (1) `POST` kiểm quyền bằng chính phiên người nghe (gọi hàm SQL `claim_playback`) rồi trả một *vé* ký HMAC sống 2 giờ; (2) `GET ?t=<vé>` trả playlist, trong đó đường dẫn file nhạc là link ký của Storage. Luật "khách 3 bài mỗi ngày" là SQL, nằm cạnh dữ liệu.
+**Edge Function `playback` làm hai việc:** (1) `POST` kiểm quyền bằng chính phiên người nghe (gọi hàm SQL `claim_playback`) rồi trả một *vé* ký HMAC bằng `mintToken` của thư viện **hugo-stream**; (2) `GET ?song=<id>&t=<vé>` kiểm vé bằng `verifyToken` của cùng thư viện rồi trả playlist, trong đó đường dẫn file nhạc là link ký của Storage. Luật "khách 3 bài mỗi ngày" là SQL, nằm cạnh dữ liệu.
 
 ```text
 App ── POST /functions/v1/playback {song_id} + phiên đăng nhập ──▶ Edge Function ── rpc claim_playback ──▶ Postgres
-App ◀──────────── { url: .../playback?t=<vé> } ─────────────────────┘
-Trình phát ── GET .../playback?t=<vé> ──────────▶ master.m3u8 (các mức 64, 128, 192...)
-Trình phát ── GET .../playback?t=<vé>&kbps=128 ─▶ 128.m3u8, file nhạc = link ký Storage
+App ◀──────────── { url: .../playback?song=<id>&t=<vé> } ─────────┘
+Trình phát ── GET ...?song=<id>&t=<vé> ──────────▶ master.m3u8 (các mức 64, 128, 192...)
+Trình phát ── GET ...?song=<id>&t=<vé>&kbps=128 ─▶ 128.m3u8, file nhạc = link ký Storage
 Trình phát ── GET link ký (byte range) ─────────▶ Storage + CDN (không qua function)
 ```
 
@@ -88,29 +88,43 @@ async function grant(req: Request) {
 }
 ```
 
-**Bước 3: vé HMAC bằng Web Crypto.** Deno có sẵn Web Crypto, không cần thư viện. Vé gồm id bài và giờ hết hạn, ký bằng một bí mật chỉ function biết; sửa một ký tự là vé hỏng.
+**Bước 3: vé nghe bằng hugo-stream.** Không tự viết phần ký vé: thư viện `hugo-stream` (chương Ứng dụng 1) có sẵn `mintToken` để ký và `verifyToken` để kiểm. Thư viện chỉ dùng Web Crypto, nên cùng một hàm chạy được trong Deno (Edge Function), trong Cloudflare Worker (chương 23) và trong test Node. Deno nạp thẳng gói từ npm bằng tiền tố `npm:`.
 
 ```ts
-const key = crypto.subtle.importKey('raw', enc.encode(Deno.env.get('PLAYBACK_SECRET')!),
-  { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify']);
+// supabase/functions/playback/index.ts (trích)
+import { mintToken, verifyToken } from 'npm:hugo-stream@0.1.1';
 
-async function sign(payload: { s: string; e: number }) {
-  const body = b64(enc.encode(JSON.stringify(payload)));
-  return `${body}.${b64(await crypto.subtle.sign('HMAC', await key, enc.encode(body)))}`;
-}
+const SECRET = Deno.env.get('PLAYBACK_SECRET')!;
+const TICKET_WINDOW = 60 * 60;                     // vé sống 1–2 giờ
+const scope = (songId: string) => `hls/${songId}/`; // vé gắn với cả bài: playlist và mọi mức
+
+// POST: đã qua claim_playback
+const ticket = await mintToken(scope(song_id), SECRET, { ttl: TICKET_WINDOW });
+return Response.json({ url: `${url}/functions/v1/playback?song=${song_id}&t=${ticket}`, remaining });
+
+// GET: trình phát gọi
+if (!(await verifyToken(scope(songId), t, SECRET))) throw new Error('invalid ticket');
 ```
+
+Vé có dạng `<hạn>.<chữ ký>`, chữ ký là HMAC-SHA256 của `"hls/<bài>|<hạn>"`. Ba tính chất có sẵn nhờ thư viện:
+
+- **Một vé mở cả bài.** Mọi khóa nằm dưới `hls/<bài>/` đều được ký thành `hls/<bài>`, nên một vé dùng được cho master playlist, playlist từng mức và mọi đoạn nhạc.
+- **Thân thiện với cache.** Hạn được làm tròn lên mốc giờ kế tiếp, nên mọi vé xin trong cùng một giờ là **cùng một chuỗi**. Link tải trước và link phát sau trùng nhau, CDN dùng lại được.
+- **Kiểm an toàn.** `verifyToken` không bao giờ ném lỗi, từ chối vé hết hạn hoặc sai dạng, và so chữ ký trong thời gian không đổi. Kẻ gian không đoán được chữ ký bằng cách đo thời gian trả lời.
 
 **Bước 4: trả playlist.** Không có `kbps`: danh sách các mức (master). Có `kbps`: lấy playlist worker đã ghi, thay tên file tương đối bằng link ký tuyệt đối.
 
 ```ts
 async function playlist(u: URL) {
-  const { s: songId } = await verify(u.searchParams.get('t') ?? '');
+  const songId = u.searchParams.get('song') ?? '';
+  const t = u.searchParams.get('t') ?? '';
+  if (!(await verifyToken(scope(songId), t, SECRET))) throw new Error('invalid ticket');
   const kbps = u.searchParams.get('kbps');
   if (!kbps) {
     const { data: song } = await admin.from('songs').select('hls_tiers').eq('id', songId).single();
     const lines = ['#EXTM3U', '#EXT-X-VERSION:7'];
     for (const k of song.hls_tiers)
-      lines.push(`#EXT-X-STREAM-INF:BANDWIDTH=${k * 1100},CODECS="mp4a.40.2"`, `?t=${u.searchParams.get('t')}&kbps=${k}`);
+      lines.push(`#EXT-X-STREAM-INF:BANDWIDTH=${k * 1100},CODECS="mp4a.40.2"`, `?song=${songId}&t=${t}&kbps=${k}`);
     return new Response(lines.join('\n') + '\n', m3u8);
   }
   const base = `${songId}/${Number(kbps)}`;
@@ -223,10 +237,20 @@ curl -s "$SUPABASE_URL/functions/v1/playback?t=gia.mao"          # {"error":"inv
 
 ### Ví dụ tính tay
 
-**Vé và lượt nghe của khách.** Vé sống 2 giờ, app giữ vé 30 phút (prefetch, chương 11):
+**Vé sống bao lâu.** `mintToken` với `ttl` = 3 600 giây tính hạn = (phần nguyên của giờ hiện tại + 2) × 3 600:
 
 ```text
-khách bấm phát bài A lúc 10:00   → claim_playback: lượt 1/3, vé hết hạn 12:00
+xin vé lúc 10:05 → hạn 12:00 (sống 1 giờ 55 phút)
+xin vé lúc 10:59 → hạn 12:00 (sống 1 giờ 1 phút)   ← cùng một chuỗi với vé 10:05
+xin vé lúc 11:00 → hạn 13:00                        ← vé mới
+```
+
+Vé luôn sống từ 1 tới 2 giờ, và trong cùng một giờ chỉ có một vé cho mỗi bài.
+
+**Vé và lượt nghe của khách.** App giữ vé 30 phút (prefetch, chương 11):
+
+```text
+khách bấm phát bài A lúc 10:00   → claim_playback: lượt 1/3, vé hết hạn 12:00 (mốc giờ 10 + 2)
 bấm lại bài A lúc 10:20          → app dùng vé đã giữ, không gọi Function: không tốn lượt
 bấm lại bài A lúc 10:40          → vé trong app đã quá 30 phút, xin vé mới;
                                    claim_playback đếm bài KHÁC NHAU trong ngày → vẫn là lượt 1/3
@@ -242,8 +266,9 @@ bài D 10:55                      → từ chối: guest_limit, app mời đăng
 ### Tự kiểm
 
 1. Trình phát gốc không gửi được header đăng nhập. Vé HMAC giải quyết điều đó thế nào?
-2. Kể lại sáu bước từ lúc bấm phát tới lúc Storage trả đoạn âm thanh đầu tiên.
-3. Khách đã nghe 3 bài hôm nay bấm bài thứ tư: lớp nào từ chối, trả gì, app làm gì tiếp?
+2. Vì sao vé được ký cho `hls/<bài>/` thay vì cho từng file? Vì sao hai người xin vé cùng một bài trong cùng một giờ nhận cùng một chuỗi, và điều đó có lợi gì?
+3. Kể lại sáu bước từ lúc bấm phát tới lúc Storage trả đoạn âm thanh đầu tiên.
+4. Khách đã nghe 3 bài hôm nay bấm bài thứ tư: lớp nào từ chối, trả gì, app làm gì tiếp?
 
 ### Khi nào đổi
 
@@ -263,3 +288,4 @@ Các file chương này viết, trong repo đã clone ở phần Mở đầu:
 - `app/src/audio/audioEngine.ts`
 - `app/src/components/Player/BottomPlayer.tsx`
 - `app/src/screens/Player/FullPlayer.tsx`
+- `hugo-stream` trên npm: `mintToken`, `verifyToken` (https://www.npmjs.com/package/hugo-stream)

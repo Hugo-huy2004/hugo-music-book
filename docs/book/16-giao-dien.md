@@ -25,7 +25,7 @@ Viết ba app riêng (web React, iOS Swift, Android Kotlin) là gấp ba công s
 
 ### Chọn gì, vì sao
 
-**Một dự án Expo SDK 58 (React Native 0.88, React 19.3) duy nhất trong thư mục `app/`; giao diện từ `packages/ui` (hugo-music); trạng thái bằng Zustand; dữ liệu qua `app/src/api/api.ts`.** Màn hình không gọi Supabase trực tiếp mà gọi `api.*`, nên đổi backend chỉ sửa một file.
+**Một dự án Expo SDK 58 (React Native 0.88, React 19.3) duy nhất trong thư mục `app/`; giao diện từ thư viện `hugo-music` trên npm; trạng thái bằng Zustand; dữ liệu qua `app/src/api/api.ts`.** Màn hình không gọi Supabase trực tiếp mà gọi `api.*`, nên đổi backend chỉ sửa một file.
 
 ### Sơ đồ điều hướng
 

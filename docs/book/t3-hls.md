@@ -14,11 +14,11 @@ Chương 11 viết Edge Function trả playlist. Đọc được từng dòng pl
 #EXTM3U
 #EXT-X-VERSION:7
 #EXT-X-STREAM-INF:BANDWIDTH=70400,CODECS="mp4a.40.2"
-?t=<vé>&kbps=64
+?song=<id>&t=<vé>&kbps=64
 #EXT-X-STREAM-INF:BANDWIDTH=140800,CODECS="mp4a.40.2"
-?t=<vé>&kbps=128
+?song=<id>&t=<vé>&kbps=128
 #EXT-X-STREAM-INF:BANDWIDTH=281600,CODECS="mp4a.40.2"
-?t=<vé>&kbps=256
+?song=<id>&t=<vé>&kbps=256
 ```
 
 | Dòng | Nghĩa |

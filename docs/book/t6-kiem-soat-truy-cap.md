@@ -44,9 +44,9 @@ Hugo Music dùng **ABAC cho phát nhạc**, **RBAC cho trang quản trị** (`ap
 ```text
 1. App: POST /functions/v1/playback {song_id}   (kèm phiên đăng nhập)
 2. Function gọi claim_playback() bằng phiên đó  → quyết định (ABAC, đếm lượt khách)
-3. Đồng ý → trả vé: chữ ký HMAC(song_id, hạn 2 giờ)
-4. Trình phát: GET ?t=<vé>                       → master playlist (không cần header đăng nhập)
-5.           GET ?t=<vé>&kbps=128               → playlist có signed URL tới file trong bucket riêng tư
+3. Đồng ý → trả vé: mintToken("hls/<bài>/") của hugo-stream, sống 1–2 giờ
+4. Trình phát: GET ?song=<id>&t=<vé>             → master playlist (không cần header đăng nhập)
+5.           GET ?song=<id>&t=<vé>&kbps=128     → playlist có signed URL tới file trong bucket riêng tư
 6.           GET <signed URL> (Range)            → Storage/CDN tự kiểm chữ ký
 ```
 
@@ -79,7 +79,7 @@ sau 22:00: Function từ chối vé hết hạn → không còn playlist, không
 
 ```bash
 # vé giả: Function từ chối
-curl -s "https://<ref>.supabase.co/functions/v1/playback?t=gia" | head -c 120
+curl -s "https://<ref>.supabase.co/functions/v1/playback?song=00000000-0000-0000-0000-000000000000&t=gia" | head -c 120
 # đọc thẳng file trong bucket riêng tư không có chữ ký: bị chặn
 curl -s -o /dev/null -w "%{http_code}\n" "https://<ref>.supabase.co/storage/v1/object/audio/<id>/64.mp4"
 ```

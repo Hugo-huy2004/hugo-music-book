@@ -120,7 +120,7 @@ useEffect(() => {
 }, [current, boxHeight]);
 ```
 
-`activeLine` (trong `packages/stream/src/lyrics.js`) là tìm nhị phân trên mảng mốc thời gian của LRC. Bấm một dòng thì tua tới đúng giây của dòng đó.
+`activeLine` (của thư viện `hugo-stream`, cùng với `parseLrc` đọc tệp LRC) là tìm nhị phân trên mảng mốc thời gian của LRC. Bấm một dòng thì tua tới đúng giây của dòng đó.
 
 ### Kết quả
 

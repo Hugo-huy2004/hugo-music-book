@@ -25,7 +25,7 @@ Làm theo thứ tự mà không có mốc rất dễ sa đà vào phần thú v�
 | 8 | Tải bài lên | Storage, chính sách trên `storage.objects` | Tài khoản thường không tải được vào `originals` |
 | 9 | Duyệt bài | Hàm SQL, Supabase Queues, Cron | Duyệt hai lần vẫn chỉ một việc trong hàng đợi |
 | 10 | Xử lý âm thanh | Node 26 chạy thẳng TS, ffmpeg, HLS fMP4, PSL | Bài chuyển sang `published` với `hls_tiers` |
-| 11 | Phát nhạc | Edge Function, vé HMAC, link ký | Khách bị chặn ở bài thứ tư |
+| 11 | Phát nhạc | Edge Function, vé `hugo-stream`, link ký | Khách bị chặn ở bài thứ tư |
 | 12 | Tìm kiếm, lời bài hát | unaccent, pg_trgm, LRC | "mua deem" ra "Mưa Đêm" |
 | 13 | Đài 24/7 | Cron theo giây, Broadcast từ database, Presence | Hai máy phát cùng một giây |
 | 14 | Blind test | Game loop trong SQL, Broadcast | `blind_results` có dữ liệu |
