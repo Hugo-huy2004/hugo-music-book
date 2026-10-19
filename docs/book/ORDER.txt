@@ -32,6 +32,7 @@ t6-kiem-soat-truy-cap.md
 20-deploy.md
 21-van-hanh.md
 22-lo-trinh.md
+23-mot-trieu-nguoi-nghe.md
 r1-thi-nghiem.md
 r2-doc-bai-bao.md
 pa-am-thanh-thuat-ngu.md

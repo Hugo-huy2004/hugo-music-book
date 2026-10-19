@@ -65,5 +65,5 @@ Một cuốn, tám phần. Ai đã biết lập trình web có thể bỏ qua ph
 4. **Backend trên Supabase** (chương 4 tới 12): database, API tự sinh, đăng nhập, RLS, lưu file, hàng đợi, worker, phát nhạc, tìm kiếm.
 5. **Nghe cùng nhau** (chương 13 tới 15): đài 24/7, blind test, nhóm nghe chung và đồng bộ nhiều thiết bị.
 6. **Giao diện** (chương 16 tới 18): một app cho ba nền tảng, chuẩn giao diện và trải nghiệm, trang quản trị.
-7. **Ra production** (chương 19 tới 22): kiểm thử, deploy, vận hành, checklist ra mắt.
+7. **Ra production** (chương 19 tới 23): kiểm thử, deploy, vận hành, checklist ra mắt, và mở rộng tới một triệu người nghe với Cloudflare R2.
 8. **Nghiên cứu và phụ lục** (Nghiên cứu 1, 2; Phụ lục A, B): thiết kế thí nghiệm cho đề tài, đọc tài liệu, nền âm thanh, thuật ngữ, và bảng đối chiếu cho người đã đọc các bản Hugo Music trước.

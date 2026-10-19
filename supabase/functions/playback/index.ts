@@ -54,14 +54,34 @@ async function playlist(u: URL) {
   }
 
   const base = `${songId}/${Number(kbps)}`;
-  const [{ data: tpl, error: e1 }, { data: signed, error: e2 }] = await Promise.all([
-    admin.storage.from('audio').download(`${base}.m3u8`),
-    admin.storage.from('audio').createSignedUrl(`${base}.mp4`, TICKET_TTL),
-  ]);
-  if (e1 || e2) throw e1 ?? e2;
-  // Worker ghi playlist với tên file tương đối; thay bằng link ký tuyệt đối.
-  const text = (await tpl.text()).replaceAll(`${Number(kbps)}.mp4`, signed.signedUrl);
-  return new Response(text, m3u8);
+  const tpl = await template(base);
+  // Có CDN (Cloudflare Worker + R2, chương 23): link file không chứa bitrate, dùng chung vé, cache được ở điểm biên.
+  // Chưa có: link ký của Supabase Storage.
+  const fileUrl = CDN
+    ? `${CDN}/a/${songId}/${await tierToken(songId, Number(kbps))}.mp4?t=${u.searchParams.get('t')}`
+    : await signedUrl(`${base}.mp4`);
+  return new Response(tpl.replaceAll(`${Number(kbps)}.mp4`, fileUrl), m3u8);
+}
+
+// Playlist mẫu của mỗi mức không bao giờ đổi: giữ trong bộ nhớ của function, khỏi tải lại từ Storage mỗi lượt.
+const CDN = Deno.env.get('AUDIO_CDN_URL');
+const templates = new Map<string, string>();
+async function template(base: string) {
+  if (!templates.has(base)) {
+    const { data, error } = await admin.storage.from('audio').download(`${base}.m3u8`);
+    if (error) throw error;
+    if (templates.size > 2000) templates.clear();
+    templates.set(base, await data.text());
+  }
+  return templates.get(base)!;
+}
+async function signedUrl(path: string) {
+  const { data, error } = await admin.storage.from('audio').createSignedUrl(path, TICKET_TTL);
+  if (error) throw error;
+  return data.signedUrl;
+}
+async function tierToken(songId: string, kbps: number) {
+  return b64(await crypto.subtle.sign('HMAC', await key, enc.encode(`tier:${songId}:${kbps}`))).slice(0, 16);
 }
 
 // Blind test: client chỉ biết "bên A", "bên B"; mức bitrate của mỗi bên chỉ server biết tới khi công bố.

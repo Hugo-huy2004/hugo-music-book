@@ -1,0 +1,9 @@
+# Cloudflare Worker phát file âm thanh từ R2 (chương 23).
+# Bí mật: wrangler secret put PLAYBACK_SECRET   (cùng giá trị với secret của Edge Function playback)
+name = "hugo-music-audio"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+[[r2_buckets]]
+binding = "AUDIO"
+bucket_name = "hugo-music-audio"

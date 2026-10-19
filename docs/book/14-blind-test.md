@@ -191,6 +191,10 @@ Mỗi mốc là giờ tuyệt đối trong database, nên ai vào phòng giữa 
 2. Lượt kiểm tra (A và B giống hệt) dùng để làm gì?
 3. `hit_rate` của một cặp mức là 0,52 sau 300 phiếu. Bạn kết luận gì về mức cao hơn?
 
+### Giới hạn cần biết
+
+Quyền theo cột và tham số `side` giấu bitrate khỏi API và khỏi đường dẫn file. Nhưng playlist của mỗi bên vẫn ghi kích thước từng đoạn (`EXT-X-BYTERANGE`), và kích thước tỉ lệ với bitrate: người dùng mở DevTools so hai playlist là đoán được. Với người nghe bình thường thì không ảnh hưởng. Khi phân tích kết quả nghiên cứu, loại những người đoán đúng gần như 100 % ở các cặp mức mà số đông chỉ đúng quanh 50 %: đó là dấu hiệu đọc kích thước file chứ không phải nghe. Chương 23 nêu cách chặn triệt để.
+
 ### Khi nào đổi
 
 - **Muốn so nhiều hơn hai mức:** đổi `a_kbps`, `b_kbps` thành mảng và bỏ phiếu theo thứ hạng (MUSHRA).

@@ -3,6 +3,7 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { db } from './supabase.ts';
+import { putAudioFile } from './storage.ts';
 import { encodeTier, loudness, probe } from './ffmpeg.ts';
 import { measurePsl } from './psl.ts';
 
@@ -27,11 +28,7 @@ export async function processSong(songId: string, log: (step: string) => Promise
     await log('hls');
     for (const kbps of ladder) {
       for (const name of await encodeTier(src, dir, kbps)) {
-        const { error: e2 } = await db.storage.from('audio').upload(`${songId}/${name}`, await readFile(join(dir, name)), {
-          contentType: name.endsWith('.m3u8') ? 'application/vnd.apple.mpegurl' : 'audio/mp4',
-          upsert: true,
-        });
-        if (e2) throw e2;
+        await putAudioFile(`${songId}/${name}`, await readFile(join(dir, name)));
       }
     }
 
