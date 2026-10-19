@@ -105,6 +105,12 @@ select title from public.search_songs('mua deem');    -- vẫn ra (gõ sai một
 explain select * from public.search_songs('neon');   -- có dùng songs_search_trgm
 ```
 
+### Tự kiểm
+
+1. Vì sao tìm "mua dem" vẫn ra "Mưa Đêm Sài Gòn"? Kể tên hai extension của Postgres tham gia.
+2. Lời bài hát đồng bộ (LRC) khác lời thường ở đâu, và trình phát dùng nó thế nào?
+3. Index trigram lớn dần theo danh mục. Khi nào nên chuyển sang công cụ tìm kiếm riêng?
+
 ### Khi nào đổi
 
 - **Hàng triệu bài, cần gợi ý khi gõ dưới 50 ms:** chuyển sang Meilisearch hoặc Typesense, đồng bộ bằng trigger đưa việc vào hàng đợi (chương 9).

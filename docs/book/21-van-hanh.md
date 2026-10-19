@@ -97,6 +97,12 @@ Bảng giá thay đổi thường xuyên nên sách không in số tiền; xem t
 - Tắt worker 20 phút, duyệt một bài: truy vấn nhịp tim trả `stuck = 1`.
 - Khôi phục bản dump vào project trống: số dòng `songs`, `profiles` khớp với bản gốc.
 
+### Tự kiểm
+
+1. Kể ba loại cảnh báo Advisors đã sửa và ba loại cố ý giữ lại.
+2. Truy vấn "nhịp tim" phát hiện worker chết bằng cách nào?
+3. Vì sao lịch pg_cron chạy mỗi giây cần thêm một lịch dọn nhật ký?
+
 ### Khi nào đổi
 
 - **Vượt giới hạn gói miễn phí** (dung lượng database, băng thông Storage, số người dùng hoạt động): lên gói Pro, đồng thời có thêm khôi phục về thời điểm bất kỳ.

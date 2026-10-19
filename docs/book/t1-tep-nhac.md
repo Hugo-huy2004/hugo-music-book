@@ -65,6 +65,30 @@ const path = `${id}/original.${ext}`;   // originals/7f3a9c21-.../original.flac
 
 Tên hiển thị nằm trong database; tên tệp chỉ cần máy đọc được. Một nguồn sự thật, không có hai bản có thể lệch nhau.
 
+### Ví dụ tính tay
+
+**1. Dung lượng bản gốc và bản phát.** Bài 4 phút (240 giây).
+
+```text
+WAV (PCM 44,1 kHz, 16 bit, stereo): 44 100 × 16 × 2 = 1 411 200 bit/giây
+  × 240 ÷ 8 = 42 336 000 byte ≈ 42,3 MB
+FLAC (nhẹ hơn khoảng 40 %):          ≈ 25 MB
+AAC 128 kbps:  128 000 × 240 ÷ 8   = 3 840 000 byte ≈ 3,84 MB
+AAC 256 kbps:                        ≈ 7,68 MB
+```
+
+Lưu FLAC tốn gấp 6,5 lần bản 128 kbps, nhưng chỉ lưu một lần; người nghe chỉ tải bản AAC.
+
+**2. Chuẩn hóa một tên bài thành tên tệp (nếu phải dùng tên).** "Chiều Sông Hàn (Bản Acoustic).mp3":
+
+```text
+bỏ dấu           → "Chieu Song Han (Ban Acoustic)"
+ký tự lạ → "-"   → "Chieu-Song-Han--Ban-Acoustic-"
+gộp "-", bỏ hai đầu, chữ thường → "chieu-song-han-ban-acoustic.mp3"
+```
+
+Hugo Music không cần bước này vì tên tệp là UUID; nhưng đây là cách làm khi cần đường dẫn dễ đọc (ví dụ link chia sẻ `/bai/chieu-song-han`).
+
 ### Kiểm tra
 
 ```bash
@@ -72,6 +96,14 @@ ffprobe -v error -show_entries format=format_name:stream=codec_name,bit_rate -of
 ```
 
 Kết quả cho biết hộp (`flac`), codec (`flac`) và bitrate thật của tệp, không phụ thuộc đuôi tệp.
+
+### Tự kiểm
+
+1. Một tệp `.m4a`: bạn biết chắc điều gì và chưa biết điều gì về nội dung của nó?
+2. Vì sao tên bài tiếng Việt hay vỡ thành ký tự lạ trong thẻ ID3, và cách tránh?
+3. Một bài được năm ca sĩ hát lại thì có mấy ISWC và mấy ISRC?
+4. Tính dung lượng bài 3 phút 30 giây ở AAC 160 kbps.
+5. Vì sao Storage dùng tên tệp không mang thông tin gì, còn thư viện nhạc cá nhân thì đặt tên theo nghệ sĩ và bài?
 
 ### Khi nào đổi
 

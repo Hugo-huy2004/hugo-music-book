@@ -47,6 +47,26 @@ Trình phát giữ sẵn vài chục giây nhạc chưa phát (buffer). Mạng t
 
 Edge Function `playback` không nhớ gì giữa hai request: mọi thứ cần biết nằm trong vé (ký HMAC, chương 11) hoặc trong database. Nhờ vậy chạy bao nhiêu bản cũng được, ở bất kỳ vùng nào, khởi động lại không mất gì. Trạng thái thật sự cần nhớ (đài đang phát bài nào, nhóm đang nghe tới giây nào) nằm trong Postgres.
 
+### Ví dụ tính tay
+
+**1. Thời gian bắt đầu phát theo khoảng cách.** Tám vòng đi về trước khi có tiếng (DNS, TCP, TLS, vé, master, playlist mức, phần khởi tạo, đoạn đầu), cộng thời gian tải đoạn đầu 48 000 byte ở 5 Mbps:
+
+```text
+tải đoạn đầu = 48 000 × 8 ÷ 5 000 000 ≈ 0,08 giây
+Singapore (RTT 35 ms):  8 × 0,035 + 0,08 ≈ 0,36 giây
+Mỹ (RTT 220 ms):        8 × 0,220 + 0,08 ≈ 1,84 giây
+```
+
+Phần lớn thời gian chờ là vòng đi về, không phải tải dữ liệu: đặt server gần người nghe lợi hơn tăng băng thông.
+
+**2. Buffer cứu được bao lâu khi vào hầm.** Buffer đang giữ 30 giây nhạc, mạng mất 15 giây:
+
+```text
+còn lại khi ra khỏi hầm = 30 − 15 = 15 giây
+```
+
+Không ngắt tiếng. Nếu buffer chỉ có 10 giây thì ngắt 5 giây: lý do trình phát cố giữ buffer đầy khi mạng còn tốt.
+
 ### Kiểm tra
 
 ```bash
@@ -54,6 +74,14 @@ curl -sI "<link ảnh bìa công khai>" | grep -i -E "cache-control|cf-cache-sta
 ```
 
 Lần thứ hai gọi, `cf-cache-status: HIT` cho biết file được phục vụ từ điểm biên.
+
+### Tự kiểm
+
+1. Vì sao giảm số vòng đi về thường lợi hơn tăng băng thông khi bấm phát?
+2. Nêu cạm bẫy khi khóa cache không tính tiêu đề Range.
+3. Ba chỉ số của trình phát mà bảng `plays` ghi lại là gì?
+4. Vì sao Edge Function `playback` không giữ trạng thái giữa các request? Trạng thái cần nhớ thì nằm ở đâu?
+5. Tính thời gian chờ trước khi có tiếng với RTT 80 ms, tám vòng, đoạn đầu 48 KB ở 2 Mbps.
 
 ### Khi nào đổi
 

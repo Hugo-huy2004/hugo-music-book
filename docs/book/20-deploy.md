@@ -124,6 +124,12 @@ fly logs --config worker/fly.toml    # worker đang chờ việc
 curl -sI https://<tên miền web> | head -1
 ```
 
+### Tự kiểm
+
+1. Mỗi phần của hệ thống (database, Edge Function, worker, web, app) được deploy lên đâu?
+2. CI chạy những bước nào trước khi cho gộp code?
+3. Sửa một lỗi giao diện trên app điện thoại đã phát hành thì có cần nộp lại cho App Store không?
+
 ### Khi nào đổi
 
 - **Cần môi trường thử trước production:** bật Supabase Branching: mỗi pull request có một nhánh database riêng với migration của nó.

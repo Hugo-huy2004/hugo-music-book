@@ -44,9 +44,42 @@ Cả bốn trường phái coi thang mức là **cho sẵn**: chọn tốt nhấ
 
 **Để ABR mặc định của từng nền tảng (hls.js, AVPlayer, ExoPlayer) làm việc, và cải thiện từ phía server bằng thang mức tốt hơn (PSL).** Viết ABR riêng cho ba nền tảng tốn công mà lợi ít; còn thang mức tốt thì mọi trình phát đều dùng được.
 
+### Ví dụ tính tay
+
+**1. ABR theo thông lượng.** Ba đoạn gần nhất tải ở 420, 380, 150 kbps (vừa vào hầm). Trung bình trượt × hệ số an toàn 0,8:
+
+```text
+trung bình = (420 + 380 + 150) ÷ 3 ≈ 317 kbps
+× 0,8 ≈ 253 kbps → chọn mức cao nhất ≤ 253: 192 kbps
+```
+
+Thông lượng thật lúc này chỉ 150 kbps: tải đoạn 6 giây ở 192 kbps mất 192 × 6 ÷ 150 ≈ 7,7 giây, lâu hơn thời lượng đoạn. Trung bình trượt phản ứng chậm.
+
+**2. ABR theo bộ đệm (dạng đơn giản kiểu BBA).** Buffer dưới 10 giây chọn mức thấp nhất, trên 30 giây chọn mức cao nhất, ở giữa chia đều:
+
+```text
+thang 64/96/128/160/192/256 (6 mức), buffer 18 giây
+vị trí = (18 − 10) ÷ (30 − 10) = 0,4 → mức thứ ⌊0,4 × 5⌋ + 1 = 3 → 128 kbps
+```
+
+**3. Lợi ích của PSL cho ABR.** Bài có 256 và 320 nghe như nhau. Mạng tốt, ABR luôn chọn mức cao nhất, bài 4 phút:
+
+```text
+thang cố định (có 320): 320 000 × 240 ÷ 8 = 9,6 MB
+thang PSL (cao nhất 256):                   7,68 MB → tiết kiệm 20 % mà tai người không nhận ra
+```
+
 ### Kiểm tra
 
 Mở app trên trình duyệt, DevTools → Network → giả lập "Slow 3G": request chuyển từ `kbps=256` xuống mức thấp; tắt giả lập thì leo lại. Bảng `plays` ghi `tier_kbps` của từng lượt nghe.
+
+### Tự kiểm
+
+1. Bốn trường phái ABR khác nhau ở dữ liệu đầu vào nào?
+2. Vì sao ABR theo bộ đệm chọn mức thấp lâu lúc mới bắt đầu?
+3. Với nhạc, vì sao tránh ngắt tiếng quan trọng hơn leo mức cao?
+4. "Điểm mù chung" của cả bốn trường phái là gì, và PSL lấp nó thế nào?
+5. Ba đoạn gần nhất tải ở 600, 500, 400 kbps, hệ số 0,8. ABR theo thông lượng chọn mức nào trong thang PSL của sách?
 
 ### Khi nào đổi
 

@@ -121,6 +121,12 @@ curl "$SUPABASE_URL/rest/v1/songs?select=title,artist:artists(name)&limit=3" \
 
 Bài chưa phát hành không bao giờ xuất hiện trong kết quả, dù không có dòng code nào trong app lọc nó: RLS làm việc đó.
 
+### Tự kiểm
+
+1. Viết lời gọi supabase-js lấy 10 bài mới phát hành kèm tên nghệ sĩ.
+2. Hàm `must()` giải quyết vấn đề gì của kiểu trả về `{ data, error }`?
+3. Khi nào nên viết một hàm SQL gọi bằng `rpc()` thay vì đọc bảng trực tiếp?
+
 ### Khi nào đổi
 
 - **Một màn hình cần dữ liệu từ năm bảng, tính toán phức tạp:** viết một view hoặc hàm SQL trả đúng hình dạng màn hình cần, thay vì ghép ở client.

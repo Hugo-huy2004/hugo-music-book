@@ -90,6 +90,12 @@ supabase.channel('admin-pipeline')
 - Đăng nhập tài khoản thường, mở `/admin`: không có dữ liệu, gọi `review_song` báo `only admins can review songs`.
 - Duyệt một bài, để worker chạy: bảng theo dõi tự chuyển qua các bước `download → analyze → psl → hls → done` mà không cần tải lại trang.
 
+### Tự kiểm
+
+1. Trang quản trị gọi hàm `admin_users()`. Nếu một người dùng thường tự gọi hàm đó qua API thì chuyện gì xảy ra?
+2. Vì sao khóa và xóa tài khoản phải đi qua Edge Function, còn liệt kê người dùng thì dùng hàm SQL được?
+3. Luật chọn bài của một đài lưu ở đâu và được dùng lúc nào?
+
 ### Khi nào đổi
 
 - **Cần quản lý người dùng (khóa tài khoản, xóa):** các thao tác này cần secret key; viết một Edge Function `admin-users` kiểm `is_admin` rồi gọi `auth.admin.*`.

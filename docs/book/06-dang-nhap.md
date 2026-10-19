@@ -190,6 +190,12 @@ deleteAccount: async () => must(await supabase.functions.invoke('delete-account'
 - Nhập email, nhận mã, nhập mã: bảng `profiles` có dòng mới cùng id.
 - Gọi `select public.is_admin();` bằng tài khoản thường trả `false`.
 
+### Tự kiểm
+
+1. Khách ẩn danh có phải là một người dùng thật trong `auth.users` không? Điều đó giúp gì cho luật 3 bài mỗi ngày?
+2. Mật khẩu là tùy chọn: người đăng nhập bằng mã 6 số muốn đặt mật khẩu thì đi qua những bước nào?
+3. Vì sao quyền admin để trong `app_metadata` mà không để trong `user_metadata`?
+
 ### Khi nào đổi
 
 - **Muốn đăng nhập bằng vân tay/Face ID:** Supabase Auth đang có passkey (bản beta từ 5/2026); thêm làm cách thứ tư khi ra bản chính thức.

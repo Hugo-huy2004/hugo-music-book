@@ -62,6 +62,12 @@ Code viết trước khi biết sản phẩm cần gì thường phải viết l
 
 Chương này kiểm tra bằng câu hỏi chứ không bằng lệnh: với mỗi tính năng bạn định thêm, nó thuộc luồng nào trong bốn luồng trên? Không thuộc luồng nào thì để lại sau.
 
+### Tự kiểm
+
+1. Bốn luồng chính của Hugo Music là gì? Một tính năng "bình luận dưới bài hát" thuộc luồng nào, và theo trang đặc tả thì có nên làm ở giai đoạn đầu không?
+2. Vì sao khách được nghe ngay mà không phải đăng ký, nhưng lại bị giới hạn 3 bài mỗi ngày?
+3. PSL và blind test liên quan với nhau thế nào?
+
 ### Khi nào đổi
 
 - Có nghệ sĩ muốn tự tải nhạc lên: thêm vai *nghệ sĩ* với quyền tải lên nhưng không tự duyệt.

@@ -166,6 +166,12 @@ select no, a_kbps, b_kbps, is_control, revealed from public.blind_trials order b
 select * from public.blind_results;          -- hit_rate gần 0,5 nghĩa là gần như đoán bừa: mức cao có thể thừa
 ```
 
+### Tự kiểm
+
+1. Hai lớp nào ngăn người chơi biết trước bên nào bitrate cao hơn?
+2. Lượt kiểm tra (A và B giống hệt) dùng để làm gì?
+3. `hit_rate` của một cặp mức là 0,52 sau 300 phiếu. Bạn kết luận gì về mức cao hơn?
+
 ### Khi nào đổi
 
 - **Muốn so nhiều hơn hai mức:** đổi `a_kbps`, `b_kbps` thành mảng và bỏ phiếu theo thứ hạng (MUSHRA).

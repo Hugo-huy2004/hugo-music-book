@@ -99,6 +99,12 @@ Danh sách soát trước khi một màn hình mới được merge:
 - [ ] Chạy thử ở chế độ tối, cỡ chữ lớn nhất và giảm chuyển động.
 - [ ] Bật trình đọc màn hình, đi hết màn hình chỉ bằng vuốt: thứ tự đọc hợp lý.
 
+### Tự kiểm
+
+1. Kể ba nguyên tắc giao diện mà sách áp dụng cho mọi màn hình.
+2. Vì sao phải thử giao diện ở cỡ chữ lớn nhất của máy và ở chế độ tối?
+3. Người dùng bật "giảm chuyển động" thì hiệu ứng kính mờ thay đổi thế nào?
+
 ### Khi nào đổi
 
 - **Muốn thương hiệu riêng mạnh hơn:** chỉ đổi token màu và gradient; cấu trúc, khoảng cách và vùng chạm giữ nguyên vì đó là thói quen của người dùng.

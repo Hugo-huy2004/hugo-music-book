@@ -221,6 +221,12 @@ select status, hls_tiers, psl_mos from public.songs where id = '<id bài>';
 select status, step, error from public.pipeline_runs order by id desc limit 5;
 ```
 
+### Tự kiểm
+
+1. Với số đo MOS 64: 3,0; 96: 3,05; 128: 3,6 và τ = 0,10, thang PSL giữ những mức nào? Tính từng bước.
+2. Vì sao PSL so với mức **đã giữ** gần nhất chứ không so với mức liền kề?
+3. Bài "Sóng Xa" chỉ giữ một mức. Điều đó nói gì về nội dung bài và về bitrate nguồn?
+
 ### Khi nào đổi
 
 - **Nhiều bài chờ xử lý:** chạy thêm worker. Hàng đợi tự chia việc, không cần sửa code.

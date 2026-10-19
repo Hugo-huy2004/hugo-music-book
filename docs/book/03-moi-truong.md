@@ -99,6 +99,12 @@ pnpm -v                      # 12.x
 supabase migration list      # cột Local và Remote khớp nhau
 ```
 
+### Tự kiểm
+
+1. `nodeLinker: hoisted` trong pnpm-workspace.yaml để làm gì?
+2. Publishable key và secret key khác nhau thế nào? Key nào được phép nằm trong app?
+3. Vì sao file `supabase/.env.deploy` phải nằm trong .gitignore?
+
 ### Khi nào đổi
 
 - **Nhiều người cùng làm:** mỗi người một nhánh database (Supabase Branching) thay vì cùng sửa một project.

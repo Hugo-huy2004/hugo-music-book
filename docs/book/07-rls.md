@@ -125,6 +125,12 @@ insert into public.song_likes (user_id, song_id) values ('<id người B>', '<id
 
 Mở *Advisors → Security Advisor* trong dashboard: không còn cảnh báo "RLS disabled" cho bảng nào trong schema `public`.
 
+### Tự kiểm
+
+1. Viết chính sách RLS cho phép mỗi người chỉ đọc lượt thích của chính mình.
+2. Vì sao viết `(select auth.uid())` thay cho `auth.uid()` trong chính sách?
+3. RLS chọn dòng, còn quyền theo cột chọn cột. Cho một ví dụ trong sách cần cả hai.
+
 ### Khi nào đổi
 
 - **Chia sẻ danh sách phát cho bạn bè:** thêm bảng `playlist_members` và một chính sách đọc `exists (... member ...)`.

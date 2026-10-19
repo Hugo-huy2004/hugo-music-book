@@ -61,6 +61,12 @@ Ba nguyên tắc giữ sơ đồ này gọn:
 
 Với mỗi tính năng ở chương 1, chỉ được nó nằm ở khối nào trên sơ đồ. Nếu một tính năng cần thêm khối mới, đó là lúc xem lại kiến trúc.
 
+### Tự kiểm
+
+1. Liệt kê ba việc trước đây phải tự viết server mà nay Supabase làm sẵn.
+2. Vì sao worker xử lý âm thanh vẫn phải là một chương trình Node.js riêng, không viết được bằng hàm SQL hay Edge Function?
+3. Nếu một ngày phải rời Supabase, phần nào mang đi nguyên vẹn, phần nào phải thay?
+
 ### Khi nào đổi
 
 - **Cần logic phức tạp gọi nhiều dịch vụ ngoài** (thanh toán, gửi email theo kịch bản): viết Edge Function; khi Edge Function phình to, tách thành một service Node.js riêng nói chuyện với Supabase bằng secret key.

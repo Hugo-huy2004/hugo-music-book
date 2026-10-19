@@ -107,6 +107,12 @@ pnpm --filter @hugo/app typecheck
 pnpm build:web && npx serve app/dist     # mở bản build tĩnh, mọi màn hình hiện dữ liệu thật
 ```
 
+### Tự kiểm
+
+1. Một mã nguồn chạy được web, iOS và Android nhờ những thành phần nào?
+2. Phiên đăng nhập trên web và trên điện thoại được lưu ở đâu?
+3. Khi nào một màn hình nên có bản riêng cho máy tính và bản riêng cho điện thoại?
+
 ### Khi nào đổi
 
 - **Cần SEO cho trang nghệ sĩ, trang bài hát:** bật xuất web theo từng trang tĩnh của Expo Router (`web.output: "static"`) hoặc thêm một Edge Function chèn thẻ xem trước cho bot mạng xã hội.

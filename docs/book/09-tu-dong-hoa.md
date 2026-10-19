@@ -144,6 +144,12 @@ select * from cron.job;                                           -- có các l�
 
 Bấm duyệt hai lần liền: lần hai báo `song not found or already processed`, hàng đợi vẫn chỉ có một việc.
 
+### Tự kiểm
+
+1. Từ lúc admin bấm Duyệt tới lúc worker nhận việc, dữ liệu đi qua những đâu?
+2. Vì sao dùng hàng đợi pgmq thay vì để database gọi thẳng worker?
+3. Việc bị lỗi ba lần thì hàng đợi và bảng `songs` ở trạng thái nào?
+
 ### Khi nào đổi
 
 - **Việc nhẹ, không cần ffmpeg** (gửi email chào mừng, tính lại bảng xếp hạng): để Cron gọi Edge Function đọc hàng đợi, không cần worker riêng.

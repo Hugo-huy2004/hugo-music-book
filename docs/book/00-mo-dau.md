@@ -59,7 +59,7 @@ pnpm web                                                # mở http://localhost:
 
 Một cuốn, tám phần. Ai đã biết lập trình web có thể bỏ qua phần Nền tảng; ai chỉ cần dựng app có thể đọc phần Truyền phát sau.
 
-1. **Nền tảng** (Nền tảng 1 tới 5): khái niệm cho người mới, JavaScript và TypeScript, bất đồng bộ, Node.js 26 và công cụ, Git và gỡ lỗi.
+1. **Nền tảng** (Nền tảng 1 tới 5): terminal, HTTP, API và JSON; JavaScript và TypeScript; bất đồng bộ; Node.js 26 và pnpm; Git và gỡ lỗi.
 2. **Hiểu truyền phát nhạc** (Truyền phát 1 tới 6): tệp nhạc, Range và cắt đoạn, HLS, CDN và bộ đệm, thuật toán chọn chất lượng, kiểm soát truy cập.
 3. **Nền móng dự án** (chương 1 tới 3): sản phẩm là gì, kiến trúc, môi trường.
 4. **Backend trên Supabase** (chương 4 tới 12): database, API tự sinh, đăng nhập, RLS, lưu file, hàng đợi, worker, phát nhạc, tìm kiếm.

@@ -117,6 +117,12 @@ supabase db push --dry-run        # không còn migration nào chưa chạy
 
 Thử trong SQL Editor: thêm một bài với `status = 'publised'` (gõ sai) phải báo lỗi `invalid input value for enum song_status`.
 
+### Tự kiểm
+
+1. Vì sao `songs` dùng UUID làm khóa chính còn `artists` dùng số tăng dần?
+2. Trạng thái bài dùng enum thay cho text. Gõ sai `'publised'` thì chuyện gì xảy ra với mỗi cách?
+3. Index một phần (`where status = 'published'`) nhỏ hơn index thường vì sao, và khi nào nó được dùng?
+
 ### Khi nào đổi
 
 - **Một bài có nhiều nghệ sĩ** (feat.): thêm bảng nối `song_artists (song_id, artist_id, role)`.

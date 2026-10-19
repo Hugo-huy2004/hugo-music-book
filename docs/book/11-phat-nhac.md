@@ -163,6 +163,12 @@ curl -s "$SUPABASE_URL/functions/v1/playback?t=gia.mao"          # {"error":"inv
 
 Đăng nhập khách, phát 4 bài khác nhau: bài thứ tư mở hộp đăng nhập. Phát lại bài thứ nhất: vẫn nghe được.
 
+### Tự kiểm
+
+1. Trình phát gốc không gửi được header đăng nhập. Vé HMAC giải quyết điều đó thế nào?
+2. Kể lại sáu bước từ lúc bấm phát tới lúc Storage trả đoạn âm thanh đầu tiên.
+3. Khách đã nghe 3 bài hôm nay bấm bài thứ tư: lớp nào từ chối, trả gì, app làm gì tiếp?
+
 ### Khi nào đổi
 
 - **Danh mục có nhạc thương mại:** thêm mã hóa nội dung (HLS AES-128 hoặc DRM FairPlay/Widevine); vé ngắn hơn (vài phút).

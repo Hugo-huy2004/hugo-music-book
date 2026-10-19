@@ -155,6 +155,12 @@ const expectedOf = (t: Timeline) => () => t.pos + (t.playing ? (serverNow() - t.
 - Tài khoản C không có trong nhóm thử `supabase.channel('group:<id>', { config: { private: true } }).subscribe()`: lỗi quyền, không nhận tin nào.
 - Cùng tài khoản ở hai trình duyệt, bật Đồng bộ: thao tác ở bên nào bên kia cũng làm theo.
 
+### Tự kiểm
+
+1. Nhóm nghe chung và đồng bộ thiết bị dùng chung cơ chế nào, khác nhau ở tên kênh nào?
+2. Vì sao chỉ chủ nhóm được phát lệnh, còn thành viên chỉ nghe theo?
+3. Thành viên vào nhóm muộn 2 phút thì làm sao biết đang phát bài gì, tới giây nào?
+
 ### Khi nào đổi
 
 - **Muốn mọi người trong nhóm cùng điều khiển** (bữa tiệc): thêm cột `everyone_controls` vào `listening_groups` và bỏ điều kiện `group.hostId !== user._id` khi cột bật.

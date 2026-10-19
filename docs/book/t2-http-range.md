@@ -73,12 +73,47 @@ https://…/64.mp4?token=…
 
 Được ba thứ: Storage chỉ giữ 6 file `.mp4` và 6 playlist mỗi bài; ký URL theo file, không theo đoạn; và **một file mức là một bản nghe offline hoàn chỉnh**, tải về là phát được.
 
+### Ví dụ tính tay
+
+**1. Tua bằng Range với bitrate cố định.** Tệp 7 516 192 byte, dài 329 giây. Muốn tua tới giây 60:
+
+```text
+tỉ lệ vị trí    = 60 ÷ 329 = 0,1824
+byte tương ứng  = 0,1824 × 7 516 192 ≈ 1 370 953
+→ Range: bytes=1370953-
+kiểm lại: bitrate = 7 516 192 × 8 ÷ 329 ≈ 182 764 bit/giây → 22 846 byte/giây × 60 = 1 370 760 ✓
+```
+
+Với bitrate thay đổi (VBR), đoạn phức tạp chiếm nhiều byte hơn, nên phép tính này lệch: lý do cần bảng chỉ mục hoặc cắt đoạn.
+
+**2. Tiết kiệm khi người nghe bỏ bài.** Nghe 10 giây rồi chuyển, mạng 380 kbps, mức 64 kbps, đoạn 6 giây:
+
+```text
+tải cả tệp 256 kbps: 8,06 MB
+cắt đoạn: 2 đoạn × 48 000 byte + playlist ~3 KB ≈ 99 KB   → tiết kiệm khoảng 99 %
+```
+
+**3. Đọc một phản hồi 206.** `Content-Range: bytes 0-262143/7516192`:
+
+```text
+số byte trả = 262 143 − 0 + 1 = 262 144 (256 KB)
+tỉ lệ đã nhận = 262 144 ÷ 7 516 192 ≈ 3,5 %
+```
+
 ### Kiểm tra
 
 ```bash
 node --env-file=worker/.env scripts/try-playback.mjs <email> <mật khẩu>
 # dòng cuối: GET đoạn âm thanh (Range: bytes=0-1023) → 206 audio/mp4, bytes 0-1023/<tổng>
 ```
+
+### Tự kiểm
+
+1. Một tệp 12 MB trên đường truyền 1 Mbps mất bao lâu để tải xong? Tính từng bước.
+2. `bytes=-65536` khác `bytes=65536-` thế nào?
+3. Trong ba vấn đề của cách tải cả tệp, vấn đề nào Range không giải được?
+4. Vì sao Hugo Music dùng một file fMP4 mỗi mức thay vì mỗi đoạn một file?
+5. Đoạn 2 giây và đoạn 10 giây: mỗi loại được gì, mất gì?
 
 ### Khi nào đổi
 

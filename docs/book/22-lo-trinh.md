@@ -88,6 +88,12 @@ Làm theo thứ tự mà không có mốc rất dễ sa đà vào phần thú v�
 - [ ] Ra mắt vào buổi sáng đầu tuần theo giờ Việt Nam, còn cả ngày phía trước để sửa.
 - [ ] Sau 1 giờ, 1 ngày, 1 tuần: xem Advisors, Logs, Usage.
 
+### Tự kiểm
+
+1. Trước khi ra mắt, ba việc bảo mật nào phải kiểm tra lại?
+2. Chỉ số nào cho biết chi phí đang tăng hợp lý hay bất thường?
+3. Chọn một tính năng chưa có trong sách và chỉ ra nó thuộc luồng nào, cần chương nào sửa.
+
 ### Khi nào đổi
 
 - **Trễ hơn kế hoạch:** cắt phạm vi theo thứ tự: blind test (chương 14) ra sau, đồng bộ thiết bị của cùng một người (chương 15) ra sau; giữ nhóm nghe chung vì đó là điểm khác biệt. Không cắt RLS, kiểm thử bảo mật, sao lưu.

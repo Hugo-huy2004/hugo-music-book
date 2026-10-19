@@ -92,6 +92,12 @@ const coverUrl = (path?: string | null) =>
 - Tải file 400 MB lên `originals`: bị từ chối vì vượt `file_size_limit`.
 - Mở URL ảnh bìa ở cửa sổ ẩn danh: xem được, header có `cf-cache-status` (qua CDN).
 
+### Tự kiểm
+
+1. Bốn bucket của Hugo Music, bucket nào công khai, bucket nào riêng tư, vì sao?
+2. Tên file trong Storage được sinh thế nào, và vì sao không lấy từ tên người dùng đặt?
+3. File gốc trong bucket `originals` có cần sao lưu riêng không? Vì sao?
+
 ### Khi nào đổi
 
 - **File gốc rất lớn, mạng chập chờn:** dùng upload tiếp tục được (TUS, thư viện `tus-js-client` trỏ vào `/storage/v1/upload/resumable`) để mất mạng giữa chừng không phải tải lại từ đầu.

@@ -102,6 +102,12 @@ pnpm --filter @hugo/app e2e # Playwright (cần bản build web đang chạy)
 
 Để chắc test bảo mật bắt được lỗi thật: xóa thử chính sách "members like songs" rồi chạy lại; test đầu tiên phải đỏ.
 
+### Tự kiểm
+
+1. Ba tầng test của sách là gì, mỗi tầng bắt loại lỗi nào?
+2. Viết một test pgTAP kiểm tra người dùng thường không phát hành được bài.
+3. Vì sao test bảo mật nên viết "từ góc nhìn kẻ tấn công"?
+
 ### Khi nào đổi
 
 - **Test database chậm vì dữ liệu mẫu lớn:** tách dữ liệu mẫu ra `supabase/seed.sql`, chỉ tạo đúng dòng cần cho từng test.

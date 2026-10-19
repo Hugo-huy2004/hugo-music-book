@@ -69,9 +69,36 @@ Edge Function thay tên file bằng **signed URL** (link có chữ ký, hết h�
 
 **HLS với fMP4 và AAC.** Đây là định dạng duy nhất chạy gốc trên iOS (bắt buộc với app nghe nhạc trên App Store), chạy trên Android qua ExoPlayer/Media3, trên web qua hls.js. Đi qua HTTP thường nên mọi CDN đều cache được, không cần server phát chuyên dụng. Nghe chung "đúng giây" ở đài 24/7 (chương 13) không cần độ trễ dưới giây của WebRTC: mỗi máy tự tính vị trí theo giờ máy chủ.
 
+### Ví dụ tính tay
+
+**1. BANDWIDTH trong master playlist.** Hugo Music lấy bitrate × 1,1:
+
+```text
+64 kbps  → 64 × 1 100 = 70 400 bit/giây
+256 kbps → 281 600 bit/giây
+```
+
+Mạng đo được 150 000 bit/giây: trình phát chọn mức cao nhất có BANDWIDTH dưới mức đó (thường kèm hệ số an toàn khoảng 0,8): 150 000 × 0,8 = 120 000 → mức 96 kbps (BANDWIDTH 105 600).
+
+**2. Số đoạn và kích thước một đoạn.** Bài 91 giây, đoạn 6 giây, mức 128 kbps:
+
+```text
+số đoạn = ⌈91 ÷ 6⌉ = 16 (15 đoạn đủ 6 giây + 1 đoạn 1 giây)
+một đoạn ≈ 128 000 × 6 ÷ 8 = 96 000 byte
+cả file ≈ 128 000 × 91 ÷ 8 ≈ 1,46 MB   (file thật: 1 493 157 byte, gồm cả phần khởi tạo)
+```
+
 ### Kiểm tra
 
 Mở playlist một mức trong trình duyệt bằng link vé (chương 11), đếm số dòng `#EXTINF`: bằng thời lượng chia 6, làm tròn lên.
+
+### Tự kiểm
+
+1. Dòng `CODECS="mp4a.40.2"` dùng để làm gì? Khai sai thì có thể xảy ra gì?
+2. `#EXT-X-PLAYLIST-TYPE:VOD` và `#EXT-X-ENDLIST` cho trình phát biết điều gì?
+3. Vì sao playlist có vé không cache được ở CDN, còn file `.mp4` thì được?
+4. Mạng đo được 300 000 bit/giây, hệ số an toàn 0,8. Trình phát chọn mức nào trong thang 64/96/128/160/192/256?
+5. Vì sao app nghe nhạc trên iOS gần như phải dùng HLS?
 
 ### Khi nào đổi
 

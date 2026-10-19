@@ -58,6 +58,23 @@ Vì sao tách vé (bước 3) khỏi signed URL (bước 5): trình phát gốc 
 | Không chống tải file | Cùng lý do; tải về nghe offline còn là tính năng |
 | Không DRM | Chi phí và độ phức tạp không tương xứng với nhạc mở |
 
+### Ví dụ tính tay
+
+**1. Một bài cần bao nhiêu lần kiểm quyền.** Bài 252 giây, đoạn 6 giây:
+
+```text
+số đoạn = 42; thêm master, playlist mức, phần khởi tạo → khoảng 45 request
+proxy qua server, hỏi database mỗi request: 45 lần kiểm
+Hugo Music: 1 lần claim_playback() + 2 lần kiểm vé ở Function; 42 request đoạn do Storage tự kiểm chữ ký
+```
+
+**2. Khi link bị chia sẻ.** Vé sống 2 giờ. Một người dán link playlist lên mạng lúc 20:00:
+
+```text
+link còn dùng được tới 22:00; signed URL trong playlist cũng hết hạn sau 2 giờ kể từ lúc ký
+sau 22:00: Function từ chối vé hết hạn → không còn playlist, không còn link file mới
+```
+
 ### Kiểm tra
 
 ```bash
@@ -66,6 +83,14 @@ curl -s "https://<ref>.supabase.co/functions/v1/playback?t=gia" | head -c 120
 # đọc thẳng file trong bucket riêng tư không có chữ ký: bị chặn
 curl -s -o /dev/null -w "%{http_code}\n" "https://<ref>.supabase.co/storage/v1/object/audio/<id>/64.mp4"
 ```
+
+### Tự kiểm
+
+1. Nơi quyết định (PDP) và nơi chặn (PEP) của Hugo Music là gì? Vì sao chúng ở hai hệ thống khác nhau?
+2. Hugo Music dùng ABAC, RBAC và ReBAC ở đâu?
+3. Vì sao trình phát cần quyền nằm trong URL thay vì trong header?
+4. Ba thứ thiết kế hiện tại đã hy sinh là gì, và vì sao chấp nhận được với nhạc giấy phép mở?
+5. Muốn gỡ một bài ngay lập tức, bạn sửa ở bước nào của luồng phát?
 
 ### Khi nào đổi
 
