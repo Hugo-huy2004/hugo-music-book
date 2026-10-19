@@ -65,3 +65,4 @@ u2-home-mobile blob/a626364d-f345
 u3-login blob/faabfd85-1317
 dg-pc-env-flow blob/528fa7da-fe6b
 dg-23-r2-setup blob/161cf659-670a
+dg-u1-libraries blob/7fe6264d-a20a
