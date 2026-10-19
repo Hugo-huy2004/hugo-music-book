@@ -97,6 +97,30 @@ Bảng giá thay đổi thường xuyên nên sách không in số tiền; xem t
 - Tắt worker 20 phút, duyệt một bài: truy vấn nhịp tim trả `stuck = 1`.
 - Khôi phục bản dump vào project trống: số dòng `songs`, `profiles` khớp với bản gốc.
 
+### Ví dụ tính tay
+
+**Nhật ký pg_cron mỗi ngày.**
+
+```text
+advance-blind-rooms (mỗi 1 giây):  86 400 dòng/ngày
+advance-stations (mỗi 5 giây):     17 280 dòng/ngày
+tổng ≈ 103 680 dòng/ngày ≈ 3,1 triệu dòng/tháng nếu không dọn
+```
+
+**Chi phí trên 1 000 người nghe.** Mỗi người nghe 20 bài một ngày, trung bình 160 kbps, bài 4 phút:
+
+```text
+một bài ≈ 160 000 × 240 ÷ 8 = 4,8 MB → một người ≈ 96 MB/ngày ≈ 2,9 GB/tháng
+1 000 người ≈ 2,9 TB băng thông/tháng
+```
+
+Băng thông thường là khoản lớn nhất: đây là lý do PSL (bỏ mức thừa) và CDN cache đáng làm từ sớm.
+
+### Thực hành
+
+1. Chạy `bash scripts/advisors.sh` trên project của bạn, giải thích từng loại cảnh báo còn lại.
+2. Chạy `select count(*) from cron.job_run_details;` hai lần cách nhau một phút để thấy tốc độ tăng.
+
 ### Tự kiểm
 
 1. Kể ba loại cảnh báo Advisors đã sửa và ba loại cố ý giữ lại.

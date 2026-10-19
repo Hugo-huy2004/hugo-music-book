@@ -99,6 +99,11 @@ pnpm -v                      # 12.x
 supabase migration list      # cột Local và Remote khớp nhau
 ```
 
+### Thực hành
+
+1. Clone repo, `pnpm install`, `supabase link` vào project của bạn, `supabase db push`. Mở Table Editor xem các bảng.
+2. Đổi `app/.env` sang project của bạn, chạy `pnpm web`. Trang chủ trống (chưa có nhạc) là đúng.
+
 ### Tự kiểm
 
 1. `nodeLinker: hoisted` trong pnpm-workspace.yaml để làm gì?

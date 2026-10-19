@@ -90,6 +90,11 @@ supabase.channel('admin-pipeline')
 - Đăng nhập tài khoản thường, mở `/admin`: không có dữ liệu, gọi `review_song` báo `only admins can review songs`.
 - Duyệt một bài, để worker chạy: bảng theo dõi tự chuyển qua các bước `download → analyze → psl → hls → done` mà không cần tải lại trang.
 
+### Thực hành
+
+1. Tạo một đài mới chỉ phát thể loại Lo-fi, xem phần xem trước số bài hợp luật, rồi ghim một bài.
+2. Khóa tài khoản thử bằng trang Người dùng, đăng nhập bằng tài khoản đó để thấy bị từ chối, rồi mở khóa.
+
 ### Tự kiểm
 
 1. Trang quản trị gọi hàm `admin_users()`. Nếu một người dùng thường tự gọi hàm đó qua API thì chuyện gì xảy ra?

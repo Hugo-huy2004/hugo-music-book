@@ -163,6 +163,24 @@ curl -s "$SUPABASE_URL/functions/v1/playback?t=gia.mao"          # {"error":"inv
 
 Đăng nhập khách, phát 4 bài khác nhau: bài thứ tư mở hộp đăng nhập. Phát lại bài thứ nhất: vẫn nghe được.
 
+### Ví dụ tính tay
+
+**Vé và lượt nghe của khách.** Vé sống 2 giờ, app giữ vé 30 phút (prefetch, chương 11):
+
+```text
+khách bấm phát bài A lúc 10:00   → claim_playback: lượt 1/3, vé hết hạn 12:00
+bấm lại bài A lúc 10:20          → app dùng vé đã giữ, không gọi Function: không tốn lượt
+bấm lại bài A lúc 10:40          → vé trong app đã quá 30 phút, xin vé mới;
+                                   claim_playback đếm bài KHÁC NHAU trong ngày → vẫn là lượt 1/3
+bài B 10:45, bài C 10:50         → lượt 2/3, 3/3
+bài D 10:55                      → từ chối: guest_limit, app mời đăng nhập
+```
+
+### Thực hành
+
+1. Chạy `scripts/try-playback.mjs` với tài khoản của bạn và đọc từng phần đầu ra.
+2. Đăng xuất (chế độ khách), phát bốn bài khác nhau. Mở Network xem request thứ tư trả gì.
+
 ### Tự kiểm
 
 1. Trình phát gốc không gửi được header đăng nhập. Vé HMAC giải quyết điều đó thế nào?

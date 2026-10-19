@@ -124,6 +124,11 @@ fly logs --config worker/fly.toml    # worker đang chờ việc
 curl -sI https://<tên miền web> | head -1
 ```
 
+### Thực hành
+
+1. Push một nhánh có lỗi kiểu TypeScript cố ý, xem CI báo đỏ ở bước typecheck.
+2. Build bản web (`pnpm build:web`) và mở thư mục `dist` bằng một server tĩnh bất kỳ.
+
 ### Tự kiểm
 
 1. Mỗi phần của hệ thống (database, Edge Function, worker, web, app) được deploy lên đâu?

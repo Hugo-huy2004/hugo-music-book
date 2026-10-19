@@ -155,6 +155,25 @@ const expectedOf = (t: Timeline) => () => t.pos + (t.playing ? (serverNow() - t.
 - Tài khoản C không có trong nhóm thử `supabase.channel('group:<id>', { config: { private: true } }).subscribe()`: lỗi quyền, không nhận tin nào.
 - Cùng tài khoản ở hai trình duyệt, bật Đồng bộ: thao tác ở bên nào bên kia cũng làm theo.
 
+### Ví dụ tính tay
+
+**Chỉnh lệch nhịp giữa hai máy trong nhóm.** Cứ 250 ms máy thành viên so vị trí của nó với vị trí mong đợi. Hằng số trong `packages/stream/src/sync.js`: tua nếu lệch quá 0,35 giây; dưới đó thì đổi tốc độ phát, tối đa ±10 %, để đuổi kịp trong khoảng 1 giây; lệch dưới 5 ms thì bỏ qua.
+
+```text
+lệch +0,8 giây (đi trước)   → quá 0,35 → tua về đúng vị trí
+lệch +0,2 giây              → tốc độ = 1 − 0,2 ÷ 1 = 0,8 → giới hạn ở 0,9 (chậm 10 %)
+                              mỗi giây thu hẹp 0,1 giây → khoảng 2 giây là khớp
+lệch +0,02 giây             → dưới 0,03: chỉ chỉnh tối đa ±2 % (tai người không nhận ra)
+lệch +0,003 giây            → dưới 0,005: giữ nguyên tốc độ
+```
+
+(Phép tính bỏ qua bộ lọc làm mượt: giá trị lệch thật được trộn 50/50 với lần đo trước để không giật.)
+
+### Thực hành
+
+1. Tạo nhóm bằng tài khoản A trên máy tính, vào nhóm bằng tài khoản B trên điện thoại (hoặc cửa sổ ẩn danh). A phát một bài, quan sát B.
+2. Đăng nhập cùng một tài khoản trên hai trình duyệt, bật "Đồng bộ thiết bị" ở Tài khoản, phát ở một bên.
+
 ### Tự kiểm
 
 1. Nhóm nghe chung và đồng bộ thiết bị dùng chung cơ chế nào, khác nhau ở tên kênh nào?

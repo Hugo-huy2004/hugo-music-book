@@ -144,6 +144,11 @@ select * from cron.job;                                           -- có các l�
 
 Bấm duyệt hai lần liền: lần hai báo `song not found or already processed`, hàng đợi vẫn chỉ có một việc.
 
+### Thực hành
+
+1. Duyệt bài ở trang quản trị, rồi chạy `select * from pgmq.q_media;` ngay sau đó (trước khi worker nhận) để thấy tin nhắn.
+2. Tắt worker, duyệt một bài, đợi 15 phút rồi chạy truy vấn nhịp tim ở chương 21.
+
 ### Tự kiểm
 
 1. Từ lúc admin bấm Duyệt tới lúc worker nhận việc, dữ liệu đi qua những đâu?

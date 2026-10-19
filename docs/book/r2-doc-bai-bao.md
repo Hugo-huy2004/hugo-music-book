@@ -53,6 +53,14 @@ Netflix tối ưu thang theo từng phim cho video; PSL làm điều tương t�
 
 Chọn một bài trong bảng, đọc hai lượt đầu, ghi đủ sáu cột của bảng ghi chú. Nếu không ghi được cột "giới hạn", đọc lại phần thiết lập thí nghiệm.
 
+### Tự kiểm
+
+1. Ba lượt đọc một bài báo khác nhau ở mục tiêu nào?
+2. BOLA và MPC thuộc hai trường phái nào, khác nhau ở dữ liệu đầu vào ra sao?
+3. Netflix Per-Title và PSL giống và khác nhau ở đâu?
+4. 128 kbps trong 1 phút là khoảng bao nhiêu MB? Tính nhẩm.
+5. Vì sao RFC 7233 không còn là tài liệu chính cho HTTP Range?
+
 ### Khi nào đổi
 
 - Tìm tài liệu mới: Google Scholar theo trích dẫn ngược (ai trích dẫn BOLA, Pensieve), và kỷ yếu ACM MMSys, SIGCOMM, NOSSDAV.

@@ -88,6 +88,11 @@ Làm theo thứ tự mà không có mốc rất dễ sa đà vào phần thú v�
 - [ ] Ra mắt vào buổi sáng đầu tuần theo giờ Việt Nam, còn cả ngày phía trước để sửa.
 - [ ] Sau 1 giờ, 1 ngày, 1 tuần: xem Advisors, Logs, Usage.
 
+### Thực hành
+
+1. Đi hết checklist ra mắt trên project của bạn, đánh dấu mục nào chưa đạt.
+2. Chọn một tính năng chưa có (ví dụ chia sẻ danh sách phát công khai) và viết lộ trình theo chương: sửa migration nào, hàm nào, màn hình nào.
+
 ### Tự kiểm
 
 1. Trước khi ra mắt, ba việc bảo mật nào phải kiểm tra lại?

@@ -221,6 +221,25 @@ select status, hls_tiers, psl_mos from public.songs where id = '<id bài>';
 select status, step, error from public.pipeline_runs order by id desc limit 5;
 ```
 
+### Ví dụ tính tay
+
+**PSL tiết kiệm bao nhiêu trên một bài thật.** Kích thước file các mức của "Mưa Đêm Sài Gòn" (91 giây) trong bucket `audio`, và mức 320 ước tính theo tỉ lệ bitrate:
+
+```text
+64: 737 729   96: 1 104 341   128: 1 493 157   160: 1 881 402   192: 2 266 325   256: 2 977 497   (byte)
+thang PSL (6 mức)               = 10 460 451 byte ≈ 10,5 MB
+mức 320 ≈ 2 977 497 × 320 ÷ 256 ≈ 3 721 871 byte
+thang cố định (thêm 320)        ≈ 14 182 322 byte ≈ 14,2 MB
+tiết kiệm ≈ 3,72 ÷ 14,18 ≈ 26 % dung lượng
+```
+
+Với "Sóng Xa" (chỉ giữ mức 64), con số tiết kiệm lên trên 90 %. Băng thông tiết kiệm còn lớn hơn dung lượng, vì người nghe mạng tốt luôn tải mức cao nhất.
+
+### Thực hành
+
+1. Chạy `python3 supabase/seed/make_demo_music.py demo`, nạp một bài, chạy `pnpm worker`, xem `psl_mos` của bài đó.
+2. Đổi τ từ 0,10 lên 0,20 trong `worker/src/psl.ts`, chạy lại test. Bài "Mưa Đêm Sài Gòn" sẽ giữ những mức nào?
+
 ### Tự kiểm
 
 1. Với số đo MOS 64: 3,0; 96: 3,05; 128: 3,6 và τ = 0,10, thang PSL giữ những mức nào? Tính từng bước.

@@ -117,6 +117,23 @@ supabase db push --dry-run        # không còn migration nào chưa chạy
 
 Thử trong SQL Editor: thêm một bài với `status = 'publised'` (gõ sai) phải báo lỗi `invalid input value for enum song_status`.
 
+### Ví dụ tính tay
+
+**Khóa chính tốn bao nhiêu chỗ.** `bigint` 8 byte, `uuid` 16 byte. Một triệu bài:
+
+```text
+khóa songs (uuid):        1 000 000 × 16 = 16 MB
+mỗi bảng tham chiếu tới songs (song_likes, plays, playlist_songs...) cũng mang 16 byte mỗi dòng
+plays 50 triệu dòng × (16 − 8) byte chênh = 400 MB nếu dùng uuid thay vì bigint
+```
+
+Đổi lại, uuid sinh được ngay ở client (upload chọn id trước khi tạo dòng, chương 8) và không lộ số lượng bài. Với `songs` đáng; với bảng sự kiện khổng lồ như `plays` thì khóa chính của chính nó dùng `bigint`.
+
+### Thực hành
+
+1. Viết migration thêm cột `bpm_source text` cho `songs` với ràng buộc chỉ nhận `'worker'` hoặc `'manual'`. Đẩy lên, thử chèn giá trị khác để thấy lỗi.
+2. Chạy `explain analyze select * from songs where status = 'published' order by published_at desc limit 20;` trước và sau khi có index một phần. So thời gian.
+
 ### Tự kiểm
 
 1. Vì sao `songs` dùng UUID làm khóa chính còn `artists` dùng số tăng dần?

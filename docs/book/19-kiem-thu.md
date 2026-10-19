@@ -102,6 +102,11 @@ pnpm --filter @hugo/app e2e # Playwright (cần bản build web đang chạy)
 
 Để chắc test bảo mật bắt được lỗi thật: xóa thử chính sách "members like songs" rồi chạy lại; test đầu tiên phải đỏ.
 
+### Thực hành
+
+1. Chạy `bash scripts/test-db.sh` và `pnpm --filter @hugo/worker test`.
+2. Viết thêm một test pgTAP: khách ẩn danh không gọi được `review_song`.
+
 ### Tự kiểm
 
 1. Ba tầng test của sách là gì, mỗi tầng bắt loại lỗi nào?

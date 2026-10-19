@@ -92,6 +92,24 @@ const coverUrl = (path?: string | null) =>
 - Tải file 400 MB lên `originals`: bị từ chối vì vượt `file_size_limit`.
 - Mở URL ảnh bìa ở cửa sổ ẩn danh: xem được, header có `cf-cache-status` (qua CDN).
 
+### Ví dụ tính tay
+
+**Dung lượng Storage cho 1 000 bài.** Bài trung bình 4 phút (240 giây), nguồn FLAC khoảng 900 kbps, thang PSL 64/96/128/160/192/256:
+
+```text
+bản gốc:    900 000 × 240 ÷ 8           ≈ 27 MB/bài
+bản phát:   (64+96+128+160+192+256) × 1000 × 240 ÷ 8 = 896 000 × 30 ≈ 26,9 MB/bài
+ảnh bìa:    ~0,2 MB
+tổng ≈ 54 MB/bài → 1 000 bài ≈ 54 GB
+```
+
+Bản gốc chiếm khoảng một nửa. Nếu chi phí lưu trữ là vấn đề, chuyển bản gốc đã xử lý xong sang kho lưu trữ lạnh rẻ hơn, giữ lại để mã hóa lại khi cần.
+
+### Thực hành
+
+1. Tải một bài lên qua form admin, mở bucket `originals` xem đường dẫn file được sinh.
+2. Thử đọc file trong bucket `audio` không có chữ ký bằng `curl`. Sau đó tạo signed URL 60 giây bằng `supabase.storage.from("audio").createSignedUrl(path, 60)` với secret key và đọc lại; đợi quá 60 giây rồi đọc lần nữa.
+
 ### Tự kiểm
 
 1. Bốn bucket của Hugo Music, bucket nào công khai, bucket nào riêng tư, vì sao?

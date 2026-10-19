@@ -107,6 +107,11 @@ pnpm --filter @hugo/app typecheck
 pnpm build:web && npx serve app/dist     # mở bản build tĩnh, mọi màn hình hiện dữ liệu thật
 ```
 
+### Thực hành
+
+1. Chạy app trên điện thoại bằng Expo Go (`pnpm dev`, quét mã QR). So bố cục với bản web.
+2. Thêm một mục vào thanh bên (ví dụ "Lịch sử") trên máy tính, và kiểm tra nó xuất hiện đúng chỗ trên thanh tab dưới của điện thoại.
+
 ### Tự kiểm
 
 1. Một mã nguồn chạy được web, iOS và Android nhờ những thành phần nào?

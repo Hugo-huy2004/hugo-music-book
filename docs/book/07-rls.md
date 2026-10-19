@@ -125,6 +125,11 @@ insert into public.song_likes (user_id, song_id) values ('<id người B>', '<id
 
 Mở *Advisors → Security Advisor* trong dashboard: không còn cảnh báo "RLS disabled" cho bảng nào trong schema `public`.
 
+### Thực hành
+
+1. Viết chính sách cho bảng `playlists`: chủ sở hữu đọc, sửa, xóa được; người khác không thấy. Viết thêm một test pgTAP chứng minh người B không đọc được danh sách của A.
+2. Gọi `curl` tới `/rest/v1/profiles?select=date_of_birth` bằng token của chính bạn. Giải thích vì sao vẫn bị từ chối, và app đọc ngày sinh bằng đường nào.
+
 ### Tự kiểm
 
 1. Viết chính sách RLS cho phép mỗi người chỉ đọc lượt thích của chính mình.

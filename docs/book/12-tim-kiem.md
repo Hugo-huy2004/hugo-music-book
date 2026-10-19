@@ -105,6 +105,23 @@ select title from public.search_songs('mua deem');    -- vẫn ra (gõ sai một
 explain select * from public.search_songs('neon');   -- có dùng songs_search_trgm
 ```
 
+### Ví dụ tính tay
+
+**Vì sao "mua dem" tìm ra "Mưa Đêm Sài Gòn".** Cột `search_text` lưu tên bài và nghệ sĩ đã bỏ dấu, chữ thường: `mua dem sai gon lofi sai gon`. pg_trgm cắt chuỗi thành các bộ ba ký tự (trigram):
+
+```text
+"mua dem" → "  m", " mu", "mua", "ua ", " de", "dem", "em "   (7 trigram)
+cả 7 trigram đều có trong search_text → độ giống cao → khớp
+"mưa đêm" (có dấu) qua f_unaccent() cũng thành "mua dem" → cùng kết quả
+```
+
+Gõ sai một chữ ("mua dam") vẫn còn 5 trên 7 trigram trùng, nên tìm kiếm chịu được lỗi chính tả nhỏ.
+
+### Thực hành
+
+1. Tìm "MUA DEM", "mưa đêm", "mua dam" và so kết quả.
+2. Thêm lời bài hát LRC cho một bài mẫu trong SQL Editor, mở trình phát đầy đủ xem dòng đang hát sáng lên.
+
 ### Tự kiểm
 
 1. Vì sao tìm "mua dem" vẫn ra "Mưa Đêm Sài Gòn"? Kể tên hai extension của Postgres tham gia.

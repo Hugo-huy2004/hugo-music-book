@@ -62,6 +62,11 @@ Code viết trước khi biết sản phẩm cần gì thường phải viết l
 
 Chương này kiểm tra bằng câu hỏi chứ không bằng lệnh: với mỗi tính năng bạn định thêm, nó thuộc luồng nào trong bốn luồng trên? Không thuộc luồng nào thì để lại sau.
 
+### Thực hành
+
+1. Mở app web của bạn ở chế độ khách, đi qua đủ bốn luồng chính (nhập danh mục cần tài khoản admin). Ghi lại mỗi luồng đi qua những màn hình nào.
+2. Viết đặc tả một trang cho một tính năng bạn muốn thêm (ví dụ "lịch sử nghe theo tuần"): ai dùng, để làm gì, thuộc luồng nào, không làm gì.
+
 ### Tự kiểm
 
 1. Bốn luồng chính của Hugo Music là gì? Một tính năng "bình luận dưới bài hát" thuộc luồng nào, và theo trang đặc tả thì có nên làm ở giai đoạn đầu không?

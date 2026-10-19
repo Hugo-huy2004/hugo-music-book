@@ -73,6 +73,25 @@ select low_kbps, high_kbps, votes, hit_rate, same_rate from public.blind_results
 select tier_kbps, count(*), avg(startup_ms), sum(rebuffer_count) from public.plays group by 1 order by 1;
 ```
 
+### Ví dụ tính tay
+
+**Cần bao nhiêu phiếu cho một cặp mức.** Muốn phân biệt tỉ lệ đoán đúng 60 % với 50 % (đoán bừa), mức ý nghĩa 5 %, độ mạnh 80 %:
+
+```text
+n ≈ (z₀,₀₂₅·√(p₀(1−p₀)) + z₀,₂·√(p₁(1−p₁)))² ÷ (p₁ − p₀)²
+  = (1,96·0,5 + 0,84·0,49)² ÷ 0,1² = (0,98 + 0,41)² ÷ 0,01 ≈ 194 phiếu
+```
+
+Với 15 cặp mức (6 mức), cần khoảng 2 900 phiếu hợp lệ: lý do blind test phải là một trò chơi người ta muốn chơi nhiều lượt.
+
+### Tự kiểm
+
+1. Viết lại RQ2 thành một giả thuyết có thể bác bỏ.
+2. Vì sao cần cả hồ sơ mạng "vào hầm" thay vì chỉ ba mức băng thông cố định?
+3. Điểm QoE gộp có nhược điểm gì? Vì sao vẫn báo cáo từng chỉ số riêng?
+4. Lượt kiểm tra trong blind test giảm rủi ro nào trong bảng "những gì có thể làm kết quả sai"?
+5. Muốn phát hiện chênh lệch 5 điểm phần trăm thay vì 10, số phiếu cần tăng khoảng bao nhiêu lần?
+
 ### Khi nào đổi
 
 - Kết quả RQ2 cho thấy người nghe phân biệt được ở một thể loại: chỉnh τ riêng cho thể loại đó và chạy lại thí nghiệm 1.

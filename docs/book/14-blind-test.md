@@ -166,6 +166,25 @@ select no, a_kbps, b_kbps, is_control, revealed from public.blind_trials order b
 select * from public.blind_results;          -- hit_rate gần 0,5 nghĩa là gần như đoán bừa: mức cao có thể thừa
 ```
 
+### Ví dụ tính tay
+
+**Dòng thời gian một lượt blind test** (đoạn 10 giây, cron tạo lượt lúc T):
+
+```text
+a_at         = T + 3 giây              cả phòng nghe A (10 giây)
+b_at         = a_at + 11 giây          nghe B (10 giây), bắt đầu được bỏ phiếu
+vote_until   = a_at + 29 giây          hết giờ bỏ phiếu (còn 8 giây sau khi B kết thúc)
+reveal_until = a_at + 35 giây          công bố 6 giây, rồi cron tạo lượt mới
+một lượt ≈ 3 + 35 = 38 giây → khoảng 94 lượt mỗi giờ
+```
+
+Mỗi mốc là giờ tuyệt đối trong database, nên ai vào phòng giữa chừng cũng biết ngay đang ở giai đoạn nào.
+
+### Thực hành
+
+1. Vào phòng Tai vàng với hai tài khoản, bỏ phiếu khác nhau, xem kết quả công bố.
+2. Trong lúc đang bỏ phiếu, gọi `supabase.from('blind_trials').select('a_kbps')` từ console trình duyệt. Đọc lỗi trả về.
+
 ### Tự kiểm
 
 1. Hai lớp nào ngăn người chơi biết trước bên nào bitrate cao hơn?

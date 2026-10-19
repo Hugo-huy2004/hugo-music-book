@@ -121,6 +121,11 @@ curl "$SUPABASE_URL/rest/v1/songs?select=title,artist:artists(name)&limit=3" \
 
 Bài chưa phát hành không bao giờ xuất hiện trong kết quả, dù không có dòng code nào trong app lọc nó: RLS làm việc đó.
 
+### Thực hành
+
+1. Viết hàm `getSongsByGenre(genre)` trong `api.ts`, trả bài đã phát hành của một thể loại, sắp theo lượt thích.
+2. Sinh lại `database.types.ts` sau khi thêm cột ở bài tập chương 4, chạy `pnpm --filter @hugo/app typecheck`.
+
 ### Tự kiểm
 
 1. Viết lời gọi supabase-js lấy 10 bài mới phát hành kèm tên nghệ sĩ.

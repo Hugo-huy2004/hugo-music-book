@@ -190,6 +190,22 @@ deleteAccount: async () => must(await supabase.functions.invoke('delete-account'
 - Nhập email, nhận mã, nhập mã: bảng `profiles` có dòng mới cùng id.
 - Gọi `select public.is_admin();` bằng tài khoản thường trả `false`.
 
+### Ví dụ tính tay
+
+**Một "ngày" của khách là ngày nào.** Hàm `claim_playback()` đếm lượt theo giờ Việt Nam (Asia/Ho_Chi_Minh, UTC+7), không theo UTC:
+
+```text
+khách nghe bài thứ 3 lúc 23:50 giờ VN ngày 18 (= 16:50 UTC ngày 18)
+lúc 00:05 giờ VN ngày 19 (= 17:05 UTC ngày 18):
+  đếm theo UTC: vẫn là ngày 18 → hết lượt (sai với cảm nhận người dùng)
+  đếm theo giờ VN: đã sang ngày 19 → còn 3 lượt ✓
+```
+
+### Thực hành
+
+1. Đăng nhập bằng mã 6 số với email của bạn. Mở Authentication → Users, tìm tài khoản vừa tạo và tài khoản khách ẩn danh trước đó.
+2. Dùng tài khoản admin trong SQL Editor: `select raw_app_meta_data from auth.users where email = '...'`. Thử đặt `role` cho một tài khoản khác rồi đăng nhập lại để thấy trang quản trị hiện ra.
+
 ### Tự kiểm
 
 1. Khách ẩn danh có phải là một người dùng thật trong `auth.users` không? Điều đó giúp gì cho luật 3 bài mỗi ngày?

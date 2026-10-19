@@ -99,6 +99,11 @@ Danh sách soát trước khi một màn hình mới được merge:
 - [ ] Chạy thử ở chế độ tối, cỡ chữ lớn nhất và giảm chuyển động.
 - [ ] Bật trình đọc màn hình, đi hết màn hình chỉ bằng vuốt: thứ tự đọc hợp lý.
 
+### Thực hành
+
+1. Bật chế độ tối và cỡ chữ lớn nhất trên điện thoại, mở năm màn hình chính. Ghi lại chỗ nào chữ bị cắt hoặc tương phản kém.
+2. Bật "giảm chuyển động" của hệ điều hành, so hiệu ứng giọt kính mờ khi bấm nút trước và sau khi bật.
+
 ### Tự kiểm
 
 1. Kể ba nguyên tắc giao diện mà sách áp dụng cho mọi màn hình.

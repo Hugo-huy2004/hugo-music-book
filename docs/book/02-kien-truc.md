@@ -61,6 +61,11 @@ Ba nguyên tắc giữ sơ đồ này gọn:
 
 Với mỗi tính năng ở chương 1, chỉ được nó nằm ở khối nào trên sơ đồ. Nếu một tính năng cần thêm khối mới, đó là lúc xem lại kiến trúc.
 
+### Thực hành
+
+1. Vẽ lại sơ đồ kiến trúc trên giấy, đánh số theo thứ tự các bước khi người nghe bấm phát một bài.
+2. Chọn một việc của Hugo Music (ví dụ "gửi email khi bài được duyệt") và quyết định nó nên là chính sách RLS, hàm SQL, Edge Function hay việc của worker. Viết một câu giải thích.
+
 ### Tự kiểm
 
 1. Liệt kê ba việc trước đây phải tự viết server mà nay Supabase làm sẵn.
