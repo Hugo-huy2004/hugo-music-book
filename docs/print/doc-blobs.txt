@@ -60,3 +60,6 @@ dg-23-seq-cdn blob/c0660d08-8087
 dg-u1-component-tree blob/cbf86097-2d79
 dg-u2-data-flow blob/7516abb6-2665
 dg-u3-login-state blob/44fa8175-29fd
+u2-home-desktop blob/b87456bf-2557
+u2-home-mobile blob/a626364d-f345
+u3-login blob/faabfd85-1317

@@ -54,7 +54,25 @@ loginPasswordless: (email: string, code: string) => auth.verifyCode(email, code)
 logout: () => auth.signOut(),
 ```
 
-`auth.sendCode` và `auth.verifyCode` là hai hàm đã viết ở chương 6.
+`auth.sendCode` và `auth.verifyCode` là hai hàm đã viết ở chương 6. Thêm vào `api.ts` kiểu `User` và hàm `me()`, đọc người đang đăng nhập cùng hồ sơ của họ:
+
+```ts
+// app/src/api/api.ts (thêm vào)
+export type User = { _id: string; email: string; nickname?: string; musicGenres: string[]; role: 'user' | 'admin'; isGuest: boolean };
+
+export async function me(): Promise<User | null> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return null;
+  const u = session.user;
+  const { data: p } = await supabase.rpc('my_profile');   // hồ sơ đầy đủ của chính mình (chương 6, bước 7)
+  return {
+    _id: u.id, email: u.email ?? '', nickname: p?.nickname ?? undefined, musicGenres: p?.music_genres ?? [],
+    role: u.app_metadata?.role === 'admin' ? 'admin' : 'user', isGuest: u.is_anonymous ?? false,
+  };
+}
+```
+
+Vai trò đọc từ `app_metadata` (chương 6, bước 6), thứ người dùng không tự sửa được. `is_anonymous` cho biết đây là khách ẩn danh.
 
 **Bước 2: nghe sự kiện phiên, nạp hồ sơ.** Đặt trong hàm tạo store, chạy một lần khi app mở:
 
@@ -86,6 +104,8 @@ export default function LoginModal({ visible, onClose }: { visible: boolean; onC
   const [code, setCode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const { colors } = useHugoTheme();
+  const field = { borderWidth: 1, borderColor: colors.border, borderRadius: 10, padding: 12, color: colors.text, marginBottom: 12 };
   const { startPasswordlessLogin, loginPasswordless } = useStore(useShallow((s) => ({
     startPasswordlessLogin: s.startPasswordlessLogin, loginPasswordless: s.loginPasswordless })));
 
@@ -99,10 +119,10 @@ export default function LoginModal({ visible, onClose }: { visible: boolean; onC
   return (
     <Sheet visible={visible} title={step === 'email' ? 'Đăng nhập' : 'Nhập mã'} onClose={onClose}>
       {step === 'email' ? (
-        <TextField value={email} onChangeText={setEmail} placeholder="Email"
+        <TextField value={email} onChangeText={setEmail} placeholder="Email" accessibilityLabel="Email" style={field}
           textContentType="emailAddress" keyboardType="email-address" autoCapitalize="none" onSubmitEditing={send} />
       ) : (
-        <TextField value={code} onChangeText={setCode} placeholder="Mã 6 số"
+        <TextField value={code} onChangeText={setCode} placeholder="Mã 6 số" accessibilityLabel="Mã 6 số" style={field}
           textContentType="oneTimeCode" keyboardType="number-pad" maxLength={6} onSubmitEditing={verify} />
       )}
       <ErrorText message={error} />
@@ -112,6 +132,8 @@ export default function LoginModal({ visible, onClose }: { visible: boolean; onC
   );
 }
 ```
+
+`TextField` của thư viện chỉ là ô nhập trơn, nên `field` thêm viền và khoảng đệm lấy màu từ `useHugoTheme()`: đổi sang nền tối là viền tự đổi theo. `accessibilityLabel` giữ tên ô cho trình đọc màn hình sau khi chữ gợi ý biến mất.
 
 Bốn chi tiết làm hộp thoại dễ dùng:
 
@@ -154,6 +176,14 @@ export default function AccountButton({ onNavigate }: { onNavigate: (tab: string
 }
 ```
 
+Gắn nút vào tiêu đề Trang chủ. `HomeScreen` cần hàm chuyển màn hình, nên `renderScreen` của `AppLayout` truyền `go` xuống:
+
+```tsx
+// AppLayout: case 'home': return <HomeScreen onNavigate={go} />;
+// HomeScreen({ onNavigate }: { onNavigate: (tab: string) => void })
+<LargeTitle title="Trang chủ" right={<AccountButton onNavigate={onNavigate} />} />
+```
+
 `label` là chữ mà trình đọc màn hình đọc lên cho nút chỉ có biểu tượng (chương 17, nguyên tắc 10).
 
 **Bước 7: hoàn thiện hồ sơ cho người mới.** Đăng nhập bằng mã hay Google chỉ cho biết email. `CompleteProfileModal` tự hiện khi thành viên chưa có tên hiển thị hoặc chưa chọn thể loại yêu thích, và tự ẩn khi đã đủ:
@@ -188,7 +218,7 @@ return (
 
 ### Kết quả
 
-![Hộp thoại đăng nhập trên điện thoại](images/login-modal.png)
+![Hộp thoại đăng nhập, chụp từ app dựng đúng theo code của chương này](images/u3-login.png)
 
 Bấm nút tài khoản khi chưa đăng nhập thì hộp thoại trượt lên. Nhập email, nhận mã trong hộp thư, nhập mã: hộp thoại đóng, người mới thấy hộp thoại hoàn thiện hồ sơ. Tải lại trang vẫn còn đăng nhập.
 
@@ -237,3 +267,4 @@ Supabase còn giới hạn số lần gửi mã cho mỗi email trong một gi�
 - `app/src/ui/kit/AccountButton.tsx`
 - `app/src/store/useStore.ts` (phần người dùng)
 - `app/src/navigation/AppLayout.tsx` (hộp thoại)
+- `examples/app-ung-dung/`: app gõ đúng theo ba chương Ứng dụng, đã kiểm tra kiểu và chạy với dữ liệu thật; dùng để đối chiếu

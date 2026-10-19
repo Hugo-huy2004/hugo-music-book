@@ -119,25 +119,25 @@ export default function HomeScreen() {
       {songsError && <EmptyState icon="cloud-offline-outline" title="Không tải được nhạc" hint={songsError} />}
       {!isLoadingSongs && !songsError && !songs.length && <EmptyState title="Chưa có bài nào" hint="Bài đã duyệt sẽ hiện ở đây." />}
       <Shelf title="Mới phát hành">
-        {newReleases.map((s) => <MediaTile key={s._id} uri={s.coverArt} title={s.title} subtitle={s.artist} size={tile} />)}
+        {newReleases.map((s) => <MediaTile key={s._id} uri={s.coverArt} title={s.title} subtitle={s.artist} size={tile} onPress={() => {}} />)}
       </Shelf>
       <Shelf title="Nghệ sĩ">
-        {artists.map((s) => <MediaTile key={s.artist} uri={s.coverArt} title={s.artist} size={tile} round />)}
+        {artists.map((s) => <MediaTile key={s.artist} uri={s.coverArt} title={s.artist} size={tile} round onPress={() => {}} />)}
       </Shelf>
     </ScrollView>
   );
 }
 ```
 
-`useShallow` (nhập từ `zustand/react/shallow`) cho phép lấy nhiều giá trị một lần mà vẫn chỉ vẽ lại khi một trong số đó đổi. `key` giúp React biết ô nào là ô nào khi danh sách thay đổi; dùng id của bài, không dùng chỉ số trong mảng. Nút phát được nối ở chương 11, khi đã có vé nghe.
+`useShallow` (nhập từ `zustand/react/shallow`) cho phép lấy nhiều giá trị một lần mà vẫn chỉ vẽ lại khi một trong số đó đổi. `key` giúp React biết ô nào là ô nào khi danh sách thay đổi; dùng id của bài, không dùng chỉ số trong mảng. `MediaTile` bắt buộc có `onPress`; tạm để hàm rỗng `() => {}`, chương 11 thay bằng lệnh phát khi đã có vé nghe.
 
 ### Kết quả
 
-Trang chủ hiện hai kệ vuốt ngang với bài thật từ database. Ảnh dưới chụp app hoàn chỉnh, đã thêm các kệ ở chương 13 và 16; ở chương này bạn có kệ "Mới phát hành" và "Nghệ sĩ".
+Trang chủ hiện hai kệ vuốt ngang với bài thật từ database. Hai ảnh dưới chụp từ một app dựng mới, gõ đúng code của chương Ứng dụng 1 và chương này, không thêm gì khác. Ảnh bìa là ảnh tạm theo màu, vì các bài mẫu chưa có ảnh bìa riêng.
 
-![Trang chủ trên máy tính](images/home-desktop.png)
+![Trang chủ trên máy tính: thanh bên và hai kệ bài](images/u2-home-desktop.png)
 
-![Trang chủ trên điện thoại](images/home-mobile.png)
+![Trang chủ trên điện thoại: thanh tab kính mờ ở dưới](images/u2-home-mobile.png)
 
 ### Kiểm tra
 
@@ -181,3 +181,4 @@ Một ảnh bìa đã khoảng 50 KB, nên tải cả danh mục chỉ tốn nga
 - `app/src/screens/Home/useHomeSections.ts`
 - `app/src/screens/Home/HomeScreen.tsx`
 - `app/src/navigation/AppLayout.tsx` (gọi `fetchSongs`)
+- `examples/app-ung-dung/`: app gõ đúng theo ba chương Ứng dụng, đã kiểm tra kiểu và chạy với dữ liệu thật; dùng để đối chiếu

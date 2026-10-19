@@ -261,3 +261,4 @@ Một phần ô thứ ba lộ ra là cố ý: người dùng biết kệ này vu
 - `app/src/navigation/AppNavigator.tsx`, `app/src/navigation/AppLayout.tsx`
 - `app/src/lib/responsive.ts`
 - `packages/ui/src/index.ts` (thư viện giao diện, chép nguyên)
+- `examples/app-ung-dung/`: app gõ đúng theo ba chương Ứng dụng, đã kiểm tra kiểu và chạy với dữ liệu thật; dùng để đối chiếu

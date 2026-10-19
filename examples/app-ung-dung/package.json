@@ -1,0 +1,2 @@
+{ "name": "@hugo/app-ung-dung", "private": true, "main": "index.ts",
+  "scripts": { "web": "expo start --web", "typecheck": "tsc --noEmit" } }
