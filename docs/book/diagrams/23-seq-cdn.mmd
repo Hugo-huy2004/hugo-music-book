@@ -1,0 +1,20 @@
+sequenceDiagram
+  autonumber
+  participant A as Trình phát
+  participant F as Edge Function (Supabase)
+  participant W as Worker (Cloudflare)
+  participant C as Cache điểm biên
+  participant R as R2
+  A->>F: Xin vé + playlist (vài KB)
+  F-->>A: Link /a/bài/tok.mp4?t=vé
+  A->>W: GET link, Range
+  W->>W: Kiểm chữ ký vé bằng khóa chung
+  W->>C: match(khóa không chứa vé)
+  alt Trúng cache (≈ 99,99 %)
+    C-->>W: Đoạn byte
+  else Trượt
+    W->>R: get(key, range)
+    R-->>W: Đoạn byte
+    W--)C: Nạp cả file ở nền, giữ 1 năm
+  end
+  W-->>A: 206 Partial Content

@@ -30,6 +30,12 @@ Xử lý một bài (đo chất lượng, mã hóa nhiều mức) mất vài ph�
 
 **Duyệt bài là một hàm SQL `review_song()`; việc đưa vào hàng đợi `media` của pgmq; worker đọc bằng ba hàm chỉ secret key gọi được. Việc định kỳ dùng pg_cron.** Mọi thứ nằm trong database nên một giao dịch bao trọn, không có trạng thái lệch.
 
+### Sơ đồ trạng thái của một bài hát
+
+![Vòng đời của cột songs.status](images/dg-09-state-song.png)
+
+Mỗi ô là một giá trị của enum `song_status`, mỗi mũi tên là một hàm hoặc tiến trình được phép đổi trạng thái. Không có mũi tên nào từ `published` quay về: muốn sửa bài đã đăng thì tải bản mới. Hàm `review_song()` chỉ nhận bài ở `pending`, `failed` hoặc `rejected`, đúng ba mũi tên đi vào `processing`.
+
 ### Làm từng bước
 
 **Bước 1: tạo hàng đợi và bảng nhật ký.**

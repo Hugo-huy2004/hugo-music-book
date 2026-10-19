@@ -26,6 +26,12 @@ Database là nền của mọi tính năng. Thiết kế sai từ đầu (thiế
 
 **Migration SQL trong `supabase/migrations/`, chạy bằng `supabase db push`.** Supabase dùng PostgreSQL thật, nên SQL học ở đây dùng được ở mọi nơi. RLS, trigger, hàm SQL ở các chương sau cũng nằm trong migration, cùng một chỗ.
 
+### Sơ đồ quan hệ thực thể (ERD)
+
+![ERD phần lõi: danh mục, thư viện, phát nhạc, xử lý bài](images/dg-04-erd-core.png)
+
+Ký hiệu chân chim: một gạch là đúng một, vòng tròn kèm chân chim là không hoặc nhiều. Bảng nối (`song_likes`, `playlist_songs`, `playback_grants`) dùng khóa chính ghép từ hai khóa ngoại, nên một người không thích một bài hai lần. Các cột người dùng (`user_id`, `owner_id`) trỏ thẳng tới `auth.users`, bảng do Supabase Auth quản lý; `profiles` là phần hồ sơ một-một với nó (chương 6). Đường nét đứt giữa `licenses` và `songs` là quan hệ tra cứu không có khóa ngoại: thêm giấy phép mới không cần migration. Các bảng của đài, blind test và nhóm nghe ở ERD thứ hai, chương 13. Sơ đồ sinh từ `database.types.ts`, tức từ chính database đang chạy.
+
 ### Làm từng bước
 
 **Bước 1: tạo file migration.**

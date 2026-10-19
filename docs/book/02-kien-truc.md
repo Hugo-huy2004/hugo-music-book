@@ -37,19 +37,10 @@ Dữ liệu của Hugo Music có quan hệ rõ ràng: bài hát thuộc nghệ s
 
 ### Sơ đồ
 
-```text
-┌────────────────────────────┐        ┌──────────────────────────────────────────────┐
-│  App Expo (web, iOS, Android)│ ─────▶ │ Supabase                                       │
-│  supabase-js                 │ ◀───── │  Auth · API tự sinh · Realtime · Storage + CDN │
-└────────────────────────────┘        │  Edge Function "playback"                      │
-                                       │  PostgreSQL: bảng · RLS · hàm SQL · Queues · Cron│
-                                       └──────────────────────────┬───────────────────┘
-                                                                  │ hàng đợi "media"
-                                                     ┌────────────▼────────────┐
-                                                     │ Worker Node.js 26        │
-                                                     │ ffmpeg · PSL · HLS       │
-                                                     └─────────────────────────┘
-```
+![Sơ đồ kiến trúc tổng thể](images/dg-02-architecture.png)
+
+Mũi tên liền là đường luôn có; nét đứt là phần tùy chọn khi lên quy mô lớn (chương 23). App chỉ nói chuyện với Supabase; worker không nhận request từ ai, nó tự lấy việc từ hàng đợi.
+
 
 Ba nguyên tắc giữ sơ đồ này gọn:
 
@@ -63,8 +54,9 @@ Với mỗi tính năng ở chương 1, chỉ được nó nằm ở khối nào
 
 ### Thực hành
 
-1. Vẽ lại sơ đồ kiến trúc trên giấy, đánh số theo thứ tự các bước khi người nghe bấm phát một bài.
-2. Chọn một việc của Hugo Music (ví dụ "gửi email khi bài được duyệt") và quyết định nó nên là chính sách RLS, hàm SQL, Edge Function hay việc của worker. Viết một câu giải thích.
+1. Mở `docs/book/diagrams/02-architecture.mmd`, thêm một khối "Dịch vụ email (SMTP)" nối với Auth, chạy `node scripts/diagrams.mjs 02-architecture` và xem ảnh mới trong `docs/book/images`.
+2. Vẽ lại sơ đồ kiến trúc trên giấy, đánh số theo thứ tự các bước khi người nghe bấm phát một bài.
+3. Chọn một việc của Hugo Music (ví dụ "gửi email khi bài được duyệt") và quyết định nó nên là chính sách RLS, hàm SQL, Edge Function hay việc của worker. Viết một câu giải thích.
 
 ### Tự kiểm
 

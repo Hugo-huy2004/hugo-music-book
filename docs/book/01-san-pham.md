@@ -20,6 +20,12 @@ Code viết trước khi biết sản phẩm cần gì thường phải viết l
 | Thành viên | Người nghe thường xuyên | Thư viện riêng, bài yêu thích, danh sách phát, tạo nhóm nghe cùng bạn bè, nghe tiếp trên máy khác |
 | Admin | Người quản lý danh mục | Tải bài lên kèm giấy phép, duyệt bài, xem bài nào đang xử lý |
 
+### Sơ đồ use case
+
+![Sơ đồ use case của Hugo Music](images/dg-01-use-case.png)
+
+Ba tác nhân con người xếp theo quyền tăng dần, mũi tên tam giác rỗng là kế thừa: thành viên làm được mọi việc của khách, quản trị viên làm được mọi việc của thành viên. Tác nhân thứ tư là worker, một hệ thống ngoài; việc duyệt bài của quản trị viên kích hoạt nó. Mỗi elip sau này thành một chương: bảng lộ trình ở chương 22 chỉ ra chương nào làm elip nào.
+
 ### Bốn luồng chính
 
 1. **Nhập danh mục.** Admin tải file nhạc lên kèm giấy phép và nguồn → bài ở trạng thái *chờ duyệt* → admin duyệt → hệ thống tự xử lý (đo chất lượng, tạo luồng phát nhiều mức) → bài được phát hành.

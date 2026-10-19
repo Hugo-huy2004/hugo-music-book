@@ -29,6 +29,12 @@ Một trò chơi nhiều người cần: đồng hồ chung (mọi người nghe
 
 **Bảng `blind_trials` lưu từng lượt với các mốc giờ tuyệt đối (nghe A lúc nào, B lúc nào, hết giờ bỏ phiếu lúc nào); hàm `advance_blind_rooms()` chạy mỗi giây; bỏ phiếu qua hàm `vote_blind()`; ba loại sự kiện Broadcast: `trial`, `votes`, `reveal`.** Một phần sáu số lượt là *lượt kiểm tra*: A và B giống hệt, đáp án đúng là "như nhau", để lọc người chọn bừa.
 
+### Sơ đồ trình tự: một lượt blind test
+
+![Trình tự một lượt blind test](images/dg-14-seq-blind.png)
+
+Bitrate chỉ rời database ở bước 9, sau khi hết giờ bầu. Lượt kiểm tra (A = B) trông giống hệt lượt thường với người chơi; nó là cách phát hiện người chọn bừa.
+
 ### Làm từng bước
 
 **Bước 1: một lượt là một dòng với các mốc giờ.**

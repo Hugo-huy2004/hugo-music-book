@@ -1,0 +1,14 @@
+flowchart TB
+  start((Bắt đầu)) --> read["Đọc việc từ pgmq 'media'<br/>(ẩn tin nhắn 15 phút)"]
+  read --> has{Có việc?}
+  has -- Không --> wait["Chờ vài giây"] --> read
+  has -- Có --> run["pipeline_runs: running, attempts + 1"]
+  run --> dl["download: tải file gốc từ Storage"]
+  dl --> an["analyze: thời lượng, bitrate nguồn, loudness"]
+  an --> psl["psl: mã hóa thử từng mức,<br/>chấm ViSQOL, giữ mức hơn ≥ τ = 0,10"]
+  psl --> hls["hls: ghi .mp4 mỗi mức + playlist mẫu<br/>(Storage hoặc R2)"]
+  hls --> ok{Thành công?}
+  ok -- Có --> pub["songs: published, hls_tiers, psl_mos<br/>pipeline_runs: done"] --> arch["Lưu trữ tin nhắn"] --> read
+  ok -- Không --> retry{"còn lượt thử?<br/>(read_ct &lt; 3)"}
+  retry -- Có --> rq["pipeline_runs: queued<br/>tin nhắn tự hiện lại sau 15 phút"] --> read
+  retry -- Không --> fail["songs: failed, ghi lỗi<br/>pipeline_runs: failed"] --> arch

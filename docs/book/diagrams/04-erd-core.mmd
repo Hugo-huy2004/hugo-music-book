@@ -1,0 +1,81 @@
+erDiagram
+  AUTH ||--|| profiles : "hồ sơ"
+  artists ||--o{ songs : "có"
+  licenses |o..o{ songs : "tra cứu, không ràng buộc"
+  songs ||--o{ song_likes : "được thích"
+  AUTH ||--o{ song_likes : "thích"
+  AUTH ||--o{ playlists : "sở hữu"
+  playlists ||--o{ playlist_songs : "chứa"
+  songs ||--o{ playlist_songs : "nằm trong"
+  songs ||--o{ pipeline_runs : "xử lý"
+  songs ||--o{ playback_grants : "cấp lượt"
+  AUTH ||--o{ playback_grants : "nhận"
+  songs ||--o{ plays : "được nghe"
+  AUTH ||--o{ plays : "nghe"
+  AUTH["auth.users (Supabase quản lý)"] {
+    uuid id PK
+    text email
+  }
+  profiles {
+    uuid id PK,FK "= auth.users.id"
+    text username
+    text nickname
+    text_arr music_genres
+  }
+  artists {
+    bigint id PK
+    text name
+    text bio
+  }
+  songs {
+    uuid id PK
+    bigint artist_id FK
+    text title
+    song_status status
+    text license
+    int duration_sec
+    int_arr hls_tiers
+    jsonb psl_mos
+    text hls_path
+    int likes_count
+  }
+  licenses {
+    text key PK
+    text label
+    bool no_derivatives
+  }
+  song_likes {
+    uuid user_id PK,FK
+    uuid song_id PK,FK
+  }
+  playlists {
+    uuid id PK
+    uuid owner_id FK
+    text name
+  }
+  playlist_songs {
+    uuid playlist_id PK,FK
+    uuid song_id PK,FK
+    int position
+  }
+  pipeline_runs {
+    bigint id PK
+    uuid song_id FK
+    text status "queued·running·done·failed"
+    text step
+    int attempts
+  }
+  playback_grants {
+    uuid user_id PK,FK
+    uuid song_id PK,FK
+    date day PK
+  }
+  plays {
+    bigint id PK
+    uuid song_id FK
+    uuid user_id FK
+    int tier_kbps
+    int startup_ms
+    int rebuffer_count
+    text platform
+  }

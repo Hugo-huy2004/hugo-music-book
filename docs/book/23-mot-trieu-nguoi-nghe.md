@@ -47,6 +47,12 @@ Bảng giá thay đổi theo thời gian, nên sách không in số tiền; tín
 
 Thêm một lợi ích: đường dẫn file trên Worker không chứa bitrate (`/a/<bài>/<tok>.mp4`, `tok` là 16 ký tự HMAC), nên blind test không lộ đáp án qua tên file như link ký của Supabase (`…/64.mp4`).
 
+### Sơ đồ trình tự: phát nhạc qua Cloudflare
+
+![Trình tự một request file nhạc qua Worker và R2](images/dg-23-seq-cdn.png)
+
+So với sơ đồ ở chương 11, phần xin vé và playlist không đổi; chỉ vòng tải file đi sang Cloudflare. Supabase và Cloudflare không gọi nhau: Worker tự kiểm vé bằng khóa bí mật dùng chung. Nhánh "trượt" chỉ xảy ra một lần cho mỗi file ở mỗi điểm biên.
+
 ### Làm từng bước
 
 **Bước 1: Worker kiểm vé, đọc cache, rồi mới tới R2.**

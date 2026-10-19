@@ -1,0 +1,21 @@
+sequenceDiagram
+  autonumber
+  actor U as Người dùng
+  participant A as App
+  participant Au as Supabase Auth
+  participant M as Hộp thư
+  participant DB as PostgreSQL
+  U->>A: Nhập email
+  A->>Au: signInWithOtp(email)
+  Au->>M: Gửi mã 6 số (hết hạn sau vài phút)
+  U->>A: Nhập mã
+  A->>Au: verifyOtp(email, mã, 'email')
+  alt Mã đúng
+    Au->>DB: Tạo auth.users nếu là người mới
+    DB->>DB: Trigger tạo dòng profiles
+    Au-->>A: Phiên: access token (JWT) + refresh token
+    A->>A: Lưu phiên, tự làm mới token
+  else Sai hoặc hết hạn
+    Au-->>A: Lỗi, cho nhập lại
+  end
+  Note over A,DB: Mọi request sau gửi kèm JWT, RLS đọc auth.uid() từ đó

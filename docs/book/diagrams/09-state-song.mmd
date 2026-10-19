@@ -1,0 +1,11 @@
+stateDiagram-v2
+  direction LR
+  [*] --> pending: Admin tải bài lên
+  pending --> processing: duyệt, gửi việc vào pgmq
+  pending --> rejected: từ chối
+  rejected --> processing: duyệt lại
+  processing --> published: Worker xong HLS và PSL
+  processing --> failed: Lỗi sau 3 lần thử
+  failed --> processing: Admin duyệt lại
+  published --> [*]
+  note right of published: Chỉ bài published<br/>hiện với người nghe (RLS)

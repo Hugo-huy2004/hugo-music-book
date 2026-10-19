@@ -1,0 +1,21 @@
+flowchart LR
+  dev["Máy lập trình viên<br/>git push"] --> gh["GitHub Actions<br/>typecheck · test"]
+  subgraph targets["Nơi chạy"]
+    direction TB
+    sb["<b>Supabase</b> · Singapore<br/>PostgreSQL · Edge Functions (Deno)<br/>Storage + CDN · Auth · Realtime"]
+    fly["<b>Fly.io</b> · Singapore<br/>Docker: Node 26 + ffmpeg + ViSQOL"]
+    pages["<b>Cloudflare Pages</b><br/>web tĩnh (Expo export)"]
+    cfw["<b>Cloudflare Worker + R2</b><br/>file nhạc (tùy chọn)"]
+    eas["<b>EAS Build / Update</b><br/>→ App Store · Google Play"]
+  end
+  gh -- "bước 1: supabase db push<br/>functions deploy" --> sb
+  gh -- "bước 2: flyctl deploy" --> fly
+  gh -- "bước 3: wrangler pages deploy" --> pages
+  gh -. "wrangler deploy" .-> cfw
+  gh -- "bước 4: eas build / update" --> eas
+  fly <-- "pgmq, Storage" --> sb
+  users(["Người dùng<br/>web · iOS · Android"])
+  pages --> users
+  eas --> users
+  users -- "API, Realtime" --> sb
+  users -. "nghe nhạc" .-> cfw

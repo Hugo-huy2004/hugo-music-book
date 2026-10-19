@@ -30,6 +30,12 @@ Trình phát ── GET .../playback?t=<vé>&kbps=128 ─▶ 128.m3u8, file nh�
 Trình phát ── GET link ký (byte range) ─────────▶ Storage + CDN (không qua function)
 ```
 
+### Sơ đồ trình tự: một lượt phát
+
+![Trình tự từ lúc bấm phát tới lúc có tiếng](images/dg-11-seq-playback.png)
+
+Database chỉ được hỏi một lần (bước 3). Từ bước 5, quyền nằm trong vé; Function kiểm vé bằng HMAC, không hỏi lại database. Vòng `loop` là phần tốn băng thông nhất và đi thẳng tới Storage qua CDN, không qua Function. Chương 23 thay riêng vòng này bằng Cloudflare.
+
 ### Làm từng bước
 
 **Bước 1: luật nghe bằng SQL.** Khách nghe tối đa 3 bài khác nhau mỗi ngày (theo giờ Việt Nam); nghe lại bài đã nghe hôm nay không tốn lượt. Thành viên không giới hạn.

@@ -1,0 +1,17 @@
+sequenceDiagram
+  autonumber
+  participant Cr as pg_cron
+  participant DB as PostgreSQL
+  participant RT as Realtime
+  participant A as Người chơi
+  Cr->>DB: advance_blind_rooms()
+  DB->>DB: Tạo blind_trials: bài, mức A/B ngẫu nhiên,<br/>đôi khi A = B (lượt kiểm tra)
+  DB->>RT: Broadcast 'trial' (không kèm bitrate)
+  RT-->>A: trial
+  A->>A: Phát A rồi B cùng đoạn trích
+  A->>DB: rpc vote(trial, 'A' | 'B' | 'same')
+  DB->>RT: Broadcast 'votes' (số phiếu)
+  Cr->>DB: Hết vote_until → reveal
+  DB->>RT: Broadcast 'reveal' (a_kbps, b_kbps)
+  RT-->>A: Kết quả, đúng hay sai
+  Note over DB: blind_results gộp tỉ lệ đúng theo cặp mức

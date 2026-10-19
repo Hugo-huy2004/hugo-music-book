@@ -1,0 +1,22 @@
+sequenceDiagram
+  autonumber
+  actor U as Người nghe
+  participant A as App / trình phát
+  participant F as Edge Function playback
+  participant DB as PostgreSQL
+  participant S as Storage (CDN)
+  U->>A: Bấm phát
+  A->>F: POST {song_id} + JWT
+  F->>DB: claim_playback(song_id)
+  DB-->>F: Đồng ý (khách: còn lượt hôm nay)
+  F-->>A: Vé = HMAC(song_id, hạn 2 giờ)
+  A->>F: GET ?t=vé
+  F-->>A: Master playlist (các mức PSL)
+  A->>F: GET ?t=vé&kbps=128
+  F->>F: Kiểm vé, ký link file
+  F-->>A: Playlist mức + signed URL
+  loop Mỗi đoạn 6 giây
+    A->>S: GET signed URL, Range: bytes=…
+    S-->>A: 206 Partial Content
+  end
+  A->>DB: Ghi plays (startup_ms, rebuffer, mức)

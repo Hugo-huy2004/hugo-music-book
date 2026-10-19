@@ -1,0 +1,16 @@
+sequenceDiagram
+  autonumber
+  participant Cr as pg_cron (5 giây)
+  participant DB as PostgreSQL
+  participant RT as Realtime
+  participant A1 as Máy người nghe 1
+  participant A2 as Máy người nghe 2
+  Cr->>DB: advance_stations()
+  DB->>DB: Bài hết giờ? Chọn yêu cầu nhiều phiếu nhất,<br/>không có thì chọn theo luật của đài
+  DB->>DB: Cập nhật station_now (song_id, started_at)
+  DB->>RT: Trigger phát Broadcast 'now_playing'
+  RT-->>A1: now_playing
+  RT-->>A2: now_playing
+  A1->>A1: vị trí = giờ máy chủ − started_at
+  A2->>A2: vị trí = giờ máy chủ − started_at
+  Note over A1,A2: Hai máy cùng giây mà không cần nói chuyện với nhau

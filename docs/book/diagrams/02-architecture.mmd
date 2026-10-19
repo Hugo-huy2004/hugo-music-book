@@ -1,0 +1,32 @@
+flowchart TB
+  app["<b>App Expo</b> (web, iOS, Android)<br/>giao diện · trình phát HLS · supabase-js"]
+  subgraph SB["Supabase · Singapore"]
+    direction LR
+    auth["Auth<br/>mã 6 số · Google · khách"]
+    rest["API tự sinh<br/>PostgREST · rpc"]
+    rt["Realtime<br/>Broadcast · Presence"]
+    edge["Edge Function<br/>playback · admin-users"]
+    st["Storage + CDN<br/>gốc · ảnh bìa · nhạc"]
+  end
+  subgraph PG["PostgreSQL"]
+    direction LR
+    tbl["Bảng · RLS · hàm SQL"]
+    q["pgmq<br/>hàng đợi media"]
+    cron["pg_cron<br/>đài, blind test, dọn log"]
+  end
+  wk["<b>Worker Node.js 26</b> · Fly.io<br/>ffmpeg (HLS fMP4) · ViSQOL (PSL)"]
+  subgraph CF["Cloudflare (tùy chọn)"]
+    direction LR
+    cw["Worker kiểm vé<br/>cache điểm biên"]
+    r2["R2: file nhạc"]
+  end
+  app -- "JWT" --> auth & rest & rt & edge
+  app -- "file nhạc (Range)" --> st
+  app -. "file nhạc khi bật CDN" .-> cw
+  cw -.-> r2
+  rest & rt & edge --> tbl
+  cron --> tbl
+  tbl -- "duyệt bài" --> q
+  q -- "lấy việc" --> wk
+  wk -- "ghi file, cập nhật bài" --> st
+  wk -.-> r2

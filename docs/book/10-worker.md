@@ -37,6 +37,12 @@ Trình phát cần nhiều mức chất lượng để tự hạ xuống khi m�
 
 **Node.js 26 chạy thẳng TypeScript, gọi ffmpeg bằng `execFile`, HLS fMP4 một file, đo PSL bằng ViSQOL.** Quy tắc PSL: chỉ xét các mức *thấp hơn* bitrate nguồn; luôn giữ mức thấp nhất; giữ mức tiếp theo chỉ khi điểm MOS hơn mức **đã giữ** gần nhất ít nhất τ = 0,10 (lớn hơn nhiễu đo của ViSQOL, khoảng 0,03 tới 0,06).
 
+### Sơ đồ hoạt động của worker
+
+![Vòng lặp xử lý một việc trong hàng đợi media](images/dg-10-activity-worker.png)
+
+Bốn bước giữa (download, analyze, psl, hls) là bốn giá trị cột `step` của `pipeline_runs`, nên trang quản trị biết bài đang dừng ở đâu. Thử lại không cần code riêng: worker không xóa tin nhắn khi lỗi, hết 15 phút ẩn thì pgmq tự trả lại; tới lần thứ ba thì đánh dấu `failed` và rút khỏi hàng đợi.
+
 ### Làm từng bước
 
 **Bước 1: package của worker.** Không có bước build: `node src/main.ts` chạy luôn.

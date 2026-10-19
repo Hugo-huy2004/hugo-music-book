@@ -28,6 +28,12 @@ Ba cách đăng nhập của Supabase Auth hợp với Hugo Music:
 
 **Supabase Auth với cả ba cách trên.** Khách ẩn danh là một người dùng thật trong `auth.users`, nên luật "khách nghe tối đa 3 bài mỗi ngày" viết được bằng SQL như mọi luật khác (chương 11). Khi khách đăng nhập, phiên được thay bằng tài khoản thật.
 
+### Sơ đồ trình tự: đăng nhập bằng mã 6 số
+
+![Trình tự đăng nhập bằng mã email](images/dg-06-seq-login.png)
+
+Đọc từ trên xuống, mỗi mũi tên là một lần gọi, nét đứt là trả về. Khung `alt` là hai nhánh loại trừ nhau. Điểm cần nhớ: app không bao giờ tự tạo người dùng; Auth tạo `auth.users`, trigger tạo `profiles`, nên mọi cách đăng nhập (mã, Google, khách) đều đi qua cùng một trigger.
+
 ### Làm từng bước
 
 **Bước 1: bật các cách đăng nhập.** Trong dashboard: *Authentication → Sign In / Providers*: bật Email (độ dài mã 6), Anonymous sign-ins, và Google (dán Client ID, Client Secret từ Google Cloud Console). Cấu hình tương ứng trong repo:

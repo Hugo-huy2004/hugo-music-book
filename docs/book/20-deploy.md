@@ -21,6 +21,12 @@ Deploy bằng tay dễ quên một bước: đẩy code app mà quên chạy mig
 
 **Thứ tự luôn là: database trước (migration chỉ *thêm*, không phá code cũ đang chạy) → Edge Function → worker → web → app.** Migration theo kiểu mở rộng rồi thu gọn: thêm cột mới, deploy code dùng cột mới, lần sau mới xóa cột cũ.
 
+### Sơ đồ triển khai
+
+![Sơ đồ triển khai: mỗi phần chạy ở đâu, deploy theo thứ tự nào](images/dg-20-deployment.png)
+
+Số trên mũi tên là thứ tự deploy: database trước, app sau cùng. Worker và Supabase cùng vùng Singapore để việc tải file gốc và ghi file đã mã hóa không đi xa. Nét đứt là phần tùy chọn của chương 23.
+
 ### Làm từng bước
 
 **Bước 1: Docker image cho worker.** Node 26, ffmpeg, Python có ViSQOL. Không có bước build TypeScript.

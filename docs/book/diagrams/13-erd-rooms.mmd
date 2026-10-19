@@ -1,0 +1,64 @@
+erDiagram
+  stations ||--o| station_now : "đang phát"
+  songs ||--o{ station_now : ""
+  stations ||--o{ station_requests : "nhận yêu cầu"
+  songs ||--o{ station_requests : ""
+  station_requests ||--o{ station_votes : "được bầu"
+  blind_rooms ||--o{ blind_trials : "tạo lượt"
+  songs ||--o{ blind_trials : ""
+  blind_trials ||--o{ blind_votes : "nhận phiếu"
+  listening_groups ||--o{ group_members : "gồm"
+  stations {
+    bigint id PK
+    text slug
+    text genre_pattern
+    jsonb rules
+    uuid_arr pinned
+  }
+  station_now {
+    bigint station_id PK,FK
+    uuid song_id FK
+    timestamptz started_at
+    timestamptz ends_at
+  }
+  station_requests {
+    bigint id PK
+    bigint station_id FK
+    uuid song_id FK
+    uuid user_id FK
+    int votes
+  }
+  station_votes {
+    bigint request_id PK,FK
+    uuid user_id PK
+  }
+  blind_rooms {
+    bigint id PK
+    text slug
+    jsonb rules
+  }
+  blind_trials {
+    uuid id PK
+    bigint room_id FK
+    uuid song_id FK
+    int a_kbps
+    int b_kbps
+    bool is_control
+    timestamptz vote_until
+  }
+  blind_votes {
+    uuid trial_id PK,FK
+    uuid user_id PK
+    text choice
+    bool correct
+  }
+  listening_groups {
+    uuid id PK
+    text code
+    uuid host_id FK
+    timestamptz ended_at
+  }
+  group_members {
+    uuid group_id PK,FK
+    uuid user_id PK
+  }

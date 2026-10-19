@@ -27,6 +27,12 @@ Viết ba app riêng (web React, iOS Swift, Android Kotlin) là gấp ba công s
 
 **Một dự án Expo SDK 58 (React Native 0.88, React 19.3) duy nhất trong thư mục `app/`; giao diện từ `packages/ui` (hugo-music); trạng thái bằng Zustand; dữ liệu qua `app/src/api/api.ts`.** Màn hình không gọi Supabase trực tiếp mà gọi `api.*`, nên đổi backend chỉ sửa một file.
 
+### Sơ đồ điều hướng
+
+![Sơ đồ điều hướng giữa các màn hình](images/dg-16-navigation.png)
+
+Sáu mục của thanh điều hướng là sáu đường dẫn web, nên mở thẳng `/radio` hay bấm nút quay lại của trình duyệt đều đúng. Trình phát không phải một màn hình: nó nằm trên mọi màn hình và giữ nhạc khi chuyển trang. Trang quản trị chỉ hiện khi `app_metadata.role = 'admin'`; RLS vẫn chặn ở database nếu ai đó gõ thẳng `/admin`.
+
 ### Làm từng bước
 
 **Bước 1: cấu trúc mã nguồn của app.**

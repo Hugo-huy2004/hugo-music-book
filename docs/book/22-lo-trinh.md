@@ -45,6 +45,29 @@ Làm theo thứ tự mà không có mốc rất dễ sa đà vào phần thú v�
 
 Ở mốc *Nghe được*, mời vài người nghe thật dùng thử. Những gì họ nói lúc này còn đủ thời gian để sửa.
 
+### Bộ sơ đồ thiết kế
+
+Mười bốn sơ đồ đi theo vòng đời dự án, từ yêu cầu tới vận hành. Mã nguồn nằm ở `docs/book/diagrams/` (Mermaid `.mmd`, riêng use case là SVG sinh từ `scripts/use-case.py`); sửa rồi chạy `node scripts/diagrams.mjs` để vẽ lại ảnh.
+
+| Giai đoạn | Sơ đồ | Trả lời câu hỏi | Chương |
+|---|---|---|---|
+| Yêu cầu | Use case | Ai dùng hệ thống, làm được gì | 1 |
+| Kiến trúc | Kiến trúc tổng thể | Gồm những khối nào, khối nào gọi khối nào | 2 |
+| Dữ liệu | ERD phần lõi | Bảng, khóa, quan hệ của danh mục, thư viện, phát nhạc | 4 |
+| Dữ liệu | ERD phòng nghe | Bảng của đài, blind test, nhóm nghe chung | 13 |
+| Hành vi | Trình tự đăng nhập | Thứ tự các lần gọi khi đăng nhập bằng mã | 6 |
+| Hành vi | Trạng thái bài hát | Bài đi qua những trạng thái nào, ai được đổi | 9 |
+| Hành vi | Hoạt động của worker | Các bước xử lý một bài, khi lỗi thì sao | 10 |
+| Hành vi | Trình tự phát nhạc | Từ bấm phát tới có tiếng, quyền được kiểm ở đâu | 11 |
+| Hành vi | Trình tự đài 24/7 | Database chuyển bài và báo cho mọi máy thế nào | 13 |
+| Hành vi | Trình tự blind test | Một lượt chơi, khi nào lộ bitrate | 14 |
+| Hành vi | Trình tự nghe chung | Tạo nhóm, vào nhóm, giữ đồng bộ | 15 |
+| Giao diện | Điều hướng | Màn hình nào dẫn tới màn hình nào | 16 |
+| Vận hành | Triển khai | Mỗi phần chạy ở đâu, deploy theo thứ tự nào | 20 |
+| Quy mô | Trình tự qua CDN | File nhạc đi qua Cloudflare thế nào | 23 |
+
+Khi viết báo cáo hay luận văn, đặt sơ đồ theo đúng thứ tự giai đoạn này: người đọc đi từ "hệ thống làm gì" tới "hệ thống chạy thế nào".
+
 ### Checklist trước ngày ra mắt
 
 *Bảo mật*

@@ -43,3 +43,17 @@ term-19-tests blob/6bf51ebf-3ed0
 term-20-build blob/fad594ce-dc7c
 term-21-advisors blob/40b32fc9-8717
 term-23-edge blob/b96615f7-21ba
+dg-01-use-case blob/ab9200f6-a2f4
+dg-02-architecture blob/5e73f5c5-8215
+dg-04-erd-core blob/e4cfd5d9-0bed
+dg-06-seq-login blob/c82e08df-8ad5
+dg-09-state-song blob/869a4c5f-e71f
+dg-10-activity-worker blob/5cdb0aea-93cb
+dg-11-seq-playback blob/6a3d2e23-a266
+dg-13-erd-rooms blob/4c769d4a-0b3e
+dg-13-seq-station blob/685d5d9e-f675
+dg-14-seq-blind blob/a28ea9b5-f8f4
+dg-15-seq-group blob/b41c7812-35fc
+dg-16-navigation blob/b45a0677-35a3
+dg-20-deployment blob/59a09e04-28c3
+dg-23-seq-cdn blob/c0660d08-8087

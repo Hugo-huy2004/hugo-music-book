@@ -34,6 +34,12 @@ Nghe nhạc là việc xã hội: nghe cùng người yêu ở xa, cùng nhóm b
 
 **Database chỉ lưu "nhóm nào, ai là thành viên". Trạng thái phát đi qua kênh Realtime riêng tư. Chính sách RLS trên `realtime.messages` chỉ cho thành viên vào kênh nhóm, và chỉ cho chủ tài khoản vào kênh đồng bộ của mình.** Cùng một module `workspace.ts` phục vụ cả hai chế độ, chỉ khác tên kênh.
 
+### Sơ đồ trình tự: nghe chung theo nhóm
+
+![Trình tự tạo nhóm, vào nhóm và giữ đồng bộ](images/dg-15-seq-group.png)
+
+Database chỉ tham gia lúc tạo và vào nhóm (bước 1, 2) và để kiểm quyền vào kênh. Sau đó mọi tin đi qua kênh Realtime, không ghi bảng. Thành viên mới không cần chờ chủ nhóm làm gì: nó gửi `state_request`, chủ nhóm trả trạng thái hiện tại. Khung `loop` là bộ chỉnh lệch ở mục Ví dụ tính tay.
+
 ### Làm từng bước
 
 **Bước 1: bảng nhóm và thành viên.**

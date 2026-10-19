@@ -1,0 +1,19 @@
+flowchart LR
+  home["Trang chủ<br/>/"]
+  subgraph tabs["Thanh điều hướng"]
+    direction TB
+    search["Tìm kiếm /search"]
+    newp["Mới /new"]
+    radio["Đài /radio"]
+    party["Tiệc nghe /party"]
+    lib["Thư viện /library"]
+    acc["Tài khoản /account"]
+  end
+  home --> tabs
+  radio --> station["Đài đang phát"]
+  party --> blind["Phòng blind test"]
+  party --> group["Nhóm nghe chung"]
+  lib --> libsub["Bài đã thích · Danh sách phát<br/>Album · Nghệ sĩ · Đã tải"]
+  acc --> login["Đăng nhập (hộp thoại)<br/>mã 6 số · Google · mật khẩu"]
+  acc -- "role = admin" --> admin["Quản trị /admin<br/>Nhạc · Trạng thái đăng tải · Phòng nghe<br/>Người dùng · Nghệ sĩ & album"]
+  anyl["Mọi danh sách bài"] -- "bấm bài" --> player["Trình phát mini"] -- "bấm" --> full["Trình phát toàn màn hình<br/>lời bài · hàng chờ · chất lượng"]

@@ -1,0 +1,24 @@
+sequenceDiagram
+  autonumber
+  actor H as Chủ nhóm
+  participant DB as PostgreSQL
+  participant RT as Kênh riêng tư group:id
+  actor M as Thành viên
+  H->>DB: rpc create_group(name) → mã 6 ký tự
+  M->>DB: rpc join_group(mã)
+  H->>RT: Vào kênh, Presence track
+  M->>RT: Vào kênh (RLS: is_group_member)
+  M->>RT: state_request
+  RT-->>H: state_request
+  H->>RT: play_sync {bài, vị trí, at = giờ máy chủ, đang phát}
+  RT-->>M: play_sync
+  M->>M: Tải bài, tua tới vị trí + (giờ máy chủ − at)
+  loop Mỗi 250 ms
+    M->>M: So vị trí thật với vị trí mong đợi
+    alt Lệch > 0,35 giây
+      M->>M: Tua thẳng
+    else Lệch nhỏ
+      M->>M: Chỉnh tốc độ ±2–10 %
+    end
+  end
+  H->>RT: play_sync khi đổi bài, tạm dừng, tua
